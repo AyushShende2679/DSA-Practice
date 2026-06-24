@@ -1,0 +1,64 @@
+class Solution {
+public:
+    // Floyd's cycle pattern
+    int findDuplicate(vector<int>& nums) {
+        int slow = 0, fast = 0;
+
+        // detect intersection inside the cycle
+        do {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        } while (slow != fast);
+
+        //  find entry point of cycle = the duplicate number
+        slow = 0;
+        while (slow != fast) {
+            slow = nums[slow];
+            fast = nums[fast];
+        }
+        return slow;
+    }
+};
+/*  OR
+ // Same logic as above, but implemented in a different style.
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int slow = 0, fast = 0;
+
+        while (true) {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+
+            if (slow == fast) {
+                slow = 0;
+                while (slow != fast) {
+                    slow = nums[slow];
+                    fast = nums[fast];
+                }
+                return slow;
+            }
+        }
+        return 0;
+    }
+};
+*/
+/*
+OR                           naive approach
+Complexity
+Time: O(n)
+Space: O(n) (because of the hash map)
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        unordered_map<int, int> mp;
+
+        for (int i : nums) {
+            mp[i]++;
+            if (mp[i] > 1)
+                return i;
+        }
+        return 0;
+    }
+};
+*/
