@@ -1,0 +1,97 @@
+/** Logic: 
+1. A palindrome is a sequence that reads the same forward and backward.
+2. First, find the middle of the linked list using slow and fast pointers.
+3. Then take the second half of the linked list and reverse it.
+4. Now use two pointers:
+* first = head
+* second = newHead (head of reversed second half)
+5. Compare both halves:
+6. If values are equal, move both pointers forward one step.
+7. If any mismatch is found, reverse the second half again to restore the original list and return false.
+8. If all values match, return true.
+ */
+class Solution {
+public:
+    // Reverse a linked list
+    ListNode* reverse(ListNode* head) {
+        if (head == NULL || head->next == NULL)
+            return head;
+
+        ListNode* prev = NULL;
+        ListNode* temp = head;
+
+        while (temp != NULL) {
+            ListNode* front = temp->next; // store next node
+            temp->next = prev;            // reverse link
+            prev = temp;                  // move prev forward
+            temp = front;                 // move temp forward
+        }
+
+        return prev; // new head
+    }
+
+    bool isPalindrome(ListNode* head) {
+        if (!head || !head->next)
+            return true;
+
+        // Find middle using slow/fast pointer
+        ListNode* slow = head;
+        ListNode* fast = head;
+
+        while (fast->next != NULL && fast->next->next != NULL) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        // Reverse second half
+        ListNode* newHead = reverse(slow->next);
+
+        //  Compare both halves
+        ListNode* first = head;
+        ListNode* second = newHead;
+
+        while (second != NULL) {
+            if (first->val != second->val) {
+                reverse(newHead); // restore list before returning
+                return false;
+            }
+            first = first->next;
+            second = second->next;
+        }
+
+        // Restore list 
+        reverse(newHead);
+
+        return true;
+    }
+};
+/* OR    brute force approach
+
+class Solution {
+public:
+    bool isPalindrome(ListNode* head) {
+        ListNode* temp = head;
+        stack<int> st;
+
+        //  push all node values into the stack
+        while (temp != NULL) {
+            st.push(temp->val);
+            temp = temp->next;
+        }
+
+        // compare each node with stack top (reverse order)
+        temp = head;
+        while (temp != NULL) {
+            // If mismatch found, not a palindrome
+            if (temp->val != st.top())
+                return false;
+
+            temp = temp->next;
+            st.pop();
+        }
+
+        // If all matched, it's a palindrome
+        return true;
+    }
+};
+*/
