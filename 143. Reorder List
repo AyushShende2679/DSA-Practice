@@ -1,0 +1,67 @@
+/**
+ // 1. Find middle using slow-fast pointers
+// 2. Split list into two halves
+// 3. Reverse second half
+// 4. Merge both halves alternately
+//
+// Time Complexity: O(n)
+// Space Complexity: O(1)
+ */
+class Solution {
+public:
+    ListNode* reverse(ListNode* head) {
+        if (head == NULL || head->next == NULL)
+            return head;
+        ListNode* temp = head;
+        ListNode* prev = NULL;
+        while (temp != NULL) {
+            // Store next node before breaking the link
+            ListNode* front = temp->next;
+
+            // Reverse current node's pointer
+            temp->next = prev;
+
+            // Move prev and temp one step forward
+            prev = temp;
+            temp = front;
+        }
+        return prev; // new head
+    }
+    void reorderList(ListNode* head) {
+        if (head == NULL || head->next == NULL)
+            return;
+        //  Find middle of the list
+        ListNode* slow = head;
+        ListNode* fast = head;
+
+        while (fast->next != NULL && fast->next->next != NULL) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        // Split the list into two halves
+        ListNode* secondHalf = slow->next;
+        slow->next = NULL;
+        // Reverse the second half
+        ListNode* newHead = reverse(secondHalf);
+        ListNode* first = head;
+        ListNode* second = newHead;
+        //  Merge both halves alternately
+        while (second != NULL) {
+            // Save next node of first half
+            ListNode* front1 = first->next;
+
+            // Connect first node to second node
+            first->next = second;
+
+            // Save next node of second half
+            ListNode* front2 = second->next;
+
+            // Connect second node back to first half
+            second->next = front1;
+
+            // Move both pointers forward
+            first = front1;
+            second = front2;
+        }
+    }
+};
