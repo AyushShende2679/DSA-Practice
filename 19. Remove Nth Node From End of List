@@ -1,0 +1,78 @@
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* slow = head;
+        ListNode* fast = head;
+
+        // Move fast pointer n steps ahead
+        for (int i = 0; i < n; i++)
+            fast = fast->next;
+
+        // If fast becomes NULL, it means we need to remove the head node
+        if (fast == NULL) {
+            ListNode* del = head;
+            head = head->next;
+            delete del;
+            return head;
+        }
+
+        // Move both pointers until fast reaches the last node
+        // At this point, slow will be just before the node to delete
+        while (fast->next != NULL) {
+            slow = slow->next;
+            fast = fast->next;
+        }
+
+        ListNode* delNode = slow->next; // first store nth node
+        slow->next =
+            slow->next->next; // connect current node to the next of next node
+        delete delNode;       // Delete the nth node from the end
+
+        return head;
+    }
+};
+/*  OR
+class Solution {
+public:
+   // Time Complexity: O(N) (reverse + traverse + reverse = 3N)
+   // Space Complexity: O(1)
+   ListNode* reverse(ListNode* head) {
+       if (head == NULL || head->next == NULL)
+           return head;
+       ListNode* temp = head;
+       ListNode* prev = NULL;
+       while (temp != NULL) {
+           ListNode* front = temp->next;
+           temp->next = prev;
+           prev = temp;
+           temp = front;
+       }
+       return prev;
+   }
+   ListNode* removeNthFromEnd(ListNode* head, int n) {
+       if (!head)
+           return nullptr;
+
+       head = reverse(head);
+
+       // delete first node in reversed list
+       if (n == 1) {
+           ListNode* del = head;
+           head = head->next;
+           delete del;
+           return reverse(head);
+       }
+
+       ListNode* temp = head;
+
+       // move to (n-1)th node
+       for (int i = 1; i < n - 1; i++)
+           temp = temp->next;
+
+       ListNode* del = temp->next;
+       temp->next = del->next;
+       delete del;
+
+       return reverse(head);
+   }
+}; */
