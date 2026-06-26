@@ -1,0 +1,120 @@
+/* Node is defined as
+class Node {
+	public:
+	int data;
+	Node* next;
+	
+	Node(int x) {
+		data = x;
+		next = nullptr;
+	}
+};
+*/
+// Create three dummy lists to store all 0s, 1s and 2s separately.
+
+// Traverse the original linked list node by node.
+
+// For each node, detach it from the original list
+// and append it to the corresponding list (0, 1 or 2).
+
+// After processing all nodes, we have three independent lists:
+// one containing only 0s, one containing only 1s, and one containing only 2s.
+
+// Connect the end of the 0s list to the beginning of the 1s list.
+// If there are no 1s, connect the 0s list directly to the 2s list.
+
+// Connect the end of the 1s list to the beginning of the 2s list.
+
+// The head of the answer is the first non-empty list
+// (0s list, otherwise 1s list, otherwise 2s list).
+
+// Delete the dummy nodes since they are no longer needed.
+
+// Return the head of the rearranged linked list.
+
+
+class Solution {
+	public:
+	Node* segregate(Node* head) {
+		if (head == NULL || head ->next == NULL)
+			return head;
+		
+		// Dummy nodes for 0s, 1s and 2s lists
+		Node* zeroHead = new Node(-1);
+		Node* oneHead = new Node(-1);
+		Node* twoHead = new Node(-1);
+		
+		// Tail pointers for each list
+		Node* zero = zeroHead;
+		Node* one = oneHead;
+		Node* two = twoHead;
+		
+		Node* temp = head;
+		// Traverse the original list
+		while (temp != NULL) {
+			// Append node to the corresponding list
+			if (temp->data == 0) {
+				zero->next = temp;
+				zero = zero->next;
+			} else if (temp->data == 1) {
+				one->next = temp;
+				one = one->next;
+			} else { // temp->data == 2
+				two->next = temp;
+				two = two->next;
+			}
+			temp = temp->next;
+		}
+		// Connect 0s list to 1s list if it exists, otherwise to 2s list
+		zero->next = (oneHead->next)? oneHead->next: twoHead->next;
+		one ->next = twoHead->next; // Connect 1s list to 2s list
+		two->next = NULL; // since 2 is last to assign NULL
+		
+		Node* newHead = zeroHead->next; // Head of the segregated list
+		
+		// Delete dummy nodes
+		delete zeroHead;
+		delete oneHead;
+		delete twoHead;
+		
+		return newHead;
+	}
+};
+
+/*
+class Solution {
+	public:
+	// TC : O(2N), SC : O(1)
+	Node* segregate(Node* head) {
+		if (head == NULL || head ->next == NULL)
+			return head;
+		Node* temp = head;
+		int count0 = 0, count1 = 0, count2 = 0;
+		
+		while (temp != NULL) {
+			if (temp->data == 0)
+				count0++;
+			else if (temp->data == 1)
+				count1++;
+			else // temp->data == 2
+				count2++;
+			
+			temp = temp->next;
+		}
+		temp = head;
+		while (temp != NULL) {
+			if (count0) {
+				temp->data = 0;
+				count0--;
+			} else if (count1) {
+				temp->data = 1;
+				count1--;
+			} else { // count2
+				temp->data = 2;
+				count2--;
+			}
+			temp = temp->next;
+		}
+		return head;
+	}
+}; */
