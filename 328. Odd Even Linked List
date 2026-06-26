@@ -1,0 +1,46 @@
+/**
+// Step 1: If list has 0 or 1 node, return it as it is.
+
+// Step 2: Make two pointers:
+// odd → first node
+// even → second node
+
+// Step 3: Save the start of even list (evenHead)
+// so we can attach it later at the end
+
+// Step 4: Rearrange nodes:
+// - connect odd nodes together (skip even nodes)
+// - connect even nodes together (skip odd nodes)
+// - move both pointers forward
+
+// Step 5: Stop when even list ends
+
+// Step 6: Attach even list after odd list
+
+// Step 7: Return head
+ */
+
+class Solution {
+public:
+    ListNode* oddEvenList(ListNode* head) {
+        if (head == NULL || head->next == NULL)
+            return head;
+        ListNode* odd = head;        // first node
+        ListNode* even = head->next; // second node
+        ListNode* evenHead = even;   // store start of even list
+
+        // Even is always one step ahead so it reaches to NULL first
+        while (even != NULL && even->next != NULL) {
+            odd->next = odd->next->next;   // link next odd
+            even->next = even->next->next; // link next even
+
+            // move odd and even pointers forward
+            odd = odd->next;
+            even = even->next;
+        }
+        // Attach even list after odd list
+        odd->next = evenHead; // last connect
+
+        return head;
+    }
+};
