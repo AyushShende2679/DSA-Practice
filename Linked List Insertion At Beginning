@@ -1,0 +1,23 @@
+/*
+class Node {
+	public:
+	int data;
+	Node *next;
+	
+	Node(int x) {
+		data = x;
+		next = NULL;
+	}
+};
+*/
+
+class Solution {
+	public:
+	Node *insertAtFront(Node *head, int x) {
+		
+		Node* temp = new Node(x); // create dummy node and insert val
+		temp->next = head; // then connect with head
+		
+		return temp; // return temp as new head
+	}
+};
