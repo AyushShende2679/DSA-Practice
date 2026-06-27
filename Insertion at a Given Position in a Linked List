@@ -1,0 +1,40 @@
+/*
+class Node {
+	public:
+	int data;
+	Node *next;
+	Node(int x) {
+		data = x;
+		next = nullptr;
+	}
+};
+*/
+
+class Solution {
+	public:
+	Node *insertPos(Node *head, int pos, int val) {
+		Node* newNode = new Node(val);
+		
+		// insert at head or empty list
+		if (pos == 1) {
+			newNode->next = head;
+			return newNode;
+		}
+		
+		// Traverse to find (pos - 1)th node
+		Node* temp = head;
+		int count = 0;
+		while (temp != NULL) {
+			count++;
+			if (count == pos - 1) {
+				// Insert newNode between temp and temp->next
+				newNode->next = temp->next; // link new node to next node
+				temp->next = newNode; // link previous node to new node
+				break;
+			}
+			temp = temp->next;
+		}
+		
+		return head;
+	}
+};
