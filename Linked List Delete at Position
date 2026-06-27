@@ -1,0 +1,44 @@
+/* Node Structure
+class Node {
+	public:
+	int data;
+	Node* next;
+	Node(int x) {
+		data = x;
+		next = nullptr;
+	}
+};
+*/
+
+class Solution {
+	public:
+	Node *deleteAtPosition(Node *head, int pos) {
+		if (head == NULL)
+			return NULL;
+		
+		// List have only one node
+		if (pos == 1) {
+			Node* delNode = head;
+			head = head->next;
+			delete delNode;
+			return head;
+		}
+		Node* temp = head;
+		Node* prev = NULL;
+		int count = 0;
+		
+		while (temp != NULL) {
+			count++;
+			
+			if (count == pos) {
+				prev ->next = prev->next->next; // or  prev->next = temp->next;
+				delete temp;
+				break;
+			}
+			prev = temp ; // it always behind the temp
+			temp = temp->next;
+		}
+		
+		return head;
+	}
+};
