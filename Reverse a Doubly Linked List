@@ -1,0 +1,44 @@
+/* Structure of doubly linked list node
+class Node {
+	public:
+	int data;
+	Node *next;
+	Node *prev;
+	
+	Node(int val) {
+		data = val;
+		next = nullptr;
+		prev = nullptr;
+	}
+};
+
+*/
+// Logic:
+// 1. Traverse the doubly linked list node by node.
+// 2. For each node, swap its 'next' and 'prev' pointers.
+// 3. After swapping, move to the original next node, which is now stored in 'prev'.
+// 4. Continue until all nodes have been processed.
+// 5. After the loop, 'back' points to the previous node of the original last node.
+// 6. Since the original last node becomes the new head after reversal,
+//    update 'head' to 'back->prev'.
+// 7. Return the new head of the reversed doubly linked list.
+
+class Solution {
+	public:
+	Node *reverse(Node *head) {
+		Node* temp = head;
+		Node * back = NULL;
+		while (temp != NULL) {
+			back = temp->prev; // Store previous node
+			temp->prev = temp->next; // Swap prev and next
+			temp->next = back;
+			temp = temp->prev; // Move to the next node in the original list
+		}
+		// back points to the previous node of the original last node.
+		// After reversal, back->prev becomes the new head.
+		if (back != NULL)
+			head = back->prev;
+		
+		return head;
+	}
+};
