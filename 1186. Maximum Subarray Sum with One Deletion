@@ -1,0 +1,45 @@
+noDelete = Maximum subarray sum ending at the current index without any deletion.
+oneDelete = Maximum subarray sum ending at the current index after deleting one element.
+
+// Base case:
+// - At index 0, noDelete = arr[0].
+// - oneDelete is invalid because we cannot have a non-empty subarray with one deletion at the first element.
+
+// For each remaining element:
+
+1. Update oneDelete:
+ - Extend a subarray where one deletion has already been used.
+ - OR delete the current element, so take the previous noDelete.
+2. Update noDelete:
+   - Extend the previous subarray.
+ - OR start a new subarray from the current element.
+3. Update the overall maximum answer.
+
+
+class Solution {
+public:
+    int maximumSum(vector<int>& arr) {
+        int n = arr.size();
+        int noDelete = arr[0];
+        // Maximum subarray sum ending at current index with one deletion
+        // Initialized to a large negative value since no deletion is possible
+        // initially
+        int oneDelete = -1e9;// use -1e9 since INT_MIN might occur overflow
+        int ans = arr[0];
+
+        for (int i = 1; i < n; i++) {
+            // Two choices:
+            // 1. Extend a subarray where one deletion has already been used.
+            // 2. Delete the current element, so take the previous noDelete.
+            oneDelete = max(oneDelete + arr[i], noDelete);
+
+            // Standard Kadane's algorithm:
+            // Either extend the previous subarray or start a new one.
+            noDelete = max(noDelete + arr[i], arr[i]);
+
+            // Update the overall maximum.
+            ans = max({ans, noDelete, oneDelete});
+        }
+        return ans;
+    }
+};
