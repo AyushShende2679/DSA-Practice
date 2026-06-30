@@ -1,0 +1,48 @@
+# Kadane's Logic
+
+1. **Start with the first element.**
+
+   * Assume the first element is the beginning of the subarray.
+   * Traverse from the next element.
+
+2. **At every element, ask only one question:**
+
+   * **Should I continue my current subarray by adding this element?**
+   * **Or should I start a fresh subarray from this element?**
+
+3. **Evaluate both possibilities.**
+
+   * Choose whichever is better according to the problem.
+   * Use `max()` if the problem asks for the maximum.
+   * Use `min()` if the problem asks for the minimum.
+   * If the problem involves **both positive and negative contributions (like maximum absolute sum)**, then maintain **both ****`max`**** and ****`min`**** cases simultaneously**.
+
+4. **Update the final answer.**
+
+   * After deciding the current subarray, compare it with the answer found so far.
+   * Again, use `max()` or `min()` depending on the problem.
+
+### One-line Memory Trick
+
+**Kadane = Continue or Restart → Choose Better → Update Answer.**
+
+
+class Solution {
+public:
+    int maxAbsoluteSum(vector<int>& nums) {
+        int n = nums.size();
+        // store starting element
+        int minSum = nums[0], maxSum = nums[0], ans = abs(nums[0]);
+
+        // Traverse the array
+        for (int i = 1; i < n; i++) {
+            // continue by adding with next element or new start
+            minSum = min(minSum + nums[i], nums[i]);
+            maxSum = max(maxSum + nums[i], nums[i]);
+
+            // Update the answer with the largest absolute sum
+            ans = max({ans, abs(minSum), abs(maxSum)});
+        }
+        return ans;
+    }
+};
