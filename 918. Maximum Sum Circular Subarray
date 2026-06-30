@@ -1,0 +1,63 @@
+Logic: 
+
+1. Find the maximum subarray sum using Kadane.
+2. Find the minimum subarray sum using Kadane.
+3. Compute the total sum of the array.
+4. Circular maximum = totalSum - minSum.
+5. If all elements are negative (maxSum < 0), return maxSum.
+6. Otherwise, return max(maxSum, circularSum).
+
+class Solution {
+public:
+    // Returns the minimum subarray sum using Kadane's Algorithm
+    int kadanes_min(vector<int>& nums, int n) {
+        int sum = nums[0], minSum = nums[0];
+
+        for (int i = 1; i < n; i++) {
+            // Continue the current subarray or start a new one
+            sum = min(sum + nums[i], nums[i]);
+
+            // Update the overall minimum subarray sum
+            minSum = min(minSum, sum);
+        }
+        return minSum;
+    }
+
+    // Returns the maximum subarray sum using Kadane's Algorithm
+    int kadanes_max(vector<int>& nums, int n) {
+        int sum = nums[0], maxSum = nums[0];
+
+        for (int i = 1; i < n; i++) {
+            // Continue the current subarray or start a new one
+            sum = max(sum + nums[i], nums[i]);
+
+            // Update the overall maximum subarray sum
+            maxSum = max(maxSum, sum);
+        }
+        return maxSum;
+    }
+
+    int maxSubarraySumCircular(vector<int>& nums) {
+        int n = nums.size();
+
+        // Calculate the total sum of the array
+        int totalSum = accumulate(nums.begin(), nums.end(), 0);
+
+        // Minimum subarray sum
+        int minSum = kadanes_min(nums, n);
+
+        // Maximum subarray sum
+        int maxSum = kadanes_max(nums, n);
+
+        // Maximum circular subarray sum
+        int circularSum = totalSum - minSum;
+
+        // If all elements are negative,
+        // circular sum becomes 0, which is invalid
+        if (maxSum < 0)
+            return maxSum;
+
+        // Return the better of normal and circular subarray sums
+        return max(maxSum, circularSum);
+    }
+};
