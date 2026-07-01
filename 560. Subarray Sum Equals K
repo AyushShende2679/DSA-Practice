@@ -1,0 +1,25 @@
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        int n = nums.size();
+        unordered_map<int, int> mp;
+        // Initialize with prefix sum 0 occurring once
+        // This handles the case when a subarray starting from index 0 sums to k
+        mp[0] = 1;
+
+        int prefixSum = 0, count = 0;
+
+        for (int i = 0; i < n; i++) {
+            prefixSum += nums[i];
+
+            // If (prefixSum - k) exists, then there are
+            // mp[prefixSum - k] subarrays ending at the current index
+            // whose sum equals k
+            if (mp.find(prefixSum - k) != mp.end()) {
+                count += mp[prefixSum - k];
+            }
+            mp[prefixSum]++;
+        }
+        return count;
+    }
+};
