@@ -1,0 +1,56 @@
+// Logic:
+//
+// 1. Traverse the array and keep adding elements to get the current prefix sum.
+//
+// 2. If the current prefix sum becomes equal to k,
+//    it means the subarray from index 0 to the current index has sum k.
+//
+// 3. Otherwise, check if (prefixSum - k) was seen before.
+//    Why?
+//    Because:
+//    Current Prefix Sum = Left Part + Required Subarray
+//    So,
+//    Left Part = Current Prefix Sum - k
+//
+//    If that left part exists, removing it leaves a subarray
+//    whose sum is exactly k.
+//
+// 4. Calculate the length of that subarray:
+//    length = currentIndex - previousIndex
+//    Update the maximum length if it is larger.
+//
+// 5. Store the first occurrence of every prefix sum.
+//    We store the first occurrence because it gives the
+//    longest possible subarray.
+
+class Solution {
+	public:
+	int longestSubarray(vector<int>& arr, int k) {
+		int n = arr.size();
+		map<int, int> mp;
+		int prefixSum = 0;
+		int maxLen = 0;
+		
+		for (int i = 0; i < n; i++) {
+			
+			prefixSum += arr[i];
+			
+			// If subarray starts from index 0
+			if (prefixSum == k) {
+				maxLen = i + 1;
+			}
+			
+			// Check if there is a previous prefix sum = prefixSum - k
+			if (mp.find(prefixSum - k) != mp.end()) {
+				maxLen = max(maxLen, i - mp[prefixSum - k]);
+			}
+			
+			// Store only the first occurrence of a prefix sum
+			if (mp.find(prefixSum) == mp.end()) {
+				mp[prefixSum] = i;
+			}
+		}
+		
+		return maxLen;
+	}
+};
