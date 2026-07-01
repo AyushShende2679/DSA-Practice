@@ -1,0 +1,44 @@
+// Logic:
+//
+// 1. Find the total sum of all elements in the array.
+//
+// 2. Start with leftSum = 0.
+//
+// 3. For every index:
+//    - Calculate the right sum by removing the left sum
+//      and the current element from the total sum.
+//      rightSum = totalSum - leftSum - currentElement
+//
+// 4. Compare:
+//    - If leftSum == rightSum,
+//      then the current index is the pivot index.
+//
+// 5. If they are not equal,
+//    add the current element to leftSum
+//    and move to the next index.
+//
+// 6. If no index satisfies the condition,
+//    return -1.
+
+class Solution {
+public:
+    int pivotIndex(vector<int>& nums) {
+        int n = nums.size();
+        int leftSum = 0, rightSum = 0;
+        // Calculate the total sum of the array
+        int totalSum = accumulate(nums.begin(), nums.end(), 0);
+
+        for (int i = 0; i < n; i++) {
+            // Right sum = Total sum - Left sum - Current element
+            rightSum = totalSum - leftSum - nums[i];
+
+            if (leftSum == rightSum)
+                return i;
+
+            // Include the current element in the left sum
+            // before moving to the next index
+            leftSum += nums[i];
+        }
+        return -1;
+    }
+};
