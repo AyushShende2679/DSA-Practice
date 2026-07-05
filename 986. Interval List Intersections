@@ -1,0 +1,101 @@
+/*
+Logic:
+
+1. Use two pointers, one for each interval list.
+
+2. Compare the current intervals from both lists.
+
+3. Check if the two intervals overlap.
+   - If they do, the intersection is:
+       start = max(start1, start2)
+       end = min(end1, end2)
+     Store this intersection.
+
+4. After processing the current pair, move the pointer of the interval
+   that ends first because it cannot overlap with any future interval
+   from the other list.
+
+5. Continue until one of the lists is completely traversed.
+
+Time Complexity: O(n + m)
+Space Complexity: O(1) (excluding the output array)
+*/
+class Solution {
+public:
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& firstList,
+                                             vector<vector<int>>& secondList) {
+        int n = firstList.size(), m = secondList.size();
+        vector<vector<int>> res;
+        int i = 0, j = 0;
+
+        // Traverse both interval lists using two pointers
+        while (i < n && j < m) {
+            int start1 = firstList[i][0];
+            int end1 = firstList[i][1];
+            int start2 = secondList[j][0];
+            int end2 = secondList[j][1];
+
+            // If first interval starts before (or at) the second
+            if (start1 <= start2) {
+                // Overlap exists if first interval ends after second starts
+                if (end1 >= start2) {
+                    start1 = max(start1, start2); // Intersection start
+                    end1 = min(end1, end2);       // Intersection end
+                    res.push_back({start1, end1});
+                    // or
+                    //  res.push_back({max(start1, start2), min(end1, end2)});
+                }
+            } // If second interval starts before the first
+            else {
+
+                // Overlap exists if second interval ends after first starts
+                if (end2 >= start1) {
+                    start1 = max(start1, start2); // Intersection start
+                    end1 = min(end1, end2);       // Intersection end
+                    res.push_back({start1, end1});
+                    // or
+                    //  res.push_back({max(start1, start2), min(end1, end2)});
+                }
+            }
+            // Move the pointer of the interval that ends first,
+            // since it cannot overlap with any future interval.
+            if (end1 < end2)
+                i++;
+            else
+                j++;
+        }
+        return res;
+    }
+};
+/* OR - It uses same logic , just implementation is different
+
+class Solution {
+public:
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& firstList,
+                                             vector<vector<int>>& secondList) {
+        int n = firstList.size(), m = secondList.size();
+        vector<vector<int>> res;
+        int i = 0, j = 0;
+
+        while (i < n && j < m) {
+            int start1 = firstList[i][0];
+            int end1 = firstList[i][1];
+            int start2 = secondList[j][0];
+            int end2 = secondList[j][1];
+
+            int start = max(start1, start2);
+            int end = min(end1, end2);
+
+            if (start <= end)
+                res.push_back({start, end});
+
+            if (end1 < end2)
+                i++;
+            else
+                j++;
+        }
+
+        return res;
+    }
+};
+*/
