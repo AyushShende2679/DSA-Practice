@@ -1,0 +1,32 @@
+class Solution {
+	public:
+	bool isIntersect(vector<vector<int>> intervals) {
+		int n = intervals.size();
+		
+		// If there are 0 or 1 intervals, no intersection is possible
+		if (n <= 1)
+			return false;
+		
+		sort(intervals.begin(), intervals.end());
+		
+		// Store the start and end of the first interval
+		int start1 = intervals[0][0];
+		int end1 = intervals[0][1];
+		
+		for (int i = 1; i<n; i++) {
+			int start2 = intervals[i][0];
+			int end2 = intervals[i][1];
+			
+			// If the previous interval ends after or at the current
+			// interval's start, the intervals overlap
+			if (end1 >= start2)
+				return true;
+			
+			// Update the previous interval for the next comparison
+			// 			start1 = start2;
+			end1 = end2;
+		}
+		// No overlapping intervals found
+		return false;
+	}
+};
