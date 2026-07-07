@@ -1,0 +1,46 @@
+// Logic:
+// 1. Sort all meeting start times and end times separately.
+// 2. Use two pointers:
+//    - One pointer for the next meeting to start.
+//    - One pointer for the next meeting to end.
+// 3. If the next meeting starts before the earliest meeting ends,
+//    we need a new room.
+// 4. Otherwise, a meeting has already ended, so its room becomes
+//    available and can be reused.
+// 5. Keep track of the maximum number of rooms used at the same time.
+// 6. That maximum is the minimum number of meeting rooms required.
+
+class Solution {
+	public:
+	int minMeetingRooms(vector<int> &start, vector<int> &end) {
+		int n = start.size();
+		
+		// Sort start times and end times
+		sort(start.begin(), start.end());
+		sort(end.begin(), end.end());
+		
+		int i = 0, j = 0;
+		int room = 0, maxRoom = 0;
+		
+		// Check every meeting start time
+		while (i < n) { // since starting (i)  point check first so it reaches first at the end
+			
+			// If a meeting starts before the earliest meeting ends,
+			// we need one more room.
+			if (start[i] < end[j]) {
+				room++;
+				maxRoom = max(maxRoom, room);
+				i++;
+			}
+			// Otherwise, one meeting has finished,
+			// so its room becomes free.
+			else {
+				room--;
+				j++;
+			}
+		}
+		
+		// Maximum rooms used at the same time
+		return maxRoom;
+	}
+};
