@@ -1,0 +1,27 @@
+class Solution {
+public:
+    string removeDuplicates(string s) {
+        int n = s.size();
+        stack<char> st;
+
+        for (int i = 0; i < n; i++) {
+
+            // If current character is same as the top of the stack,
+            // remove the top character (adjacent duplicate found)
+            if (!st.empty() && st.top() == s[i]) {
+                st.pop();
+            } else
+                // Otherwise, push the current character onto the stack
+                st.push(s[i]);
+        }
+        string res;
+        while (!st.empty()) {
+            res += st.top();
+            st.pop();
+        }
+        // Stack gives characters in reverse order,
+        // so reverse the string to restore the original order
+        reverse(res.begin(), res.end());
+        return res;
+    }
+};
