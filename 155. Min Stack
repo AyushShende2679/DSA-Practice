@@ -1,0 +1,73 @@
+// Keep track of the current minimum element.
+
+// While pushing:
+// 1. If the stack is empty, push the value and make it the minimum.
+// 2. If the new value is greater than or equal to the current minimum,
+//    push it normally.
+// 3. If the new value is smaller than the current minimum,
+//    store a special encoded value instead of the actual value.
+//    Then update the minimum to the new value.
+
+// While popping:
+// 1. If the top is a normal value, simply remove it.
+// 2. If the top is an encoded value, it means the current minimum
+//    is being removed.
+// 3. Decode the previous minimum using the encoded value,
+//    then remove the top element.
+
+// While getting the top:
+// 1. If the top is a normal value, return it.
+// 2. If the top is an encoded value, the actual top element
+//    is the current minimum.
+
+// While getting the minimum:
+// Simply return the stored minimum.
+
+class MinStack {
+private:
+    stack<long long> st;
+    long long minimum;
+
+public:
+    MinStack() {
+        minimum = LLONG_MAX;
+    }
+
+    void push(int value) {
+        if (st.empty()) {
+            minimum = value;
+            st.push(value);
+        } else if (value >= minimum) {
+            st.push(value);
+        } else {
+            st.push(2LL * value - minimum);
+            minimum = value;
+        }
+    }
+
+    void pop() {
+        if (st.empty())
+            return;
+
+        long long x = st.top();
+        st.pop();
+
+        if (x < minimum)
+            minimum = 2 * minimum - x;
+
+        if (st.empty())
+            minimum = LLONG_MAX;
+    }
+
+    int top() {
+        if (st.empty())
+            return -1;
+
+        long long x = st.top();
+        return (x >= minimum) ? x : minimum;
+    }
+
+    int getMin() {
+        return st.empty() ? -1 : minimum;
+    }
+};
