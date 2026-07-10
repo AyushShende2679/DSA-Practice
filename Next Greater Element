@@ -1,0 +1,51 @@
+/*
+Logic:
+
+1. Traverse the array from right to left because the next greater element
+   always lies on the right side of the current element.
+
+2. Maintain a monotonic decreasing stack.
+   The stack stores only elements that can potentially be the next greater
+   element for the upcoming (left-side) elements.
+
+3. For each element:
+   - Remove all elements from the stack that are smaller than or equal to
+     the current element, since they can never be the next greater element.
+   - If the stack becomes empty, there is no greater element on the right,
+     so store -1.
+   - Otherwise, the top of the stack is the next greater element.
+
+4. Push the current element onto the stack so it can act as the next
+   greater element for elements to its left.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+*/
+
+class Solution {
+	public:
+	vector<int> nextLargerElement(vector<int>& arr) {
+		int n = arr.size();
+		stack<int> st; // Monotonic decreasing stack
+		vector<int> nge(n);
+		
+		for (int i = n - 1; i >= 0; i--) {
+			// Remove all elements smaller than or equal to the current element
+			// because they cannot be the next greater element
+			while (!st.empty() && st.top() <= arr[i])
+				st.pop();
+			
+			// If the stack is empty, no greater element exists on the right
+			if (st.empty())
+				nge[i] = -1;
+			else
+				// Top of the stack is the next greater element
+			nge[i] = st.top();
+			
+			// Push the current element onto the stack
+			st.push(arr[i]);
+			
+		}
+		return nge;
+	}
+};
