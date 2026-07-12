@@ -1,0 +1,27 @@
+class Solution {
+	public:
+	vector<int> prevSmaller(vector<int>& arr) {
+		int n = arr.size();
+		// Monotonic increasing stack to store previous elements
+		stack<int> st;
+		
+		// Stores the previous smaller element for each index
+		vector<int> pse(n);
+		
+		// Traverse the array from left to right
+		for (int i = 0; i<n; i++) {
+			// Remove all elements that are greater than or equal
+			// to the current element, since they cannot be the
+			// previous smaller element for this or any future element.
+			while (!st.empty() && st.top() >= arr[i])
+				st.pop();
+			
+			// If the stack is empty, there is no previous smaller element.
+			// Otherwise, the top of the stack is the previous smaller element.
+			pse[i] = st.empty()? -1: st.top();
+			
+			st.push(arr[i]);
+		}
+		return pse;
+	}
+};
