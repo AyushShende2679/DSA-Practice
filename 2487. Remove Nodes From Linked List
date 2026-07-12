@@ -1,0 +1,71 @@
+// Logic: 
+We need to remove every node that has a greater value somewhere on its right.
+
+// Since a singly linked list cannot be traversed backwards,
+// first push all nodes into a stack.
+// Now, when we pop from the stack, we'll process the list
+// from the last node towards the first node.
+
+// The last node is always kept because there is no node
+// to its right that could be greater.
+
+// Treat the last node's value as the largest value seen so far
+// while moving from right to left.
+
+// Start building the answer list with this last node.
+
+// For every remaining node (moving right to left):
+// - If its value is smaller than the largest value seen so far,
+//   it means there exists a greater node on its right,
+//   so this node should be removed.
+// - Otherwise, keep this node, add it to the front of the
+//   answer list, and update the largest value seen so far.
+
+// At the end, the newly built list contains only the nodes
+// that do not have any greater value on their right.
+
+
+class Solution {
+public:
+    ListNode* removeNodes(ListNode* head) {
+
+        // Stack to store pointers to all nodes
+        stack<ListNode*> st;
+        ListNode* temp = head;
+
+        // Push all nodes into the stack
+        while (temp != NULL) {
+            st.push(temp);
+            temp = temp->next;
+        }
+
+        // The last node is always part of the answer
+        temp = st.top();
+        st.pop();
+
+        int maxNode = temp->val;
+
+        // Create the new list starting from the last node
+        ListNode* newHead = new ListNode(temp->val);
+
+        // Process remaining nodes from right to left
+        while (!st.empty()) {
+            temp = st.top();
+            st.pop();
+
+            // Skip nodes smaller than the maximum value seen so far
+            if (temp->val < maxNode)
+                continue;
+
+            // Include the current node in the answer
+            ListNode* newNode = new ListNode(temp->val);
+            newNode->next = newHead;
+            newHead = newNode;
+
+            // Update the maximum value
+            maxNode = temp->val;
+        }
+
+        return newHead;
+    }
+};
