@@ -1,0 +1,24 @@
+class Solution {
+public:
+    vector<int> sortedSquares(vector<int>& nums) {
+        int n = nums.size();
+        int i = 0, j = n - 1;
+        int k = n - 1;
+        vector<int> res(n);
+
+        while (i <= j) {
+            int sq1 = nums[i] * nums[i];
+            int sq2 = nums[j] * nums[j];
+
+            if (sq1 < sq2) {
+                res[k] = sq2;
+                j--;
+            } else {
+                res[k] = sq1;
+                i++;
+            }
+            k--;
+        }
+        return res;
+    }
+};
