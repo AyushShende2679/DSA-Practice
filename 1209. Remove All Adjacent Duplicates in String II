@@ -1,0 +1,47 @@
+// Use a stack to store each character along with its consecutive frequency.
+
+// Traverse the string:
+// - If the current character matches the top of the stack,
+//   increase its frequency.
+// - If the frequency becomes k, remove that entire group.
+// - Otherwise, start a new group with frequency 1.
+
+// After processing all characters, the stack contains
+// only the groups that were not removed.
+
+// Reconstruct the answer by repeating each character
+// according to its stored frequency.
+
+// Since the stack returns elements in reverse order,
+// reverse the constructed string before returning it.
+
+class Solution {
+public:
+    string removeDuplicates(string s, int k) {
+        int n = s.size();
+        stack<pair<char, int>> st;
+
+        for (int i = 0; i < n; i++) {
+            // If the current character matches the character on top of the
+            // stack, increase its consecutive count.
+            if (!st.empty() && st.top().first == s[i]) {
+                st.top().second++;
+                // If the count reaches k, remove this group from the stack
+                if (st.top().second == k)
+                    st.pop();
+            } else {
+                // Otherwise, start a new group with count = 1.
+                st.push({s[i], 1});
+            }
+        }
+        string res;
+        while (!st.empty()) {
+            // Append the character 'count' times.
+            // Example: {'a', 3} -> "aaa"
+            res.append(st.top().second, st.top().first);
+            st.pop();
+        }
+        reverse(res.begin(), res.end());
+        return res;
+    }
+};
