@@ -1,0 +1,103 @@
+// Logic: 
+
+// Split the given path into directory names using '/' as the delimiter.
+
+// Ignore empty directory names and "." since they do not change the path.
+
+// If the current directory is "..", move to the parent directory by
+// removing the last valid directory, if one exists.
+
+// Otherwise, store the current directory as part of the canonical path.
+
+// If no valid directories remain, return the root directory ("/").
+
+// Join all remaining valid directories with '/' to construct
+// the simplified absolute path.
+
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string token;
+        stringstream ss(path);
+        vector<string> st; // vector is more convinent than stack since we don't
+                           // have to reverse the result
+
+        // Split the path using '/' as the delimiter
+        while (getline(ss, token, '/')) {
+
+            // Ignore empty strings ("//") and current directory "."
+            if (token.empty() || token == ".")
+                continue;
+
+            // ".." means move to the parent directory
+            if (token == "..") {
+                // Remove the last valid directory if it exists
+                if (!st.empty())
+                    st.pop_back();
+            }
+            // Store valid directory names
+            else {
+                st.push_back(token);
+            }
+        }
+
+        // If no directories remain, return the root directory
+        if (st.empty())
+            return "/";
+
+        // Construct the simplified canonical path
+        string res;
+        for (const auto& dir : st) {
+            res += "/" + dir;
+        }
+
+        return res;
+    }
+};
+
+// OR  - Both have same complexity 
+// Time Complexity: O(n)
+// Space Complexity: O(n)
+
+class Solution {
+public:
+    string simplifyPath(string path) {
+        string token;
+        stringstream ss(path);
+        stack<string> st;
+
+        // Split the path using '/' as the delimiter
+        // getline(input_stream, variable, delimiter) 
+        while (getline(ss, token, '/')) {
+
+            // Ignore empty strings (caused by "//")
+            // and current directory "."
+            if (token.empty() || token == ".")
+                continue;
+
+            // ".." means move to the parent directory
+            if (token == "..") {
+                // Go back only if there is a directory to remove
+                if (!st.empty())
+                    st.pop();
+            }
+            // Otherwise, it's a valid directory name
+            else {
+                st.push(token);
+            }
+        }
+
+        // If no valid directories remain, return the root
+        if (st.empty())
+            return "/";
+
+        // Build the simplified path
+        string res;
+        while (!st.empty()) {
+            res = "/" + st.top() + res;
+            st.pop();
+        }
+
+        return res;
+    }
+};
