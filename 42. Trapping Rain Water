@@ -1,0 +1,49 @@
+// Logic: 
+// Maintain two pointers: one at the left end and one at the right end.
+
+// Keep track of the maximum height encountered from both the left and right sides.
+
+// At each step, process the side with the smaller height because the amount of
+// water that can be trapped there is already determined by its maximum boundary.
+
+// If the current bar is lower than the maximum seen on that side,
+// add the difference to the answer as trapped water.
+
+// Otherwise, update the maximum height for that side.
+
+// Move the processed pointer inward and continue until both pointers meet.
+
+// Return the total trapped water accumulated.
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int l = 0, r = height.size() - 1;
+        int leftMax = 0, rightMax = 0, total = 0;
+
+        // Process until both pointers meet
+        while (l < r) {
+            if (height[l] <= height[r]) {
+                // If current height is below leftMax,
+                // water can be trapped here
+                if (leftMax > height[l])
+                    total += leftMax - height[l];
+                else
+                    // Update leftMax if current bar is taller
+                    leftMax = height[l];
+                l++;
+
+            } else {
+                // If current height is below rightMax,
+                // water can be trapped here
+                if (rightMax > height[r])
+                    total += rightMax - height[r];
+                else
+                    // Update rightMax if current bar is taller
+                    rightMax = height[r];
+                r--;
+            }
+        }
+        return total;
+    }
+};
