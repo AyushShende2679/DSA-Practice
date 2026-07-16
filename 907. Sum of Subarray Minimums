@@ -1,0 +1,92 @@
+/*
+Logic:
+
+1. Every element arr[i] contributes as the minimum in some subarrays.
+2. Instead of generating all subarrays, calculate how many subarrays have
+   arr[i] as their minimum.
+
+3. For each index i, find:
+   - Previous Smaller Element (PSE): first smaller element on the left.
+   - Next Smaller Element (NSE): first smaller element on the right.
+
+4. The number of choices for the left boundary is:
+      left = i - PSE[i]
+
+5. The number of choices for the right boundary is:
+      right = NSE[i] - i
+
+6. Therefore, the total number of subarrays in which arr[i] is the minimum is:
+      left * right
+
+7. Contribution of arr[i] to the final answer:
+      arr[i] * left * right
+
+8. Sum the contribution of every element and take modulo 1e9+7.
+
+Time Complexity: O(n)
+Space Complexity: O(n)
+
+Note:
+- Use one strict comparison and one non-strict comparison while finding
+  PSE and NSE to handle duplicate values correctly.
+*/
+
+class Solution {
+public:
+    // Find the index of the Next Smaller Element for each element
+    vector<int> find_NSE(vector<int>& arr, int n) {
+        stack<int> st;
+        vector<int> nse(n);
+
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove elements greater than or equal to current element
+            while (!st.empty() && arr[st.top()] >= arr[i])
+                st.pop();
+
+            // Store index of next smaller element, or n if none exists
+            nse[i] = st.empty() ? n : st.top();
+
+            st.push(i);
+        }
+        return nse;
+    }
+
+    // Find the index of the Previous Smaller Element for each element
+    vector<int> find_PSE(vector<int>& arr, int n) {
+        stack<int> st;
+        vector<int> pse(n);
+
+        for (int i = 0; i < n; i++) {
+            // Remove elements strictly greater than current element
+            while (!st.empty() && arr[st.top()] > arr[i])
+                st.pop();
+
+            // Store index of previous smaller element, or -1 if none exists
+            pse[i] = st.empty() ? -1 : st.top();
+
+            st.push(i);
+        }
+        return pse;
+    }
+
+    int sumSubarrayMins(vector<int>& arr) {
+        int n = arr.size();
+
+        // Compute next and previous smaller element indices
+        vector<int> nse = find_NSE(arr, n);
+        vector<int> pse = find_PSE(arr, n);
+
+        int modulo = 1e9 + 7;
+        long long total = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Number of subarrays extending to the left and right
+            long long l = i - pse[i];
+            long long r = nse[i] - i;
+
+            // Contribution of arr[i] as the minimum element
+            total = (total + (l * r % modulo) * arr[i]) % modulo;
+        }
+        return total;
+    }
+};
