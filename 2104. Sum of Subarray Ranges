@@ -1,0 +1,157 @@
+// Logic:
+//
+// 1. Every element contributes to the answer as both:
+//    - the maximum of some subarrays
+//    - the minimum of some subarrays
+//
+// 2. To compute the total contribution as a maximum:
+//    - Find the Previous Greater Element (PGE) for every index.
+//    - Find the Next Greater Element (NGE) for every index.
+//    - The number of subarrays in which arr[i] is the maximum is:
+//          (distance to previous greater) × (distance to next greater)
+//      = (i - PGE[i]) × (NGE[i] - i)
+//    - Multiply this count by arr[i] and add it to the total maximum sum.
+//
+// 3. To compute the total contribution as a minimum:
+//    - Find the Previous Smaller Element (PSE) for every index.
+//    - Find the Next Smaller Element (NSE) for every index.
+//    - The number of subarrays in which arr[i] is the minimum is:
+//          (distance to previous smaller) × (distance to next smaller)
+//      = (i - PSE[i]) × (NSE[i] - i)
+//    - Multiply this count by arr[i] and add it to the total minimum sum.
+//
+// 4. The required answer is:
+//        (Sum of contributions as maximum)
+//      - (Sum of contributions as minimum)
+//
+// 5. Monotonic stacks are used to find the previous and next greater/smaller
+//    elements in O(n) time, making the overall time complexity O(n).
+
+
+class Solution {
+public:
+    // Finds the index of the Previous Greater Element for every element.
+    // If no greater element exists on the left, stores -1.
+    vector<int> find_PGE(vector<int>& arr, int n) {
+        vector<int> pge(n);
+        stack<int> st;
+
+        for (int i = 0; i < n; i++) {
+            // Remove all elements smaller than the current element
+            while (!st.empty() && arr[st.top()] < arr[i])
+                st.pop();
+
+            // Top of the stack is the previous greater element
+            pge[i] = st.empty() ? -1 : st.top();
+
+            // Push current index onto the stack
+            st.push(i);
+        }
+
+        return pge;
+    }
+
+    // Finds the index of the Next Greater Element for every element.
+    // If no greater element exists on the right, stores n.
+    vector<int> find_NGE(vector<int>& arr, int n) {
+        vector<int> nge(n);
+        stack<int> st;
+
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove all elements smaller than or equal to the current element
+            while (!st.empty() && arr[st.top()] <= arr[i])
+                st.pop();
+
+            // Top of the stack is the next greater element
+            nge[i] = st.empty() ? n : st.top();
+
+            // Push current index onto the stack
+            st.push(i);
+        }
+
+        return nge;
+    }
+
+    long long sumOfMax(vector<int>& arr) {
+        int n = arr.size();
+
+        // Find previous and next greater element indices
+        vector<int> pge = find_PGE(arr, n);
+        vector<int> nge = find_NGE(arr, n);
+
+        long long sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Number of choices for the left boundary
+            long long left = i - pge[i];
+
+            // Number of choices for the right boundary
+            long long right = nge[i] - i;
+
+            // Contribution of arr[i] as the maximum element
+            sum += left * right * arr[i];
+        }
+
+        return sum;
+    }
+
+    // Find the index of the Next Smaller Element for each element
+    vector<int> find_NSE(vector<int>& arr, int n) {
+        stack<int> st;
+        vector<int> nse(n);
+
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove elements greater than or equal to current element
+            while (!st.empty() && arr[st.top()] >= arr[i])
+                st.pop();
+
+            // Store index of next smaller element, or n if none exists
+            nse[i] = st.empty() ? n : st.top();
+
+            st.push(i);
+        }
+        return nse;
+    }
+
+    // Find the index of the Previous Smaller Element for each element
+    vector<int> find_PSE(vector<int>& arr, int n) {
+        stack<int> st;
+        vector<int> pse(n);
+
+        for (int i = 0; i < n; i++) {
+            // Remove elements strictly greater than current element
+            while (!st.empty() && arr[st.top()] > arr[i])
+                st.pop();
+
+            // Store index of previous smaller element, or -1 if none exists
+            pse[i] = st.empty() ? -1 : st.top();
+
+            st.push(i);
+        }
+        return pse;
+    }
+
+    long long sumOfMin(vector<int>& arr) {
+        int n = arr.size();
+
+        // Compute next and previous smaller element indices
+        vector<int> nse = find_NSE(arr, n);
+        vector<int> pse = find_PSE(arr, n);
+
+        long long total = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Number of subarrays extending to the left and right
+            long long l = i - pse[i];
+            long long r = nse[i] - i;
+
+            // Contribution of arr[i] as the minimum element
+            total += l * r * arr[i];
+        }
+        return total;
+    }
+
+    long long subArrayRanges(vector<int>& nums) {
+        return sumOfMax(nums) - sumOfMin(nums); // ∑(maximum)−∑(minimum)
+    }
+};
