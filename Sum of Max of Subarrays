@@ -1,0 +1,67 @@
+class Solution {
+public:
+    // Finds the index of the Previous Greater Element for every element.
+    // If no greater element exists on the left, stores -1.
+    vector<int> find_PGE(vector<int> &arr, int n) {
+        vector<int> pge(n);
+        stack<int> st;
+
+        for (int i = 0; i < n; i++) {
+            // Remove all elements smaller than the current element
+            while (!st.empty() && arr[st.top()] < arr[i])
+                st.pop();
+
+            // Top of the stack is the previous greater element
+            pge[i] = st.empty() ? -1 : st.top();
+
+            // Push current index onto the stack
+            st.push(i);
+        }
+
+        return pge;
+    }
+
+    // Finds the index of the Next Greater Element for every element.
+    // If no greater element exists on the right, stores n.
+    vector<int> find_NGE(vector<int> &arr, int n) {
+        vector<int> nge(n);
+        stack<int> st;
+
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove all elements smaller than or equal to the current element
+            while (!st.empty() && arr[st.top()] <= arr[i])
+                st.pop();
+
+            // Top of the stack is the next greater element
+            nge[i] = st.empty() ? n : st.top();
+
+            // Push current index onto the stack
+            st.push(i);
+        }
+
+        return nge;
+    }
+
+    int sumOfMax(vector<int> &arr) {
+        int n = arr.size();
+
+        // Find previous and next greater element indices
+        vector<int> pge = find_PGE(arr, n);
+        vector<int> nge = find_NGE(arr, n);
+
+        long long sum = 0;
+
+        for (int i = 0; i < n; i++) {
+            // Number of choices for the left boundary
+            long long left = i - pge[i];
+
+            // Number of choices for the right boundary
+            long long right = nge[i] - i;
+
+            // Contribution of arr[i] as the maximum element
+            sum += left * right * arr[i];
+        }
+
+        return sum;
+    }
+};
