@@ -61,6 +61,8 @@ The largest rectangle among all histograms is the answer.
    Previous Smaller Element and Next Smaller Element.
 3. Return the maximum rectangle found across all rows.
 */
+// time complexity is O(n × m) 
+// Space complexity is O(n × m)
 
 class Solution {
 private:
