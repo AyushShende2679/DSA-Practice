@@ -1,0 +1,91 @@
+// Logic:
+//
+// 1. For every bar, find the index of the Previous Smaller Element (PSE),
+//    i.e., the nearest bar on the left having a smaller height.
+//
+// 2. For every bar, find the index of the Next Smaller Element (NSE),
+//    i.e., the nearest bar on the right having a smaller height.
+//
+// 3. The current bar can extend from (PSE + 1) to (NSE - 1),
+//    because all bars in this range are at least as tall as the current bar.
+//
+// 4. Therefore,
+//      Width = NSE - PSE - 1
+//
+// 5. Treat the current bar as the minimum height of the rectangle.
+//      Area = Height × Width
+//
+// 6. Compute the area for every bar and return the maximum area obtained.
+
+class Solution {
+private:
+    // Find the index of the Previous Smaller Element (PSE) for each bar.
+    // If no smaller element exists on the left, store -1.
+    vector<int> find_PSE(vector<int>& heights, int n) {
+        stack<int> st;
+        vector<int> pse(n);
+
+        for (int i = 0; i < n; i++) {
+            // Remove all elements greater than the current height
+            // so that the top of the stack is the previous smaller element.
+            while (!st.empty() && heights[st.top()] > heights[i])
+                st.pop();
+
+            // If the stack is empty, no previous smaller element exists.
+            pse[i] = st.empty() ? -1 : st.top();
+
+            // Push the current index onto the stack.
+            st.push(i);
+        }
+        return pse;
+    }
+
+    // Find the index of the Next Smaller Element (NSE) for each bar.
+    // If no smaller element exists on the right, store n.
+    vector<int> find_NSE(vector<int>& heights, int n) {
+        stack<int> st;
+        vector<int> nse(n);
+
+        // Traverse from right to left.
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove all elements greater than or equal to the current height
+            // so that the top of the stack is the next strictly smaller
+            // element.
+            while (!st.empty() && heights[st.top()] >= heights[i])
+                st.pop();
+
+            // If the stack is empty, no next smaller element exists.
+            nse[i] = st.empty() ? n : st.top();
+
+            // Push the current index onto the stack.
+            st.push(i);
+        }
+        return nse;
+    }
+
+public:
+    int largestRectangleArea(vector<int>& heights) {
+        int n = heights.size();
+
+        // Compute Previous Smaller and Next Smaller indices.
+        vector<int> pse = find_PSE(heights, n);
+        vector<int> nse = find_NSE(heights, n);
+
+        int area = 0;
+
+        // Compute the largest rectangle using each bar as the minimum height.
+        for (int i = 0; i < n; i++) {
+            int l = heights[i];
+
+            // Width = distance between next and previous smaller elements.
+            int b = nse[i] - pse[i] - 1;
+
+            // Area of rectangle with current bar as the limiting height.
+            int newArea = l * b;
+
+            area = max(area, newArea);
+        }
+
+        return area;
+    }
+};
