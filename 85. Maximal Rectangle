@@ -1,0 +1,167 @@
+/* Logic: 
+------------------------- Previous Smaller Element (PSE) -------------------------
+Traverse the histogram from left to right.
+Maintain a monotonic increasing stack of indices.
+For every bar:
+  • Remove all bars that are taller (or taller/equal, depending on convention),
+    since they can never be the previous smaller bar for the current bar.
+  • After removing them:
+        - If the stack becomes empty, there is no smaller bar on the left.
+        - Otherwise, the top of the stack is the nearest smaller bar.
+  • Store this index and push the current bar onto the stack for future bars.
+
+
+------------------------- Next Smaller Element (NSE) -------------------------
+Traverse the histogram from right to left.
+Again maintain a monotonic increasing stack of indices.
+For every bar:
+  • Remove all bars that cannot become the next smaller bar.
+  • After removing them:
+        - If the stack is empty, there is no smaller bar on the right.
+        - Otherwise, the top of the stack is the nearest smaller bar.
+  • Store this index and push the current bar onto the stack.
+
+
+------------------------- Largest Rectangle in Histogram -------------------------
+Every bar is considered as the smallest (limiting) height of a rectangle.
+Using PSE and NSE:
+  • Left boundary  = previous smaller element.
+  • Right boundary = next smaller element.
+The rectangle can extend from just after the previous smaller bar
+to just before the next smaller bar.
+Therefore:
+  Width  = Right Boundary - Left Boundary - 1
+  Area   = Height × Width
+Compute this for every bar and keep the maximum area.
+
+
+------------------------- Building Histogram for the Matrix -------------------------
+Instead of checking every possible rectangle in the matrix,
+convert each row into a histogram.
+
+For every column:
+  • Move from top to bottom.
+  • If the current cell is '1', increase the running height.
+  • If the current cell is '0', reset the height to zero,
+    because a rectangle cannot pass through a zero.
+Store these heights so that every row represents a histogram.
+
+
+------------------------- Finding the Maximum Rectangle -------------------------
+After constructing all histograms:
+  • Treat each row independently as a histogram.
+  • Find the largest rectangle in that histogram.
+  • Compare it with the current maximum answer.
+The largest rectangle among all histograms is the answer.
+
+
+------------------------- Overall Intuition -------------------------
+1. Convert each row of the binary matrix into histogram heights.
+2. For each histogram, compute the largest rectangle using
+   Previous Smaller Element and Next Smaller Element.
+3. Return the maximum rectangle found across all rows.
+*/
+
+class Solution {
+private:
+    // Find the index of the Previous Smaller Element (PSE) for each bar.
+    // If no smaller element exists on the left, store -1.
+    vector<int> find_PSE(vector<int>& heights, int n) {
+        stack<int> st;
+        vector<int> pse(n);
+
+        for (int i = 0; i < n; i++) {
+            // Remove all elements greater than the current height
+            // so that the top of the stack is the previous smaller element.
+            while (!st.empty() && heights[st.top()] > heights[i])
+                st.pop();
+
+            // If the stack is empty, no previous smaller element exists.
+            pse[i] = st.empty() ? -1 : st.top();
+
+            // Push the current index onto the stack.
+            st.push(i);
+        }
+        return pse;
+    }
+
+    // Find the index of the Next Smaller Element (NSE) for each bar.
+    // If no smaller element exists on the right, store n.
+    vector<int> find_NSE(vector<int>& heights, int n) {
+        stack<int> st;
+        vector<int> nse(n);
+
+        // Traverse from right to left.
+        for (int i = n - 1; i >= 0; i--) {
+            // Remove all elements greater than or equal to the current height
+            // so that the top of the stack is the next strictly smaller
+            // element.
+            while (!st.empty() && heights[st.top()] >= heights[i])
+                st.pop();
+
+            // If the stack is empty, no next smaller element exists.
+            nse[i] = st.empty() ? n : st.top();
+
+            // Push the current index onto the stack.
+            st.push(i);
+        }
+        return nse;
+    }
+    int largestRectangleArea(vector<int>& heights) {
+        int n = heights.size();
+
+        // Compute Previous Smaller and Next Smaller indices.
+        vector<int> pse = find_PSE(heights, n);
+        vector<int> nse = find_NSE(heights, n);
+
+        int area = 0;
+
+        // Compute the largest rectangle using each bar as the minimum height.
+        for (int i = 0; i < n; i++) {
+            int l = heights[i];
+
+            // Width = distance between next and previous smaller elements.
+            int b = nse[i] - pse[i] - 1;
+
+            // Area of rectangle with current bar as the limiting height.
+            int newArea = l * b;
+
+            area = max(area, newArea);
+        }
+
+        return area;
+    }
+
+public:
+    int maximalRectangle(vector<vector<char>>& matrix) {
+        // Handle empty matrix.
+        if (matrix.empty() || matrix[0].empty())
+            return 0;
+        int n = matrix.size();
+        int m = matrix[0].size();
+        // prefixSum[i][j] stores the height of consecutive '1's
+        // ending at cell (i, j).
+        vector<vector<int>> prefixSum(n, vector<int>(m));
+
+        // Build the histogram heights column by column.
+        for (int j = 0; j < m; j++) {
+            int sum = 0;
+            for (int i = 0; i < n; i++) {
+                if (matrix[i][j] == '1')
+                    sum++;
+                else
+                    sum = 0;
+
+                prefixSum[i][j] = sum;
+            }
+        }
+        int area = 0;
+
+        // Treat every row as a histogram and compute its largest rectangle.
+        for (int i = 0; i < n; i++) {
+            area = max(area, largestRectangleArea(prefixSum[i]));
+        }
+
+        return area;
+    }
+};
