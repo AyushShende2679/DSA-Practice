@@ -1,0 +1,64 @@
+/* Logic:
+
+1. Traverse each digit of the given number from left to right.
+
+2. Maintain a monotonic increasing stack (using a string).
+   - The stack stores digits of the smallest possible number formed so far.
+
+3. For each digit:
+   - While the stack is not empty,
+   - There are still digits left to remove (k > 0),
+   - And the top digit of the stack is greater than the current digit,
+     remove the top digit from the stack.
+   - This ensures that larger digits appearing before a smaller digit are removed,
+     producing a smaller overall number.
+
+4. After removing larger digits, insert the current digit.
+   - Skip leading zeros by not inserting '0' when the stack is empty.
+   - Once the stack contains a non-zero digit, allow zeros to be inserted.
+
+5. After processing all digits, if k is still greater than 0,
+   remove the remaining digits from the end of the stack.
+   - This happens when the number is already in increasing order.
+
+6. If the stack becomes empty after all removals,
+   return "0".
+
+7. Otherwise, the stack itself represents the smallest possible number.
+*/
+
+class Solution {
+public:
+    string removeKdigits(string num, int k) {
+        int n = num.size();
+        string st = ""; // Use string as a monotonic increasing stack
+
+        for (int i = 0; i < n; i++) {
+
+            // Remove previous larger digits to make the number as small as possible
+            while (!st.empty() && k > 0 && st.back() > num[i]) {
+                st.pop_back();
+                k--;
+            }
+
+            // Avoid leading zeros:
+            // - If the stack is not empty, push every digit.
+            // - If the stack is empty, push only non-zero digits.
+            if (!st.empty() || num[i] != '0')
+                st.push_back(num[i]);
+        }
+
+        // If there are still digits left to remove,
+        // remove them from the end (largest remaining digits).
+        while (!st.empty() && k > 0) {
+            st.pop_back();
+            k--;
+        }
+
+        // If all digits are removed, return "0".
+        if (st.empty())
+            return "0";
+
+        return st;
+    }
+};
