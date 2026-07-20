@@ -1,0 +1,68 @@
+// Logic:
+//
+// 1. Keep a stack that stores pairs of (stock price, index).
+//    The stack is maintained in decreasing order of prices.
+//
+// 2. For every new stock price:
+//    - Increase the current index.
+//    - Remove all previous prices from the stack that are
+//      less than or equal to the current price because they
+//      cannot be the previous greater price anymore.
+//
+// 3. After removing them:
+//    - If the stack is empty, there is no previous greater price,
+//      so the span is the number of days from the beginning.
+//    - Otherwise, the top of the stack is the nearest previous
+//      greater price, so the span is the difference between the
+//      current index and that index.
+//
+// 4. Push the current price and its index onto the stack.
+//
+// 5. Return the calculated span.
+
+class StockSpanner {
+public:
+    // Stack stores {price, index}
+    // Maintains a monotonic decreasing stack of prices.
+    stack<pair<int, int>> st;
+
+    // Index of the current stock price.
+    int idx;
+
+    // Constructor
+    StockSpanner() {
+        // Start before the first index.
+        idx = -1;
+    }
+
+    // Returns the stock span for the given price.
+    int next(int price) {
+        // Move to the next day's index.
+        idx++;
+
+        // Remove all previous prices that are
+        // less than or equal to the current price,
+        // since they cannot affect future spans.
+        while (!st.empty() && st.top().first <= price) {
+            st.pop();
+        }
+
+        // If the stack is empty, there is no previous
+        // greater price, so span = idx - (-1) = idx + 1.
+        // Otherwise, span = distance from the previous
+        // greater price.
+        int ans = idx - (st.empty() ? -1 : st.top().second);
+
+        // Store the current price and its index.
+        st.push({price, idx});
+
+        // Return the calculated span.
+        return ans;
+    }
+};
+
+/**
+ * Your StockSpanner object will be instantiated and called as such:
+ * StockSpanner* obj = new StockSpanner();
+ * int param_1 = obj->next(price);
+ */
