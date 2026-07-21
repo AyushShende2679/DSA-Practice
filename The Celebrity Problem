@@ -1,0 +1,125 @@
+// Logic: 
+Step 1:
+// Assume the first person and the last person are possible celebrities.
+
+// Step 2:
+// Compare both people.
+// - If the first person knows the last person, the first person cannot be a celebrity.
+// - If the last person knows the first person, the last person cannot be a celebrity.
+// - If neither knows the other, both are eliminated.
+
+// Step 3:
+// Keep repeating this process until only one possible celebrity remains.
+
+// Step 4:
+// Verify the remaining person:
+// - They should not know any other person.
+// - Every other person should know them.
+
+// Step 5:
+// If both conditions are satisfied, return their index.
+// Otherwise, return -1 because no celebrity exists.
+
+
+// Time Complexity: O(n)
+// Space Complexity: O(1)
+class Solution {
+	public:
+	int celebrity(vector<vector<int>> &mat) {
+		int n = mat.size();
+		
+		// Two pointers representing potential celebrity candidates
+		int top = 0, down = n - 1;
+		
+		// Eliminate non-celebrities
+		while (top < down) {
+			
+			// If 'top' knows 'down', then 'top' cannot be a celebrity
+			if (mat[top][down] == 1)
+				top++;
+			
+			// If 'down' knows 'top', then 'down' cannot be a celebrity
+			else if (mat[down][top] == 1)
+				down--;
+			
+			// If neither knows the other, both cannot be celebrities
+			else {
+				top++;
+				down--;
+			}
+		}
+		
+		// No candidate found
+		if (top > down)
+			return -1;
+		
+		// Verify the remaining candidate
+		for (int i = 0; i < n; i++) {
+			if (i == top)
+				continue; // Skip self
+			
+			// Celebrity should know nobody and everyone should know the celebrity
+			if (mat[top][i] == 0 && mat[i][top] == 1)
+				continue;
+			else
+				return -1;
+		}
+		
+		// Candidate satisfies celebrity conditions
+		return top;
+	}
+};
+
+/* 
+Time Complexity: O(n)
+Space Complexity: O(n)
+class Solution {
+public:
+    int celebrity(vector<vector<int>> &mat) {
+        int n = mat.size();
+
+        // If there are no people, no celebrity exists
+        if (n == 0) return -1;
+
+        stack<int> st;
+
+        // Push all people (0 to n-1) into the stack
+        for (int i = 0; i < n; i++)
+            st.push(i);
+
+        // Eliminate non-celebrities until only one candidate remains
+        while (st.size() > 1) {
+            int a = st.top();
+            st.pop();
+
+            int b = st.top();
+            st.pop();
+
+            // If 'a' does not know 'b',
+            // then 'b' cannot be a celebrity
+            if (mat[a][b] == 0) {
+                st.push(a);
+            }
+            // Otherwise, 'a' cannot be a celebrity
+            else {
+                st.push(b);
+            }
+        }
+
+        // The remaining person is the potential celebrity
+        int celebrity = st.top();
+
+        // Verify the candidate
+        for (int i = 0; i < n; i++) {
+            // Celebrity should be known by everyone
+            // and should not know anyone
+            if (i != celebrity &&
+                (mat[i][celebrity] == 0 || mat[celebrity][i] == 1))
+                return -1;
+        }
+
+        // Valid celebrity found
+        return celebrity;
+    }
+};
+*/
