@@ -1,0 +1,143 @@
+// Logic:
+//
+// 1. Use a Hash Map to store (key -> node address) so that any key
+//    can be accessed in O(1) time.
+//
+// 2. Use a Doubly Linked List to maintain the order of usage.
+//    - Node next to head  -> Least Recently Used (LRU)
+//    - Node before tail   -> Most Recently Used (MRU)
+//
+// 3. Initialize the cache with two dummy nodes (head and tail)
+//    to simplify insertion and deletion operations.
+//
+// 4. get(key):
+//    - If the key is not present, return -1.
+//    - Otherwise, access the corresponding node.
+//    - Remove it from its current position.
+//    - Move it to the end (before tail) since it is now the
+//      Most Recently Used.
+//    - Return its value.
+//
+// 5. put(key, value):
+//    - If the key already exists:
+//         • Update its value.
+//         • Move it to the end (MRU position).
+//
+//    - If the key does not exist:
+//         • If the cache is full:
+//              - Remove the node next to head
+//                (Least Recently Used).
+//              - Remove its entry from the hash map.
+//         • Create a new node.
+//         • Insert it before the tail (MRU position).
+//         • Store its address in the hash map.
+//
+// 6. Complexity:
+//    - get()  -> O(1)
+//    - put()  -> O(1)
+//    - Space  -> O(capacity)
+
+class LRUCache {
+private:
+    // Doubly Linked List Node
+    struct Node {
+        int key, val;
+        Node* prev;
+        Node* next;
+
+        // Constructor
+        Node(int k, int v) : key(k), val(v), prev(nullptr), next(nullptr) {}
+    };
+
+    int capacity;                 // Maximum cache size
+    unordered_map<int, Node*> mp; // Maps key -> corresponding node
+    Node* head;                   // Dummy head (Least Recently Used side)
+    Node* tail;                   // Dummy tail (Most Recently Used side)
+
+    // Removes a node from the linked list
+    void removeNode(Node* node) {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    // Inserts a node just before the dummy tail
+    // (Marks it as Most Recently Used)
+    void insertAtTail(Node* node) {
+        node->prev = tail->prev;
+        node->next = tail;
+        tail->prev->next = node;
+        tail->prev = node;
+    }
+
+public:
+    // Constructor
+    LRUCache(int capacity) : capacity(capacity) {
+
+        // Create dummy head and tail nodes
+        head = new Node(0, 0);
+        tail = new Node(0, 0);
+
+        // Initially head <-> tail
+        head->next = tail;
+        tail->prev = head;
+    }
+
+    // Returns value corresponding to key if present,
+    // otherwise returns -1.
+    int get(int key) {
+
+        // Key not present
+        if (mp.find(key) == mp.end())
+            return -1;
+
+        // Move accessed node to MRU position
+        Node* node = mp[key];
+        removeNode(node);
+        insertAtTail(node);
+
+        return node->val;
+    }
+
+    // Inserts or updates the key-value pair
+    void put(int key, int value) {
+
+        // If key already exists
+        if (mp.find(key) != mp.end()) {
+
+            Node* node = mp[key];
+
+            // Update value
+            node->val = value;
+
+            // Move to MRU position
+            removeNode(node);
+            insertAtTail(node);
+
+        } else {
+
+            // Cache is full, remove LRU node
+            if (mp.size() == capacity) {
+
+                // First real node after head is LRU
+                Node* lru = head->next;
+
+                removeNode(lru);
+
+                // Remove from hash map
+                mp.erase(lru->key);
+
+                // Free memory
+                delete lru;
+            }
+
+            // Create new node
+            Node* node = new Node(key, value);
+
+            // Insert at MRU position
+            insertAtTail(node);
+
+            // Store in hash map
+            mp[key] = node;
+        }
+    }
+};
