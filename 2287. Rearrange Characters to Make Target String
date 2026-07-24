@@ -1,0 +1,38 @@
+class Solution {
+public:
+    int rearrangeCharacters(string s, string target) {
+
+        // Count the frequency of each character in the target string.
+        unordered_map<char, int> need;
+
+        // Count the frequency of each character in the source string.
+        unordered_map<char, int> have;
+
+        for (int i = 0; i < target.length(); i++) {
+            need[target[i]]++;
+        }
+
+        for (int i = 0; i < s.length(); i++) {
+            have[s[i]]++;
+        }
+
+        // Assume the answer is very large initially.
+        int ans = INT_MAX;
+
+        // Find how many complete target strings can be formed
+        //    using each required character.
+        for (auto i : need) {
+            char c = i.first;
+            int f_need = i.second;
+            int f_have = have[c];
+
+            int times = f_have / f_need;
+
+            //  The limiting character determines the final answer.
+            ans = min(ans, times);
+        }
+
+        // Return the maximum number of target strings that can be formed.
+        return ans;
+    }
+};
