@@ -1,0 +1,41 @@
+// Logic: 
+Count the frequency of every character required by the ransom note.
+
+// Count the frequency of every character available in the magazine.
+
+// For each character required by the ransom note:
+//   - Find how many times it is needed.
+//   - Find how many times it is available in the magazine.
+//   - If the available count is less than the required count,
+//     the ransom note cannot be constructed, so return false.
+
+// All required characters are available in sufficient quantity,
+// so return true.
+
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        unordered_map<char, int> have;
+        unordered_map<char, int> need;
+
+        // Count characters in ransomNote
+        for (char c : ransomNote)
+            need[c]++;
+
+        // Count characters in magazine
+        for (char c : magazine)
+            have[c]++;
+
+        // Check if magazine has enough of each required character
+        for (auto i : need) {
+            char c = i.first;
+            int f_need = i.second; // needed in ransomNote
+            int f_have = have[c];  // available in magazine
+
+            if (f_have < f_need)
+                return false;
+        }
+
+        return true;
+    }
+};
