@@ -1,0 +1,55 @@
+/*
+Logic:
+1. Traverse the string and count the frequency of each character.
+2. Maintain a variable `odd` to track how many characters have an odd frequency.
+3. Whenever a character's frequency becomes odd, increment `odd`.
+   Whenever it becomes even, decrement `odd`.
+4. After processing all characters:
+   - If there are no odd-frequency characters, all characters can be used,
+     so the answer is the length of the string.
+   - If there are one or more odd-frequency characters, one odd character
+     can be placed at the center of the palindrome, while one occurrence
+     from every other odd-frequency character remains unused.
+     Hence, the maximum palindrome length is:
+         total length - odd + 1.
+5. Return the computed maximum palindrome length.
+
+Time Complexity: O(n)
+Space Complexity: O(1) (or O(k), where k is the number of distinct characters)
+*/
+class Solution {
+public:
+    int longestPalindrome(string s) {
+        int n = s.size();
+
+        // Store the frequency of each character
+        unordered_map<char, int> mp;
+
+        // Count how many characters currently have an odd frequency
+        int odd = 0;
+
+        for (int i = 0; i < n; i++) {
+            char ch = s[i];
+
+            // Increase the frequency of the current character
+            mp[ch]++;
+
+            // If frequency becomes odd, increment odd count
+            // If frequency becomes even, decrement odd count
+            if (mp[ch] % 2 != 0) {
+                odd++;
+            } else {
+                odd--;
+            }
+        }
+
+        // If there are odd-frequency characters,
+        // all but one odd character must lose one occurrence
+        if (odd > 0) {
+            return n - odd + 1;
+        }
+
+        // If all frequencies are even, use every character
+        return n;
+    }
+};
