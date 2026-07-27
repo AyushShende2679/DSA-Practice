@@ -1,0 +1,87 @@
+// Logic: 
+// 1. If the list is empty or has only one node, no swap is possible.
+//    Return the head as it is.
+
+// 2. Create a dummy node before the head.
+//    This makes it easy to handle swapping when the first pair includes the head node.
+
+// 3. Keep one pointer pointing to the node before the current pair,
+//    and another pointer pointing to the first node of the current pair.
+
+// 4. Repeat while there are at least two nodes available to swap.
+
+// 5. Store the second node of the current pair.
+
+// 6. Make the first node point to the node after the current pair.
+
+// 7. Make the second node point to the first node,
+//    completing the swap of the two nodes.
+
+// 8. Connect the previous part of the list to the new first node
+//    (which was originally the second node).
+
+// 9. Move the previous pointer to the end of the swapped pair.
+
+// 10. Move to the next pair and repeat the process.
+
+// 11. Return the node after the dummy node,
+//  which is the new head of the swapped list.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution {
+public:
+    ListNode* swapPairs(ListNode* head) {
+
+        // If the list is empty or contains only one node,
+        // no swapping is needed.
+        if (head == NULL || head->next == NULL)
+            return head;
+
+        // Create a dummy node to simplify swapping,
+        // especially when the head changes after the first swap.
+        ListNode* dummyNode = new ListNode(0);
+        dummyNode->next = head;
+
+        // 'point' points to the node before the current pair.
+        ListNode* point = dummyNode;
+
+        // 'temp' points to the first node of the current pair.
+        ListNode* temp = head;
+
+        // Continue while there are at least two nodes left to swap.
+        while (point->next != NULL && point->next->next != NULL) {
+
+            // Second node of the current pair.
+            ListNode* front = temp->next;
+
+            //  First node points to the node after the pair.
+            temp->next = front->next;
+
+            //  Second node points to the first node.
+            front->next = temp;
+
+            //  Connect the previous part of the list
+            // to the new first node of the swapped pair.
+            point->next = front;
+
+            // Move 'point' to the end of the swapped pair.
+            point = temp;
+
+            // Move 'temp' to the first node of the next pair.
+            temp = temp->next;
+        }
+
+        // Return the new head of the modified list.
+        return dummyNode->next;
+    }
+};
