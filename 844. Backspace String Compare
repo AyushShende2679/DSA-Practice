@@ -1,0 +1,48 @@
+// Logic: 
+// Create two empty strings to store the final result after processing.
+
+// Traverse the first string.
+// If the current character is '#', remove the last character (if one exists).
+// Otherwise, add the current character to the result string.
+
+// Traverse the second string.
+// If the current character is '#', remove the last character (if one exists).
+// Otherwise, add the current character to the result string.
+
+// Compare the two processed strings.
+// Return true if they are the same; otherwise, return false.
+
+class Solution {
+public:
+    bool backspaceCompare(string s, string t) {
+        // Strings to store the final processed result
+        string s1, s2;
+
+        // Process the first string
+        for (char c : s) {
+            if (c == '#') {
+                // Remove the last character if possible
+                if (!s1.empty())
+                    s1.pop_back();
+            } else {
+                // Add normal characters
+                s1.push_back(c);
+            }
+        }
+
+        // Process the second string
+        for (char c : t) {
+            if (c == '#') {
+                // Remove the last character if possible
+                if (!s2.empty())
+                    s2.pop_back();
+            } else {
+                // Add normal characters
+                s2.push_back(c);
+            }
+        }
+
+        // Compare the processed strings
+        return s1 == s2;
+    }
+};
