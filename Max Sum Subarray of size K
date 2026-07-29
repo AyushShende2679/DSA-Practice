@@ -1,0 +1,22 @@
+class Solution {
+	public:
+	int maxSubarraySum(vector<int>& arr, int k) {
+		int n = arr.size();
+		int sum = 0, maxSum = INT_MIN;
+		
+		//  build the first window
+		for (int i = 0; i < k; i++) {
+			sum += arr[i];
+		}
+		
+		maxSum = sum;
+		
+		// Slide
+		for (int i = k; i<n ; i++) {
+			sum = sum - arr[i - k] + arr[i];
+			
+			maxSum = max(maxSum, sum); // Track answer
+		}
+		return maxSum;
+	}
+};
