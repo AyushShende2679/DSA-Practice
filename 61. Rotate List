@@ -1,0 +1,88 @@
+// Logic: 
+// 1. Handle edge cases:
+//    - If the list is empty, has only one node, or k = 0,
+//      no rotation is needed.
+
+// 2. Traverse the linked list once to:
+//    - Find the last node (tail).
+//    - Calculate the total number of nodes (length).
+
+// 3. Normalize k using k % length because rotating by the
+//    length (or its multiples) gives the original list.
+
+// 4. If the normalized k becomes 0,
+//    return the original head.
+
+// 5. Connect the last node to the head,
+//    forming a circular linked list.
+
+// 6. Find the new tail:
+//    - It is the (length - k)th node from the beginning.
+//    - Move from the head until reaching this node.
+
+// 7. The node immediately after the new tail
+//    becomes the new head of the rotated list.
+
+// 8. Break the circular link by setting
+//    newTail->next = NULL.
+
+// 9. Return the new head.
+
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+
+        // If the list is empty, has only one node,
+        // or no rotation is needed, return as it is.
+        if (head == NULL || head->next == NULL || k == 0)
+            return head;
+
+        // Find the last node (tail) and calculate the length of the list.
+        ListNode* tail = head;
+        int len = 1;
+        while (tail->next != NULL) {
+            tail = tail->next;
+            len++;
+        }
+
+        // Normalize k because rotating by the length
+        // of the list results in the same list.
+        k = k % len;
+
+        // If k becomes 0 after normalization,
+        // no rotation is required.
+        if (k == 0)
+            return head;
+
+        // Connect the last node to the head
+        // to make the linked list circular.
+        tail->next = head;
+
+        // Move to the new tail.
+        // The new tail is the (len - k)th node (1-based indexing).
+        ListNode* newTail = head;
+        for (int i = 1; i < len - k; i++) {
+            newTail = newTail->next;
+        }
+
+        // The node after the new tail becomes the new head.
+        head = newTail->next;
+
+        // Break the circular list.
+        newTail->next = NULL;
+
+        // Return the rotated list.
+        return head;
+    }
+};
