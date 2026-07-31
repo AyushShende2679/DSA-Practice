@@ -1,0 +1,32 @@
+class Solution {
+	public:
+	// Find the index of the smallest element >= x (Ceil)
+	int findCeil(vector<int>& arr, int x) {
+		
+		int n = arr.size();
+		
+		// Search space is [low, high]
+		int low = 0, high = n - 1;
+		
+		// Stores the current best ceil index
+		int res = -1;
+		
+		while (low <= high) {
+			int mid = low + (high - low) / 2;
+			
+			// Ceil cannot be on the left
+			if (arr[mid] < x)
+				low = mid + 1;
+			else {
+				// arr[mid] is a possible ceil
+				res = mid;
+				
+				// Look for a smaller valid ceil on the left
+				high = mid - 1;
+			}
+		}
+		
+		// Returns the index of the ceil, or -1 if no ceil exists
+		return res;
+	}
+};
