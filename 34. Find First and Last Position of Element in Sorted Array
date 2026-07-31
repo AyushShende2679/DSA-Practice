@@ -1,0 +1,104 @@
+/*
+Logic:
+
+1. Since the array is sorted, we can use Binary Search to find the target
+   positions efficiently.
+
+2. To find the first occurrence:
+   - Perform a normal binary search.
+   - Whenever the target is found:
+       * Store the current index as the possible first position.
+       * Continue searching in the left half because there may be another
+         occurrence before this index.
+   - If no smaller index with the target exists, the stored index will be
+     the first occurrence.
+
+3. To find the last occurrence:
+   - Perform another binary search.
+   - Whenever the target is found:
+       * Store the current index as the possible last position.
+       * Continue searching in the right half because there may be another
+         occurrence after this index.
+   - If no larger index with the target exists, the stored index will be
+     the last occurrence.
+
+4. After finding both positions:
+   - If the first occurrence is not found, the target does not exist in the
+     array, so return {-1, -1}.
+   - Otherwise, return the first and last occurrence indices.
+
+Time Complexity:
+- Two binary searches are performed.
+- Overall complexity: O(log n)
+
+Space Complexity:
+- Only constant extra variables are used.
+- Complexity: O(1)
+*/
+
+class Solution {
+public:
+    // Function to find the first occurrence of target
+    int firstOccurrence(vector<int>& nums, int target, int n) {
+        int low = 0, high = n - 1;
+        int first = -1; // Stores the index of first occurrence
+
+        // Binary search
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (nums[mid] == target) {
+                first = mid; // Possible first occurrence found
+                high = mid -
+                       1; // Search in the left half for an earlier occurrence
+            } else if (nums[mid] < target) {
+                low = mid + 1; // Target is in the right half
+            } else {
+                high = mid - 1; // Target is in the left half
+            }
+        }
+
+        return first;
+    }
+
+    // Function to find the last occurrence of target
+    int lastOccurrence(vector<int>& nums, int target, int n) {
+        int low = 0, high = n - 1;
+        int last = -1; // Stores the index of last occurrence
+
+        // Binary search
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            if (nums[mid] == target) {
+                last = mid; // Possible last occurrence found
+                low =
+                    mid + 1; // Search in the right half for a later occurrence
+            } else if (nums[mid] < target) {
+                low = mid + 1; // Target is in the right half
+            } else {
+                high = mid - 1; // Target is in the left half
+            }
+        }
+
+        return last;
+    }
+
+    // Function to return the first and last position of target
+    vector<int> searchRange(vector<int>& nums, int target) {
+        int n = nums.size();
+
+        // Find first occurrence
+        int first = firstOccurrence(nums, target, n);
+
+        // If target is not present, return {-1, -1}
+        if (first == -1)
+            return {-1, -1};
+
+        // Find last occurrence
+        int last = lastOccurrence(nums, target, n);
+
+        // Return the range of target positions
+        return {first, last};
+    }
+};
