@@ -1,0 +1,33 @@
+class Solution {
+public:
+    // Find the index of the first element > target (Upper Bound)
+    int upperBound(vector<int>& arr, int target) {
+
+        int n = arr.size();
+
+        // Search space is [low, high]
+        int low = 0, high = n - 1;
+
+        // Default answer is n (if no upper bound exists)
+        int res = n;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+
+            // Upper bound cannot be on the left
+            if (arr[mid] <= target)
+                low = mid + 1;
+            else {
+                // arr[mid] is a possible upper bound
+                res = mid;
+
+                // Look for an earlier valid upper bound
+                high = mid - 1;
+            }
+        }
+
+        // Returns the index of the first element > target
+        // Returns n if no such element exists
+        return res;
+    }
+};
