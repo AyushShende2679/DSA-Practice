@@ -1,0 +1,66 @@
+/* Logic : 
+1. Find the minimum element in the rotated sorted array 
+2. keep track of that minimum element 
+3. return index of that minimum element 
+NOTE: minimum element index = no. of rotations
+*/
+
+class Solution {
+public:
+    int findKRotation(vector<int> &arr) {
+        int n = arr.size();
+
+        // Initialize binary search boundaries
+        int low = 0, high = n - 1;
+
+        // 'ans' stores the minimum element found so far
+        // 'index' stores the index of the minimum element
+        int ans = INT_MAX;
+        int index = -1;
+
+        while (low <= high) {
+
+            // Find the middle element
+            int mid = (low + high) / 2;
+
+            // If the current search space is already sorted,
+            // then the first element is the smallest.
+            if (arr[low] <= arr[high]) {
+                if (arr[low] < ans) {
+                    ans = arr[low];
+                    index = low;
+                }
+                break;
+            }
+
+            // Check if the left half is sorted
+            if (arr[low] <= arr[mid]) {
+
+                // Since the left half is sorted,
+                // its first element is the smallest in this half.
+                if (arr[low] < ans) {
+                    ans = arr[low];
+                    index = low;
+                }
+
+                // Search in the right half
+                low = mid + 1;
+            }
+            else {
+
+                // Right half is sorted, so the minimum
+                // could be the middle element.
+                if (arr[mid] < ans) {
+                    ans = arr[mid];
+                    index = mid;
+                }
+
+                // Search in the left half
+                high = mid - 1;
+            }
+        }
+
+        // Index of the minimum element = number of rotations
+        return index;
+    }
+};
