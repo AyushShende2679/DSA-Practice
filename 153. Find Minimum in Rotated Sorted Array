@@ -1,0 +1,66 @@
+// Logic: 
+// Initialize two pointers (low and high) to perform binary search.
+// Initialize a variable to store the minimum element found so far.
+
+// Repeat until the search space becomes empty:
+
+// 1. Find the middle index.
+
+// 2. If the current search range is already sorted,
+//    then the first element of this range is the minimum.
+//    Update the answer and stop searching.
+
+// 3. Otherwise, check whether the left half is sorted.
+
+// 4. If the left half is sorted:
+//    - The smallest element in this half is at the low index.
+//    - Update the answer with nums[low].
+//    - Since the rotation point cannot be in the sorted half,
+//      continue searching in the right half.
+
+// 5. Otherwise:
+//    - The rotation point lies in the left half.
+//    - The middle element may be the minimum, so update the answer.
+//    - Continue searching in the left half.
+
+// Return the minimum element found.
+
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int n = nums.size();
+        int low = 0, high = n - 1;
+        int ans = INT_MAX;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+
+            // If the current search space is already sorted,
+            // the first element is the minimum.
+            if (nums[low] <= nums[high]) { // optional step
+                ans = min(ans, nums[low]);
+                break;
+            }
+
+            // Left half is sorted.
+            if (nums[low] <= nums[mid]) {
+                // Update answer with the smallest element
+                // of the sorted left half.
+                ans = min(ans, nums[low]);
+
+                // Search in the right half.
+                low = mid + 1;
+            }
+            // Right half is sorted, so the pivot lies in the left half.
+            else {
+                // Mid element can be the minimum.
+                ans = min(ans, nums[mid]);
+
+                // Search in the left half.
+                high = mid - 1;
+            }
+        }
+
+        return ans;
+    }
+};
