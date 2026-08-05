@@ -1,0 +1,63 @@
+/*
+Logic:
+If the number is 0 or 1, return it directly because its square root is the number itself.
+Since the square root of a positive number lies between 1 and n, initialize the search range with:
+low = 1
+high = n
+Maintain a variable ans to store the best valid square root found so far.
+Use Binary Search:
+Find the middle value (mid) of the current range.
+Compute mid × mid (using long long to avoid overflow).
+Compare mid² with n:
+If mid² is equal to n, then mid is the exact square root.
+If mid² is less than n, then mid is a possible answer. Store it in ans and search the right half to see if a larger valid value exists.
+If mid² is greater than n, search the left half because mid is too large.
+Continue the binary search until the search range becomes invalid (low > high).
+Return ans, which represents the floor (greatest integer less than or equal to) the square root of n.
+*/
+class Solution {
+	public:
+	int floorSqrt(int n) {
+		// Base cases: sqrt(0) = 0 and sqrt(1) = 1
+		if (n == 0 || n == 1)
+			return n;
+		
+		int low = 1, high = n;
+		int ans = 1; // Stores the floor value of sqrt(n)
+		
+		while (low <= high) {
+			// Use long long to avoid overflow during multiplication
+			long long mid = low + (high - low) / 2;
+			
+			// mid * mid is calculated as long long, so no overflow
+			long long val = mid * mid;
+			
+			if (val <= n) {
+				// mid is a possible answer, search for a larger one
+				ans = mid;
+				low = mid + 1;
+			} else {
+				// mid is too large, search in the left half
+				high = mid - 1;
+			}
+		}
+		
+		return ans;
+	}
+};
+/* TC : O(N)
+   SC : O(1)
+class Solution {
+	public:
+	int floorSqrt(int n) {
+		int ans = 1;
+		
+		for (int i = 1; i <= n; i++) {
+			if (i* i <= n) {
+				ans = i;
+			} else break;
+		}
+		return ans;
+	}
+};
+*/
