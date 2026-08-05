@@ -1,0 +1,27 @@
+class Solution {
+	public:
+	int longestKSubstr(string &s, int k) {
+		int n = s.size();
+		int l = 0, r = 0, maxLen = -1;
+		unordered_map<char, int> mpp;
+		
+		while (r<n) {
+			mpp[s[r]]++; // store in hashmap
+			
+			if (mpp.size()>k) {
+				
+				mpp[s[l]]--; // decrement the duplicate
+				
+				if (mpp[s[l]] == 0)
+					mpp.erase(s[l]); // remove the character completely
+				l++;
+			}
+			
+			if (mpp.size() == k) { // exactly k
+				maxLen = max(maxLen, r - l + 1);
+			}
+			r++;
+		}
+		return maxLen;
+	}
+};
