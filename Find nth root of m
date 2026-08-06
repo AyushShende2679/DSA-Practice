@@ -1,0 +1,76 @@
+/*
+Logic:
+
+1. Apply Binary Search on the range [1, m] since the integer nth root
+   must lie between 1 and m.
+
+2. For every middle value (mid), calculate mid^n.
+
+3. While calculating mid^n, stop immediately if the value becomes
+   greater than m to avoid unnecessary computation and overflow.
+
+4. Compare mid^n with m:
+   - If mid^n == m, then mid is the required nth root.
+   - If mid^n < m, search in the right half because a larger value
+     might satisfy the condition.
+   - If mid^n > m, search in the left half because the current value
+     is too large.
+
+5. Continue the binary search until the search space becomes empty.
+
+6. If no value satisfies mid^n == m, return -1 since m does not have
+   an integer nth root.
+*/
+
+class Solution {
+	private:
+	// Returns:
+	// 0 -> mid^n < m
+	// 1 -> mid^n == m
+	// 2 -> mid^n > m
+	int fun(int mid, int n, int m) {
+		long long ans = 1;
+		
+		// Calculate mid^n
+		for (int i = 0; i < n; i++) {
+			ans *= mid;
+			
+			// Stop early if the value exceeds m
+			if (ans > m)
+				return 2;
+		}
+		
+		// Check if nth power is exactly equal to m
+		if (ans == m)
+			return 1;
+		
+		// Otherwise, nth power is less than m
+		return 0;
+	}
+	
+	public:
+	int nthRoot(int n, int m) {
+     if(m == 0) return 0;
+
+		// Search space for the nth root
+		int low = 1, high = m;
+		
+		while (low <= high) {
+			// Find the middle element
+			int mid = low + (high - low) / 2;
+			
+			// Compare mid^n with m
+			int val = fun(mid, n, m);
+			
+			if (val == 1)
+				return mid; // Exact nth root found
+			else if (val == 0)
+				low = mid + 1; // Search in the right half
+			else
+				high = mid - 1; // Search in the left half
+		}
+		
+		// No integer nth root exists
+		return - 1;
+	}
+};
