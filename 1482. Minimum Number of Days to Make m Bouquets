@@ -1,0 +1,89 @@
+/* Logic: 
+Helper Function:
+Traverse the bloomDay array.
+Count consecutive flowers that have bloomed by the given day (mid).
+If a flower has not bloomed yet, reset the consecutive count.
+Whenever k consecutive bloomed flowers are found,
+form one bouquet and reset the consecutive count
+because a flower can be used in only one bouquet.
+Return the total number of bouquets that can be formed.
+
+Main Function:
+If the total flowers required (m * k) are more than the available flowers,
+return -1 since it is impossible.
+
+The answer lies between the minimum bloom day
+and the maximum bloom day, so apply binary search on this range.
+
+For each middle day (mid):
+  - Calculate how many bouquets can be formed by that day.
+  - If at least m bouquets can be formed,
+    store mid as a possible answer and search for a smaller day.
+  - Otherwise, search in the larger days.
+
+Return the minimum day on which it is possible
+to make exactly or at least m bouquets.
+*/
+
+class Solution {
+public:
+    // Returns the number of bouquets that can be made
+    // if we wait until 'mid' days.
+    int fun(vector<int>& bloomDay, int mid, int k) {
+        int bouqCount = 0;         // Number of bouquets formed
+        int consecutive_count = 0; // Count of consecutive bloomed flowers
+
+        for (int i = 0; i < bloomDay.size(); i++) {
+
+            // Flower has bloomed by 'mid' day
+            if (bloomDay[i] <= mid) {
+                consecutive_count++;
+            } else {
+                // Break in consecutive flowers
+                consecutive_count = 0;
+            }
+
+            // Form one bouquet when k consecutive flowers are found
+            if (consecutive_count == k) {
+                bouqCount++;
+                consecutive_count = 0; // Reset since flowers can't be reused
+            }
+        }
+
+        return bouqCount;
+    }
+
+    int minDays(vector<int>& bloomDay, int m, int k) {
+        int n = bloomDay.size();
+
+        // Not enough flowers to make m bouquets
+        if ((long long)m * k > n)
+            return -1;
+
+        // Search space: minimum to maximum bloom day
+        int low = *min_element(bloomDay.begin(), bloomDay.end());
+        int high = *max_element(bloomDay.begin(), bloomDay.end());
+
+        int ans = -1;
+
+        // Binary search for the minimum day
+        while (low <= high) {
+            int mid = (low + high) / 2;
+
+            // Number of bouquets possible by day 'mid'
+            int canMakeMBouquet = fun(bloomDay, mid, k);
+
+            if (canMakeMBouquet >= m) {
+                // Possible to make required bouquets
+                // Try to find a smaller valid day
+                ans = mid;
+                high = mid - 1;
+            } else {
+                // Need more days
+                low = mid + 1;
+            }
+        }
+
+        return ans;
+    }
+};
