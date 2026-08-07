@@ -1,0 +1,85 @@
+/* Logic:
+
+1. The minimum possible eating speed is 1 banana/hour.
+2. The maximum possible eating speed is equal to the largest pile size.
+3. Apply Binary Search on the possible eating speeds.
+4. For every candidate speed (mid):
+   - Calculate the total hours required to finish all piles.
+   - Hours for one pile = ceil(pileSize / speed).
+   - Add the hours required for every pile.
+5. If the total hours are less than or equal to h:
+   - The current speed is valid.
+   - Store it as a possible answer.
+   - Try to find a smaller valid speed by searching the left half.
+6. Otherwise:
+   - The current speed is too slow.
+   - Search in the right half to increase the speed.
+7. Continue until the binary search ends.
+8. Return the minimum valid eating speed found.
+Complexity
+Time: O(nlog(max(piles)))
+Space: O(1)
+*/
+
+
+class Solution {
+private:
+    // Calculates the total number of hours required
+    // to eat all banana piles at the given eating speed (mid).
+    long long calculateTotalHrs(vector<int>& piles, int mid, int n) {
+        long long totalHrs = 0;
+
+        // Traverse each pile
+        for (int i = 0; i < n; i++) {
+
+            // Hours needed for the current pile.
+            // ceil function round-up the floating number upto nearest interger
+            // which greater than equal to
+            // eg. 2.3 => 3.0
+            totalHrs += ceil((double)piles[i] / (double)mid);
+
+            // Integer alternative (more efficient):
+            // totalHrs += (piles[i] + mid - 1) / mid;
+        }
+
+        return totalHrs;
+    }
+
+public:
+    int minEatingSpeed(vector<int>& piles, int h) {
+        int n = piles.size();
+
+        // Stores the minimum valid eating speed.
+        int ans = INT_MAX;
+
+        // Minimum possible eating speed.
+        int low = 1;
+
+        // Maximum possible eating speed
+        // (eat the largest pile in one hour).
+        int high = *max_element(piles.begin(), piles.end());
+
+        // Binary search on the eating speed.
+        while (low <= high) {
+
+            // Candidate eating speed.
+            int mid = low + (high - low) / 2;
+
+            // Total hours needed at speed = mid.
+            long long totalHrs = calculateTotalHrs(piles, mid, n);
+
+            // If Koko can finish within h hours,
+            // try to find a smaller valid speed.
+            if (totalHrs <= h) {
+                ans = mid;
+                high = mid - 1;
+            }
+            // Otherwise, increase the eating speed.
+            else {
+                low = mid + 1;
+            }
+        }
+
+        return ans;
+    }
+};
