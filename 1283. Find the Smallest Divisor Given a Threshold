@@ -1,0 +1,84 @@
+/*
+Logic:
+
+1. We need to find the smallest divisor such that the sum of
+   ceil(nums[i] / divisor) for all elements is <= threshold.
+
+2. If the divisor is small, the calculated sum will be large.
+   If the divisor is large, the calculated sum will be small.
+
+3. Therefore, the answer follows a monotonic pattern, so we can
+   use Binary Search on the divisor instead of checking every divisor.
+
+4. The smallest possible divisor is 1.
+   The largest useful divisor is the maximum element in the array.
+
+5. For every middle divisor:
+   - Calculate the sum using that divisor.
+   - If the sum <= threshold, the divisor is valid.
+     Store it as the answer and search for a smaller divisor.
+   - If the sum > threshold, the divisor is too small.
+     Search for a larger divisor.
+
+6. For calculating ceil(num / divisor), we use:
+   (num + divisor - 1) / divisor
+   This avoids floating-point calculations.
+
+7. At the end, the smallest valid divisor is returned.
+
+Time Complexity: O(n * log(max(nums)))
+Space Complexity: O(1)
+*/
+
+
+class Solution {
+private:
+    long long calculateSmallDivisor(vector<int>& nums, int mid) {
+        long long sum = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            // sum += ceil((double)nums[i] / (double)mid);
+            sum += (nums[i] + mid - 1) / mid;
+        }
+        return sum;
+    }
+
+public:
+    int smallestDivisor(vector<int>& nums, int threshold) {
+        // Minimum possible divisor is 1.
+        int low = 1;
+
+        // Maximum possible divisor is the maximum element.
+        int high = *max_element(nums.begin(), nums.end());
+
+        // Store the answer found so far.
+        int ans = high;
+
+        // Binary search for the smallest valid divisor.
+        while (low <= high) {
+
+            // Find the middle divisor.
+            int mid = low + (high - low) / 2;
+
+            // Calculate the sum using mid as the divisor.
+            long long val = calculateSmallDivisor(nums, mid);
+
+            if (val <= threshold) {
+
+                // mid is a valid divisor.
+                ans = mid;
+                // Try to find a smaller valid divisor.
+                high = mid - 1;
+
+            } else {
+
+                // mid is too small because the sum is
+                // greater than the threshold.
+                // So, increase the divisor.
+                low = mid + 1;
+            }
+        }
+
+        // Return the smallest valid divisor.
+        return ans;
+    }
+};
