@@ -1,0 +1,108 @@
+// Logic: 
+// We need to find the minimum ship capacity that allows
+// all packages to be shipped within the given number of days.
+
+// The minimum possible capacity is the weight of the heaviest package,
+// because the ship must be able to carry every individual package.
+
+// The maximum possible capacity is the sum of all package weights,
+// because with this capacity all packages can be shipped in one day.
+
+// We use binary search between the minimum and maximum capacity.
+
+// For every possible capacity (mid), calculate how many days
+// are required to ship all the packages.
+
+// Start with the first day and keep adding packages to the current day
+// as long as their total weight does not exceed the ship capacity.
+
+// When adding the next package exceeds the capacity,
+// start a new day and put that package on the new day.
+
+// After processing all packages, we know how many days
+// are required for the current capacity.
+
+// If the required days are less than or equal to the given days,
+// the current capacity is sufficient.
+
+// Since we need the minimum capacity, try a smaller capacity
+// by moving the binary search to the left.
+
+// If the required days are greater than the given days,
+// the current capacity is not sufficient.
+
+// Therefore, increase the capacity by moving the binary search
+// to the right.
+
+// Continue the binary search until the minimum valid capacity is found.
+
+// The answer is the smallest ship capacity that can ship
+// all packages within the required number of days.
+
+class Solution {
+private:
+    // This function calculates how many days are required
+    // to ship all packages if the ship capacity is 'mid'.
+    int fun(vector<int>& weights, int mid) {
+        int load = 0; // Current load of the ship
+        int days = 1; // Start with the first day
+
+        for (int i = 0; i < weights.size(); i++) {
+
+            // If the current package can fit in the current day's load
+            if (load + weights[i] <= mid) {
+                load += weights[i];
+            } else {
+                // Current day is full, so start a new day
+                days++;
+
+                // Put the current package on the new day
+                load = weights[i];
+            }
+        }
+
+        // Return the total number of days required
+        return days;
+    }
+
+public:
+    int shipWithinDays(vector<int>& weights, int days) {
+
+        // Minimum possible capacity:
+        // The ship must at least be able to carry the heaviest package.
+        int low = *max_element(weights.begin(), weights.end());
+
+        // Maximum possible capacity:
+        // If the ship can carry the sum of all packages,
+        // everything can be shipped in one day.
+        int high = accumulate(weights.begin(), weights.end(), 0);
+
+        // Store the best answer found so far
+        int ans = high;
+
+        // Binary search for the minimum capacity
+        while (low <= high) {
+
+            // Calculate the middle capacity
+            int mid = (low + high) / 2;
+
+            // Find how many days are needed with capacity 'mid'
+            int no_of_days = fun(weights, mid);
+
+            // If we can ship everything within the required number of days,
+            // 'mid' is a possible answer.
+            if (no_of_days <= days) {
+                ans = mid;
+
+                // Try to find an even smaller capacity
+                high = mid - 1;
+            } else {
+                // We need more capacity because we require too many days
+                low = mid + 1;
+            }
+        }
+
+        // Return the minimum ship capacity that works
+        return ans;
+    }
+};
