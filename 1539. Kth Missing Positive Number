@@ -1,0 +1,62 @@
+/* Logic: 
+
+1. We are given a **sorted array** of positive integers and need to find the **k-th missing positive number**.
+
+2. For any element at index `mid`, its expected value should be:
+
+   * `mid + 1`
+   * Example: index `0 → 1`, index `1 → 2`, index `2 → 3`
+
+3. The actual value may be larger than this expected value because some numbers are missing.
+
+4. Therefore, the number of missing positive integers before `arr[mid]` is:
+
+   * **actual value − expected value**
+
+5. If the number of missing values is **less than k**, the k-th missing number must be **to the right**, so move the binary-search range right.
+
+6. If the number of missing values is **greater than or equal to k**, the answer could be **at or to the left**, so move the range left.
+
+7. After binary search ends, the `low` position represents where the k-th missing number should be inserted.
+
+8. The answer is obtained by adding `k` to this position.
+
+### Time & Space Complexity
+
+* **Time:** `O(log n)` because we use binary search.
+* **Space:** `O(1)` because no extra data structure is used.
+*/
+
+class Solution {
+public:
+    int findKthPositive(vector<int>& arr, int k) {
+        int n = arr.size();
+        int low = 0;
+        int high = n - 1;
+
+        while (low <= high) {
+
+            // Find the middle index
+            int mid = low + (high - low) / 2;
+
+            // Number of positive integers missing before arr[mid]
+            // Expected value at index mid = mid + 1
+            // So missing numbers = actual value - expected value
+            int missing = arr[mid] - (mid + 1);
+
+            // If fewer than k numbers are missing,
+            // the kth missing number must be on the right
+            if (missing < k) {
+                low = mid + 1;
+            } else {
+                // At least k numbers are missing,
+                // so the answer could be on the left
+                high = mid - 1;
+            }
+        }
+
+        // low is the position where the kth missing number belongs
+        // Adding k gives the actual value of the kth missing number
+        return low + k; // high + 1 + k
+    }
+};
