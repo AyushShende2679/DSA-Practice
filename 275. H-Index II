@@ -1,0 +1,81 @@
+/*
+Logic:
+
+1. H-index can range from 0 to n.
+
+2. Use binary search to find the maximum possible H-index.
+
+3. For every mid, check:
+   - How many papers have citations >= mid?
+   - If at least mid papers satisfy this, mid is a valid H-index.
+   - Otherwise, mid is invalid.
+
+4. If mid is valid:
+   - Store it as the current answer.
+   - Search for a larger value.
+
+5. If mid is invalid:
+   - Search for a smaller value.
+
+6. Return the largest valid H-index.
+
+Time Complexity: O(n log n)
+Space Complexity: O(1)
+*/
+
+class Solution {
+private:
+    // Checks whether 'mid' can be a valid H-index
+    bool fun(const vector<int>& citations, int mid) {
+        int count = 0;
+
+        // Count how many papers have at least 'mid' citations
+        for (int i = 0; i < citations.size(); i++) {
+            if (citations[i] >= mid)
+                count++;
+
+            // We already found 'mid' papers
+            // having at least 'mid' citations
+            if (count >= mid)
+                return true;
+        }
+
+        // Fewer than 'mid' papers have at least 'mid' citations
+        return false;
+    }
+
+public:
+    int hIndex(vector<int>& citations) {
+        int n = citations.size();
+
+        // H-index can range from 0 to n
+        int low = 0, high = n;
+
+        // Stores the maximum valid H-index found so far
+        int ans = 0;
+
+        // Binary search for the maximum possible H-index
+        while (low <= high) {
+
+            // Find the middle value
+            int mid = low + (high - low) / 2;
+
+            // Check if 'mid' is a valid H-index
+            if (fun(citations, mid) == true) {
+
+                // 'mid' is possible, so store it
+                ans = mid;
+
+                // Try to find a larger H-index
+                low = mid + 1;
+            } else {
+                // 'mid' is not possible,
+                // so search in the smaller half
+                high = mid - 1;
+            }
+        }
+
+        // Return the maximum valid H-index
+        return ans;
+    }
+};
