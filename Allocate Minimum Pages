@@ -1,0 +1,114 @@
+/* Logic:
+
+1. The answer lies between:
+   - Maximum pages in a single book
+   - Total pages of all books
+
+2. Use binary search on this range.
+   Treat the middle value as the maximum pages
+   that one student is allowed to get.
+
+3. For every possible maximum:
+   - Start with one student.
+   - Keep assigning consecutive books to the current student
+     as long as the total pages do not exceed the maximum.
+   - If adding a book exceeds the maximum, assign that book
+     to a new student.
+
+4. Count how many students are required for that maximum.
+
+5. If required students <= k:
+   - The maximum is possible.
+   - Store it as the answer.
+   - Search for a smaller maximum.
+
+6. If required students > k:
+   - The maximum is too small.
+   - Increase the lower bound.
+
+7. Continue until the search space is exhausted.
+   The stored answer is the minimum possible maximum pages.
+
+Important:
+We check "students <= k", not "students == k",
+because a smaller maximum may require fewer than k students
+while still being a valid allocation.
+*/
+
+
+class Solution {
+	private:
+	// Returns the number of students required
+	// if each student can be allocated at most 'mid' pages.
+	int fun(vector<int> &arr, long long mid, int k) {
+		
+		// Initially, we have one student.
+		int student = 1;
+		
+		// Pages allocated to the current student.
+		long long pages = 0;
+		
+		for (int i = 0; i < arr.size(); i++) {
+			
+			// If the current student can take this book
+			// without exceeding 'mid', give it to them.
+			if (pages + arr[i] <= mid) {
+				pages += arr[i];
+			}
+			else {
+				// Otherwise, assign this book to a new student.
+				student++;
+				pages = arr[i];
+				
+				// If we already need more than k students,
+				// this 'mid' is not possible.
+				if (student > k)
+					return student;
+			}
+		}
+		
+		// Return the number of students required.
+		return student;
+	}
+	
+	public:
+	int findPages(vector<int> &arr, int k) {
+		
+		// More students than books is impossible because
+		// every student must receive at least one book.
+		if (k > arr.size())
+			return - 1;
+		
+		// Minimum possible answer:
+		// At least one student must take the largest book.
+		long long low = *max_element(arr.begin(), arr.end());
+		
+		// Maximum possible answer:
+		// One student takes all the books.
+		long long high = accumulate(arr.begin(), arr.end(), 0LL);
+		
+		long long ans = -1;
+		
+		// Binary search for the minimum possible maximum pages.
+		while (low <= high) {
+			
+			long long mid = low + (high - low) / 2;
+			
+			// Check how many students are needed for this limit.
+			if (fun(arr, mid, k) <= k) {
+				
+				// Possible allocation.
+				// Try to find an even smaller maximum.
+				ans = mid;
+				high = mid - 1;
+			}
+			else {
+				// Need more than k students,
+				// so increase the allowed pages.
+				low = mid + 1;
+			}
+		}
+		
+		return ans; // low
+	}
+};
