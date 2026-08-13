@@ -1,0 +1,98 @@
+// Logic: 
+// We need to distribute candies equally among k children.
+// Each child must receive the same number of candies.
+
+// We binary search for the maximum number of candies
+// that each child can receive.
+
+// low = 1 because each child must get at least 1 candy.
+// high = maximum candies in any single pile because
+// one child cannot receive more than the largest pile.
+
+// For a chosen value mid:
+// Check how many children can be given exactly mid candies.
+
+// From each candy pile:
+// number of children possible = candies[i] / mid.
+
+// Add this for all piles to get the total number of children
+// that can receive mid candies.
+
+// If total children >= k:
+// mid is a valid answer.
+// We can try giving more candies to each child,
+// so move the binary search to the right.
+
+// If total children < k:
+// mid is too large.
+// We cannot satisfy all k children,
+// so search for a smaller value.
+
+// Continue until the binary search ends.
+
+// The largest valid mid is the answer.
+
+class Solution {
+private:
+    // Returns the maximum number of children/piles
+    // that can be created if each child gets 'mid' candies.
+    long long fun(vector<int>& candies, long long mid, long long k) {
+        long long child = 0;
+
+        for (int i = 0; i < candies.size(); i++) {
+
+            // From this pile, we can give 'mid' candies
+            // to candies[i] / mid children.
+            child += candies[i] / mid;
+
+            // We only need at least k children.
+            // No need to continue once we reach k.
+            if (child >= k)
+                return child;
+        }
+
+        // Total number of children possible is less than k.
+        return child;
+    }
+
+public:
+    int maximumCandies(vector<int>& candies, long long k) {
+
+        // Minimum possible candies per child.
+        long long low = 1;
+
+        // Maximum possible candies per child
+        // cannot exceed the largest pile.
+        long long high = *max_element(candies.begin(), candies.end());
+
+        // Stores the best valid answer found so far.
+        long long ans = 0;
+
+        // Binary search for the maximum possible
+        // number of candies each child can receive.
+        while (low <= high) {
+
+            // Try the middle value.
+            long long mid = low + (high - low) / 2;
+
+            // If we can make at least k children
+            // with 'mid' candies each, then 'mid' is valid.
+            if (fun(candies, mid, k) >= k) {
+
+                // Store this valid answer.
+                ans = mid;
+
+                // Try to find an even larger value.
+                low = mid + 1;
+            } else {
+                // 'mid' is too large, so search
+                // in the smaller half.
+                high = mid - 1;
+            }
+        }
+
+        // Return the maximum number of candies
+        // that can be given to each child.
+        return ans;
+    }
+};
