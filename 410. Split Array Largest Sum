@@ -1,0 +1,115 @@
+/*  Logic
+
+* Find the **minimum possible answer** using the largest element in the array.
+
+  * A subarray must contain every element, so the maximum subarray sum cannot be smaller than the largest element.
+
+* Find the **maximum possible answer** using the total sum of the array.
+
+  * If we put all elements into one subarray, the maximum sum will be the total sum.
+
+* Apply **binary search** between these two values.
+
+* For every `mid`, check how many subarrays are required if **no subarray is allowed to have a sum greater than `mid`**.
+
+* Start with one subarray and keep adding elements to it as long as its sum does not exceed `mid`.
+
+* When adding the next element would make the sum greater than `mid`:
+
+  * Start a new subarray.
+  * Increase the subarray count.
+  * Put the current element into the new subarray.
+
+* If the number of subarrays becomes greater than `k`:
+
+  * `mid` is too small.
+  * We need to increase `mid`.
+
+* If the number of subarrays is less than or equal to `k`:
+
+  * `mid` is a valid answer.
+  * Store `mid` as the current answer.
+  * Try to find a smaller answer by moving to the left half.
+
+* Finally, return the smallest valid `mid`.
+*/
+
+class Solution {
+private:
+    // Returns the number of subarrays needed if
+    // the maximum allowed sum of a subarray is 'mid'.
+    int fun(vector<int>& nums, int mid, int k) {
+        // Initially, we have one subarray.
+        int count = 1;
+
+        // Stores the sum of the current subarray.
+        int sum = 0;
+
+        for (int i = 0; i < nums.size(); i++) {
+
+            // If adding the current element does not exceed
+            // the allowed maximum sum 'mid', add it to the
+            // current subarray.
+            if (sum + nums[i] <= mid) {
+                sum += nums[i];
+            } else {
+                // Otherwise, start a new subarray.
+                count++;
+
+                // Current element becomes the first element
+                // of the new subarray.
+                sum = nums[i];
+
+                // If we already need more than k subarrays,
+                // then 'mid' is too small.
+                if (count > k)
+                    return count;
+            }
+        }
+
+        // Return the total number of subarrays required.
+        return count;
+    }
+
+public:
+    int splitArray(vector<int>& nums, int k) {
+
+        // Minimum possible answer is the largest element,
+        // because every element must belong to some subarray.
+        int low = *max_element(nums.begin(), nums.end());
+
+        // Maximum possible answer is the sum of all elements,
+        // which happens when the entire array is one subarray.
+        int high = accumulate(nums.begin(), nums.end(), 0);
+
+        // Stores the best (minimum) valid answer found.
+        int ans = 0;
+
+        // Binary search for the minimum possible maximum subarray sum.
+        while (low <= high) {
+
+            // Calculate the middle value.
+            int mid = low + (high - low) / 2;
+
+            // Find how many subarrays are required
+            // when the maximum allowed sum is 'mid'.
+            int split = fun(nums, mid, k);
+
+            // If we can split the array into k or fewer subarrays,
+            // 'mid' is a valid answer.
+            if (split <= k) {
+                ans = mid;
+
+                // Try to find an even smaller valid answer.
+                high = mid - 1;
+            } else {
+                // We need more than k subarrays, meaning 'mid'
+                // is too small. Increase the allowed maximum sum.
+                low = mid + 1;
+            }
+        }
+
+        // Return the minimum possible maximum subarray sum.
+        return ans;
+    }
+};
