@@ -1,0 +1,80 @@
+/* Logic: 
+1. Treat the 2D matrix as if it were one sorted 1D array.
+
+2. Find the total number of elements in the matrix:
+   number of rows × number of columns.
+
+3. Set the binary search range:
+   low starts at the first element.
+   high starts at the last element.
+
+4. While the search range is valid:
+   Find the middle index.
+
+5. Convert this 1D middle index into a 2D position:
+   - Divide the index by the number of columns to get the row.
+   - Take the remainder of the index divided by the number of columns to get the column.
+
+6. Check the value at that row and column.
+
+7. If the value equals the target:
+   Target is found, so return true.
+
+8. If the value is smaller than the target:
+   Target must be somewhere to the right.
+   Move low to mid + 1.
+
+9. If the value is greater than the target:
+   Target must be somewhere to the left.
+   Move high to mid - 1.
+
+10. If the binary search finishes without finding the target:
+    Return false.
+
+Time Complexity:
+    O(log(n × m))
+
+Space Complexity:
+    O(1)
+*/
+
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        if (matrix.empty() || matrix[0].empty())
+            return false;
+
+        // Get number of rows and columns
+        int n = matrix.size();
+        int m = matrix[0].size();
+
+        // Treat the 2D matrix as a sorted 1D array
+        int low = 0;
+        int high = n * m - 1;
+
+        // Binary search
+        while (low <= high) {
+            // Find middle index
+            int mid = low + (high - low) / 2;
+
+            // Convert 1D index to 2D row and column
+            int row = mid / m;
+            int col = mid % m;
+
+            // Target found
+            if (matrix[row][col] == target)
+                return true;
+
+            // Target is in the right half
+            else if (matrix[row][col] < target)
+                low = mid + 1;
+
+            // Target is in the left half
+            else
+                high = mid - 1;
+        }
+
+        // Target not found
+        return false;
+    }
+};
