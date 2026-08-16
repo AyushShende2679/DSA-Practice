@@ -1,0 +1,24 @@
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int n = s.size();
+        unordered_map<char, int> f;
+        int l = 0, r = 0, maxLen = 0;
+
+        while (r < n) {
+            // If current character was seen before
+            // AND its previous occurrence lies inside
+            if (f.find(s[r]) != f.end() && f[s[r]] >= l) { // in the hashmap
+                l = f[s[r]] + 1; // count after repeating
+            }
+            // or
+            //             if (f.find(s[r]) != f.end()) {
+            //     l = max(l, f[s[r]] + 1);
+            // }
+            maxLen = max(maxLen, r - l + 1);
+            f[s[r]] = r; // store in map
+            r++;
+        }
+        return maxLen;
+    }
+};
