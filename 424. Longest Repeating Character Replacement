@@ -1,0 +1,28 @@
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        int n = s.size();
+        int l = 0, r = 0, maxLen = 0, maxfreq = 0;
+        unordered_map<char, int> mp;
+
+        while (r < n) {
+            mp[s[r]]++;
+            // This tells how many characters we can keep without replacing
+            maxfreq = max(maxfreq, mp[s[r]]);
+
+            // Window length - most frequent character count
+            // gives the number of replacements needed
+            if ((r - l + 1) - maxfreq > k) {
+                mp[s[l]]--;
+                if (mp[s[l]] == 0)
+                    mp.erase(s[l]);
+                l++;
+            }
+            if ((r - l + 1) - maxfreq <= k) {
+                maxLen = max(maxLen, r - l + 1);
+            }
+            r++;
+        }
+        return maxLen;
+    }
+};
