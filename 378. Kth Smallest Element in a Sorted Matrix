@@ -1,0 +1,117 @@
+// Logic: 
+// Start binary search between the smallest and largest values in the matrix.
+
+// Find the middle value.
+
+// Count how many elements in the matrix are less than or equal to mid.
+
+// To count efficiently, start from the bottom-left corner.
+
+// If the current element is less than or equal to mid:
+//     Since the column is sorted, all elements above the current element
+//     are also less than or equal to mid.
+//     Add all those elements to count.
+//     Then move to the next column.
+
+// If the current element is greater than mid:
+//     Since the column is sorted, all elements below it are also greater.
+//     So move one row upward.
+
+// After counting:
+//     If count is smaller than k,
+//         fewer than k elements are <= mid,
+//         so the kth smallest element must be greater than mid.
+//         Search the right half.
+
+//     Otherwise,
+//         at least k elements are <= mid,
+//         so mid can be the answer.
+//         Store mid as the current answer
+//         and search the left half for a smaller possible answer.
+
+// Continue until the binary-search range becomes empty.
+
+// Return the smallest value for which at least k elements are <= that value.
+
+class Solution {
+private:
+    int fun(vector<vector<int>>& matrix, int mid) {
+
+        int n = matrix.size();
+        int m = matrix[0].size();
+
+        // Stores how many elements are <= mid.
+        int count = 0;
+
+        // Start from bottom-left corner.
+        int row = n - 1;
+        int col = 0;
+
+        // Continue until we go outside the matrix.
+        while (row >= 0 && col < m) {
+
+            // If current element is <= mid,
+            // then all elements above it in the same column
+            // are also <= mid because each column is sorted.
+            if (matrix[row][col] <= mid) {
+
+                // Rows 0 to row are <= mid.
+                // Therefore, there are (row + 1) valid elements.
+                count += (row + 1);
+
+                // Move to the next column.
+                col++;
+            }
+
+            else {
+                // Current element is greater than mid.
+                // Since the column is sorted, elements below it
+                // are also greater than mid.
+                // So move upward.
+                row--;
+            }
+        }
+
+        return count;
+    }
+
+public:
+    int kthSmallest(vector<vector<int>>& matrix, int k) {
+
+        int n = matrix.size();
+        int m = matrix[0].size();
+
+        // Binary search on the VALUE, not the index.
+        int low = matrix[0][0];
+        int high = matrix[n - 1][m - 1];
+
+        // Stores the possible answer.
+        int ans = -1;
+
+        while (low <= high) {
+
+            // Find middle value.
+            int mid = (low + high) / 2;
+
+            // Count how many elements are <= mid.
+            int count = fun(matrix, mid);
+
+            // If fewer than k elements are <= mid,
+            // the kth smallest element must be larger.
+            if (count < k) {
+                low = mid + 1;
+            }
+
+            // If at least k elements are <= mid,
+            // mid can be the answer.
+            // But there may be a smaller valid value,
+            // so search on the left side.
+            else {
+                ans = mid;
+                high = mid - 1;
+            }
+        }
+
+        return ans;
+    }
+};
