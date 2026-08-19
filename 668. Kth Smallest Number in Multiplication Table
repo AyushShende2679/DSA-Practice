@@ -1,0 +1,116 @@
+// Logic:
+//
+// 1. We have an m × n multiplication table.
+//    The value at row i and column j is i × j.
+//
+// 2. Instead of directly finding the kth smallest element,
+//    binary search for the ANSWER.
+//
+// 3. The possible answer lies between 1 and m × n.
+//
+// 4. For every middle value (mid), count how many elements
+//    in the multiplication table are <= mid.
+//
+// 5. To calculate this count efficiently, start from the
+//    bottom-left corner of the table.
+//
+// 6. If the current value is <= mid:
+//       All elements above it in the same column are also <= mid.
+//       Add the number of those elements to the count.
+//       Move to the next column.
+//
+// 7. If the current value is > mid:
+//       Move upward because we need a smaller value.
+//
+// 8. After counting:
+//       If count < k:
+//           There are not enough elements <= mid,
+//           so the answer must be greater than mid.
+//
+//       Otherwise:
+//           There are at least k elements <= mid,
+//           so mid can be the answer.
+//           Try to find a smaller valid value.
+//
+// 9. Continue binary search until the search range becomes empty.
+//
+// 10. The smallest value for which count >= k
+//     is the kth smallest number in the multiplication table.
+// Time: O((m + n) log(mn))
+// Space: O(1)
+
+
+class Solution {
+private:
+    // Returns the number of elements in the multiplication table
+    // that are less than or equal to 'mid'.
+    int fun(int m, int n, int mid) {
+        // Start from the bottom-left corner of the table.
+        int row = m - 1, col = 0;
+
+        // Stores the count of elements <= mid.
+        int count = 0;
+
+        // Move through the table until we go outside its boundaries.
+        while (row >= 0 && col < n) {
+
+            // Value at the current position.
+            // Row and column are 0-indexed, hence +1.
+            int matrix = (row + 1) * (col + 1);
+
+            if (matrix <= mid) {
+                // Since values increase as we move upward,
+                // all elements above the current element in this column
+                // are also <= mid.
+                // Therefore, there are (row + 1) such elements.
+                count += row + 1;
+
+                // Move to the next column.
+                col++;
+            } else {
+                // Current value is greater than mid,
+                // so move upward to get a smaller value.
+                row--;
+            }
+        }
+
+        return count;
+    }
+
+public:
+    int findKthNumber(int m, int n, int k) {
+
+        // The smallest possible value is 1.
+        // The largest possible value is m * n.
+        int low = 1, high = m * n;
+
+        // Stores the final answer.
+        int ans = -1;
+
+        // Binary search for the kth smallest value.
+        while (low <= high) {
+
+            // Middle value of the current search range.
+            int mid = (low + high) / 2;
+
+            // Count how many numbers in the multiplication table
+            // are less than or equal to mid.
+            int count = fun(m, n, mid);
+
+            if (count < k) {
+                // Fewer than k elements are <= mid,
+                // so mid is too small.
+                low = mid + 1;
+            } else {
+                // At least k elements are <= mid,
+                // so mid can be the answer.
+                ans = mid;
+
+                // Try to find a smaller possible answer.
+                high = mid - 1;
+            }
+        }
+
+        return ans;
+    }
+};
