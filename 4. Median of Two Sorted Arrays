@@ -1,0 +1,142 @@
+/*
+Logic:
+
+1. Always perform binary search on the smaller array.
+   This keeps the time complexity to O(log(min(n, m))).
+
+2. Divide both arrays into two parts:
+      Left part  |  Right part
+
+3. Choose a partition in nums1 using binary search.
+   The partition in nums2 is calculated so that the total number
+   of elements on the left side is half of the combined arrays.
+
+4. Check whether the partition is correct:
+   - The largest element on the left of nums1
+     must be <= the smallest element on the right of nums2.
+   - The largest element on the left of nums2
+     must be <= the smallest element on the right of nums1.
+
+5. If the partition is correct:
+   - If the total number of elements is odd,
+     the median is the largest element on the left side.
+   - If the total number of elements is even,
+     the median is the average of:
+         largest element on the left
+         and
+         smallest element on the right.
+
+6. If the partition is not correct:
+   - If the left element of nums1 is too large,
+     move the partition of nums1 to the left.
+   - Otherwise, move the partition of nums1 to the right.
+
+7. INT_MIN and INT_MAX are used when a partition is at
+   the beginning or end of an array, so boundary cases
+   can be handled easily.
+
+Time Complexity: O(log(min(n, m)))
+Space Complexity: O(1)
+*/
+
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+
+        int n = nums1.size();
+        int m = nums2.size();
+
+        // Always binary search on the smaller array
+        // This ensures O(log(min(n, m))) time complexity
+        if (n > m)
+            return findMedianSortedArrays(nums2, nums1);
+
+        int low = 0;
+        int high = n;
+
+        while (low <= high) {
+
+            // Partition position in nums1
+            int mid = (low + high) / 2;
+
+            // Total elements required on the left side
+            // mid elements come from nums1
+            // mid2 elements come from nums2
+            int mid2 = (n + m + 1) / 2 - mid;
+
+            /*
+                nums1:
+                [ elements on left | elements on right ]
+                                  mid
+
+                nums2:
+                [ elements on left | elements on right ]
+                                 mid2
+            */
+
+            // Largest element on the left side of nums1
+            // If mid == 0, there is no element on the left
+            int x1 = (mid == 0) ? INT_MIN : nums1[mid - 1];
+
+            // Largest element on the left side of nums2
+            // If mid2 == 0, there is no element on the left
+            int x2 = (mid2 == 0) ? INT_MIN : nums2[mid2 - 1];
+
+            // Smallest element on the right side of nums1
+            // If mid == n, there is no element on the right
+            int x3 = (mid == n) ? INT_MAX : nums1[mid];
+
+            // Smallest element on the right side of nums2
+            // If mid2 == m, there is no element on the right
+            int x4 = (mid2 == m) ? INT_MAX : nums2[mid2];
+
+            /*
+                Check whether the partition is correct.
+
+                We need every element on the left
+                to be <= every element on the right.
+
+                Therefore:
+                    x1 <= x4
+                    x2 <= x3
+            */
+            if (x1 <= x4 && x2 <= x3) {
+
+                // Odd total number of elements
+                // Median is the maximum element on the left
+                if ((m + n) % 2 == 1) {
+                    return max(x1, x2);
+                }
+
+                // Even total number of elements
+                // Median is the average of:
+                // maximum element on the left
+                // minimum element on the right
+                return (static_cast<double>(max(x1, x2)) + min(x3, x4)) / 2.0;
+            }
+
+            /*
+                x1 > x4 means:
+                We have taken too many elements from nums1.
+
+                Move partition to the left.
+            */
+            if (x1 > x4) {
+                high = mid - 1;
+            }
+
+            /*
+                Otherwise:
+                We have taken too few elements from nums1.
+
+                Move partition to the right.
+            */
+            else {
+                low = mid + 1;
+            }
+        }
+
+        // Should never be reached for valid input
+        return -1;
+    }
+};
