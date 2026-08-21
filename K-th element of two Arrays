@@ -1,0 +1,86 @@
+/* Logic
+
+* Make sure binary search is performed on the **smaller array** to minimize the time complexity.
+* We need to divide both arrays into a **left part** and a **right part** such that the left part contains exactly **k elements**.
+* Suppose we take `mid` elements from the first array. Then we must take `k - mid` elements from the second array.
+* Find the four boundary elements:
+
+  * Last element of the left part of the first array.
+  * Last element of the left part of the second array.
+  * First element of the right part of the first array.
+  * First element of the right part of the second array.
+* A valid partition is obtained when:
+
+  * The last element of the first left part is ≤ the first element of the second right part.
+  * The last element of the second left part is ≤ the first element of the first right part.
+* Once the partition is valid, the **k-th element is the maximum of the two elements at the end of the left partitions**.
+* If the first left part has an element greater than the second right part, move the partition in the first array **left**.
+* Otherwise, move the partition in the first array **right**.
+* The binary search continues until a valid partition is found.
+* **Time Complexity:** `O(log(min(n1, n2)))`
+* **Space Complexity:** `O(1)`
+*/
+
+class Solution {
+	public:
+	int kthElement(vector<int>& a, vector<int>& b, int k) {
+		int n1 = a.size();
+		int n2 = b.size();
+		
+		// Always perform binary search on the smaller array
+		if (n1 > n2)
+			return kthElement(b, a, k);
+		
+		// Number of elements to take from 'a' can range from:
+		// max(0, k - n2) to min(k, n1)
+		int low = max(0, k - n2);
+		int high = min(k, n1);
+		
+		while (low <= high) {
+			// mid = number of elements taken from array 'a'
+			int mid = (low + high) / 2;
+			
+			// Remaining elements needed from array 'b'
+			int left = k - mid;
+			
+			// Last element on the left side of 'a'
+			// If no element is taken from 'a', use -infinity
+			int x1 = (mid == 0) ? INT_MIN : a[mid - 1];
+			
+			// Last element on the left side of 'b'
+			// If no element is taken from 'b', use -infinity
+			int x2 = (left == 0) ? INT_MIN : b[left - 1];
+			
+			// First element on the right side of 'a'
+			// If all elements are taken from 'a', use +infinity
+			int x3 = (mid == n1) ? INT_MAX : a[mid];
+			
+			// First element on the right side of 'b'
+			// If all elements are taken from 'b', use +infinity
+			int x4 = (left == n2) ? INT_MAX : b[left];
+			
+			// Valid partition:
+			// Every element on the left must be <= every element on the right
+			if (x1 <= x4 && x2 <= x3) {
+				// We have exactly k elements on the left,
+				// so the k-th element is the largest element on the left
+				return max(x1, x2);
+			}
+			
+			// Too many elements taken from 'a'
+			// Move the partition to the left
+			else if (x1 > x4) {
+				high = mid - 1;
+			}
+			
+			// Too few elements taken from 'a'
+			// Move the partition to the right
+			else {
+				low = mid + 1;
+			}
+		}
+		
+		// Should never be reached if input arrays are valid and sorted
+		return - 1;
+	}
+};
