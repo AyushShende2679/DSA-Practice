@@ -1,0 +1,37 @@
+/* Logic
+
+1. Use a **min heap**, where the smallest element is always at the top.
+2. Traverse through all elements of the array.
+3. Insert each element into the min heap.
+4. If the heap size becomes greater than `k`, remove the smallest element.
+5. This keeps only the **k largest elements** in the heap.
+6. After processing all elements, the smallest element among these `k` largest elements is the **kth largest element**.
+7. Therefore, return `pq.top()`.
+
+**Time:** `O(n log k)`
+**Space:** `O(k)`
+*/
+
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        // Min heap: smallest element stays at the top
+        priority_queue<int, vector<int>, greater<int>> pq;
+
+        // Traverse through all elements of the array
+        for (int i : nums) {
+
+            // Insert current element into the heap
+            pq.push(i);
+
+            // Keep only the k largest elements
+            // Remove the smallest element if size exceeds k
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        // The smallest among the k largest elements
+        // is the kth largest element
+        return pq.top();
+    }
+};
