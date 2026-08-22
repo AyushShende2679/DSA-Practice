@@ -1,0 +1,52 @@
+/* Logic:
+1. Traverse each row of the matrix.
+2. For every row, traverse all its elements.
+3. Count the number of 1s in the current row.
+4. Compare the current count with the maximum number of 1s found so far.
+5. If the current row has more 1s, update the maximum count and row index.
+6. If the count is equal, do not update, so the smaller row index is retained.
+7. Return the row index and the maximum number of 1s.
+*/
+
+class Solution {
+public:
+    vector<int> rowAndMaximumOnes(vector<vector<int>>& mat) {
+
+        // Number of rows
+        int n = mat.size();
+
+        // Number of columns
+        int m = mat[0].size();
+
+        // Stores the maximum number of 1s found so far
+        int count_max = 0;
+
+        // Stores the index of the row having maximum 1s
+        int index = 0;
+
+        // Traverse each row
+        for (int i = 0; i < n; i++) {
+
+            // Count the number of 1s in the current row
+            int count_ones = 0;
+
+            // Traverse all elements of the current row
+            for (int j = 0; j < m; j++) {
+
+                // Since elements are either 0 or 1,
+                // adding the element directly counts the 1s
+                count_ones += mat[i][j];
+            }
+
+            // If current row has more 1s than the maximum found,
+            // update the maximum count and row index
+            if (count_ones > count_max) {
+                count_max = count_ones;
+                index = i;
+            }
+        }
+
+        // Return the row index and maximum number of 1s
+        return {index, count_max};
+    }
+};
