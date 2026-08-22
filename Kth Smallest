@@ -1,0 +1,43 @@
+/* Logic
+
+1. Use a **max heap** to store the `k` smallest elements.
+2. Traverse every element of the array.
+3. Insert the current element into the max heap.
+4. If the heap size becomes greater than `k`, remove the **largest element** using `pop()`.
+5. After processing all elements, the heap contains exactly the `k` smallest elements.
+6. The largest element among these `k` elements (`pq.top()`) is the **kth smallest element**.
+
+**Example:**
+`arr = {7, 10, 4, 3, 20, 15}, k = 3`
+
+The heap finally contains `{7, 3, 4}`.
+
+So, `pq.top() = 7` → **3rd smallest element = 7**.
+
+**Time Complexity:** `O(n log k)`
+**Space Complexity:** `O(k)`
+*/
+
+class Solution {
+	public:
+	int kthSmallest(vector<int> &arr, int k) {
+		// Max heap: largest element stays at the top
+		priority_queue<int> pq;
+		
+		// Traverse through all elements of the array
+		for (int i : arr) {
+			
+			// Add current element to the heap
+			pq.push(i);
+			
+			// Keep only the k smallest elements in the heap
+			// If size becomes greater than k, remove the largest element
+			if (pq.size() > k)
+				pq.pop();
+		}
+		
+		// The largest among the k smallest elements
+		// is the kth smallest element
+		return pq.top();
+	}
+};
