@@ -1,0 +1,81 @@
+/* Logic:
+
+1. **Count the frequency** of every number using `unordered_map`.
+2. **Create a min-heap** that stores:
+   We put `frequency` first because the heap compares the first element first.
+
+3. **Traverse the frequency map** and push every `{frequency, value}` into the heap.
+
+4. If the heap size becomes **greater than `k`**, remove the top element.
+
+   * Since it's a min-heap, the top has the **smallest frequency**.
+   * Therefore, we always remove the least frequent element.
+
+5. After processing all elements, the heap contains exactly the **k most frequent elements**.
+
+6. Extract `pq.top().second` to get the actual values.
+
+### In one line
+
+**Count frequency → put `{freq, value}` in a min-heap → keep heap size `k` → remove least frequent → extract values.**
+*/
+
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+
+        // Number of elements in nums
+        int n = nums.size();
+
+        // Pair: {frequency, value}
+        typedef pair<int, int> p;
+
+        // Hash map to store frequency of each number
+        unordered_map<int, int> mp;
+
+        // Count frequency of every element
+        for (int i : nums)
+            mp[i]++;
+
+        // Min-heap of pairs
+        // Pair is compared using the first element first.
+        // So frequency gets the highest priority.
+        priority_queue<p, vector<p>, greater<p>> pq;
+
+        // Traverse through the frequency map
+        for (auto i : mp) {
+
+            // i.first  -> number/value
+            // i.second -> frequency
+            int val = i.first;
+            int freq = i.second;
+
+            // Push {frequency, value}
+            // We put frequency first because we want
+            // the least frequent element at the top.
+            // heap take first value as priority even if it's pair
+            pq.push({freq, val});
+
+            // Keep heap size limited to k.
+            // If size becomes k+1, remove the element
+            // with the smallest frequency.
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        vector<int> res;
+
+        // Extract the remaining k elements from the heap
+        while (!pq.empty()) {
+
+            // pq.top().first  -> frequency
+            // pq.top().second -> value
+            // We only need the value in the answer.
+            res.push_back(pq.top().second);
+
+            pq.pop();
+        }
+
+        return res;
+    }
+};
