@@ -1,0 +1,100 @@
+/* Logic :
+
+1. **Count frequency** of every word using `unordered_map`.
+2. Create a **min-heap of size `k`** using a custom comparator.
+
+3. Store each word as:
+   {frequency, word}
+4. The comparator makes the **worst word** stay at the top:
+
+   * Lower frequency → worse → comes first.
+   * If frequency is equal → lexicographically larger word → worse → comes first.
+
+5. Insert every `{frequency, word}` into the heap.
+
+6. If heap size becomes greater than `k`, remove `pq.top()`.
+
+   * This removes the **worst** word.
+   * Therefore, only the best `k` words remain.
+
+7. Extract the words from the heap into `res`.
+
+8. The heap gives them in **worst → best** order, so reverse the result.
+*/
+
+class Solution {
+public:
+    // Pair stores:
+    // first  -> frequency of the word
+    // second -> word itself
+    typedef pair<int, string> p;
+
+    // Custom comparator for min-heap
+    struct comparator {
+
+        bool operator()(const p& a, const p& b) {
+
+            // If frequencies are different,
+            // word with smaller frequency should come first.
+            // It will be removed when heap size > k.
+            if (a.first != b.first)
+                return a.first > b.first;
+
+            // If frequencies are same,
+            // lexicographically larger word should come first.
+            // Example: "zoo" comes before "apple" in the heap.
+            return a.second < b.second;
+        }
+    };
+
+    vector<string> topKFrequent(vector<string>& words, int k) {
+
+        // Hash map to store frequency of each word
+        unordered_map<string, int> mp;
+
+        // Count frequency of every word
+        for (auto i : words) {
+            mp[i]++;
+        }
+
+        // Min-heap using our custom comparator
+        // The WORST element will always be at the top.
+        priority_queue<p, vector<p>, comparator> pq;
+
+        // Traverse through the frequency map
+        for (auto& i : mp) {
+
+            // i.first  -> word
+            // i.second -> frequency
+            string element = i.first;
+            int freq = i.second;
+
+            // Push {frequency, word} into the heap
+            pq.push({freq, element});
+
+            // Keep only k best elements
+            // If size becomes k + 1,
+            // remove the worst element from the top.
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        // Store final answer
+        vector<string> res;
+
+        // Extract words from the heap
+        while (!pq.empty()) {
+
+            // pq.top().second gives the word
+            res.push_back(pq.top().second);
+
+            pq.pop();
+        }
+
+        // Heap gives elements from WORST -> BEST,
+        // but we need BEST -> WORST.
+        reverse(res.begin(), res.end());
+
+        return res;
+    }
+};
