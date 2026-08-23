@@ -79,3 +79,72 @@ public:
         return res;
     }
 };
+
+/*             OR 
+// Bucket sort
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+
+        // Store the size of nums
+        int n = nums.size();
+
+        // Hash map to store the frequency of each number
+        // mp[value] = frequency
+        unordered_map<int, int> mp;
+
+        // Count frequency of every element
+        for (int i : nums)
+            mp[i]++;
+
+        // Bucket where index represents frequency
+        // bucket[freq] contains all values having that frequency
+        //
+        // Maximum possible frequency is n,
+        // so we need n + 1 buckets.
+        vector<vector<int>> bucket(n + 1);
+
+        // Traverse through the frequency map
+        for (auto i : mp) {
+
+            // i.first  -> value
+            // i.second -> frequency
+            int val = i.first;
+            int freq = i.second;
+
+            // Put the value into the bucket
+            // corresponding to its frequency.
+            bucket[freq].push_back(val);
+        }
+
+        // Store the final answer
+        vector<int> res;
+
+        // Start from the highest frequency
+        // and move towards the lowest frequency.
+        for (int i = n; i >= 0; i--) {
+
+            // If this frequency bucket is empty,
+            // move to the next frequency.
+            if (bucket[i].size() == 0)
+                continue;
+
+            // Take elements from the current bucket
+            // until we have k elements.
+            while (bucket[i].size() > 0 && k > 0) {
+
+                // Add the value to the result
+                res.push_back(bucket[i].back());
+
+                // Remove the element from the bucket
+                bucket[i].pop_back();
+
+                // One less element is needed
+                k--;
+            }
+        }
+
+        // Return the k most frequent elements
+        return res;
+    }
+};*/
