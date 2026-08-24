@@ -1,0 +1,61 @@
+/* Logic
+Calculate the squared distance of every point from the origin: x² + y².
+Use a max heap, so the point with the largest distance stays at the top.
+Insert each point into the heap.
+If the heap size becomes greater than k, remove the top element — the farthest point.
+This ensures the heap always contains only the k closest points.
+Finally, remove all points from the heap and store them in res.
+Why Max Heap?
+
+We need to remove the farthest point whenever we have more than k points.
+
+So:
+
+Max Heap → Farthest point at top → Easy to remove
+
+Complexity
+Time: O(n log k)
+Space: O(k)
+*/
+
+class Solution {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int k) {
+        int n = points.size();
+
+        // Keeps the farthest point at the top.
+        // We maintain only k closest points in the heap.
+        priority_queue<pair<long long, pair<int, int>>> pq; // max heap
+        // priority_queue < pair<long long, vector<int>>> pq;
+
+        for (int i = 0; i < n; i++) {
+
+            // Squared distance from origin.
+            // No need to calculate sqrt because squared distance
+            // gives the same ordering as actual distance.
+            long long sqrt = (1LL) * (points[i][0] * points[i][0]) +
+                             (1LL) * (points[i][1] * points[i][1]);
+
+            pq.push({sqrt, {points[i][0], points[i][1]}});
+            // pq.push({sqrt,points[i]});
+
+            // If heap contains more than k points,
+            // remove the farthest point.
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        vector<vector<int>> res;
+
+        // Heap now contains only k closest points.
+        while (!pq.empty()) {
+
+            res.push_back({pq.top().second.first, pq.top().second.second});
+            // res.push_back(pq.top().second);
+
+            pq.pop();
+        }
+
+        return res;
+    }
+};
