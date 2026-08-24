@@ -1,0 +1,43 @@
+/* Logic
+Calculate the distance of every element from x.
+Store {distance, element} in a max heap.
+If heap size becomes greater than k, remove the farthest element.
+After processing all elements, the heap contains the k closest elements.
+Store them in res and sort them because the answer must be in increasing order.
+Return res.
+*/
+
+class Solution {
+public:
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        int n = arr.size();
+
+        // Max heap: {distance, element}
+        priority_queue<pair<int, int>> pq;
+
+        for (int i = 0; i < n; i++) {
+            // Distance of current element from x
+            int close = abs(arr[i] - x);
+
+            // Add element to heap
+            pq.push({close, arr[i]});
+
+            // Remove farthest element if size > k
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        vector<int> res;
+
+        // Get k closest elements
+        while (!pq.empty()) {
+            res.push_back(pq.top().second);
+            pq.pop();
+        }
+
+        // Return in sorted order
+        sort(res.begin(), res.end());
+
+        return res;
+    }
+};
