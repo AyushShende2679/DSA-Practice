@@ -1,0 +1,75 @@
+/* Logic
+Each row is sorted in the form 1s followed by 0s, so we can use binary search to count the number of soldiers (1s) in each row.
+For every row, store {soldiers, rowIndex} in a max heap.
+The max heap keeps the strongest row at the top.
+If the heap size becomes greater than k, remove the strongest row. This leaves only the k weakest rows.
+Finally, extract the row indices from the heap.
+Since the heap gives the strongest among the remaining rows first, reverse the result to get the weakest rows in the required order.
+When two rows have the same number of soldiers, priority_queue<pair<int,int>> automatically prioritizes the larger row index, so it gets removed first and the smaller index is retained.
+*/
+
+class Solution {
+public:
+    // Finds the number of 1s (soldiers) in a row using binary search.
+    // Since all 1s come before 0s, we find the last occurrence of 1.
+    int binarySearch(vector<int>& mat, int n) {
+        int low = 0, high = n - 1;
+
+        // Stores the index of the last 1 found.
+        // -1 means there is no 1 in the row.
+        int res = -1;
+
+        while (low <= high) {
+            // Calculate middle index safely.
+            int mid = low + (high - low) / 2;
+
+            if (mat[mid] == 1) {
+                // Found a 1, so there may be more 1s on the right.
+                res = mid;
+                low = mid + 1;
+            } else {
+                // Found 0, so search on the left side.
+                high = mid - 1;
+            }
+        }
+
+        // If last 1 is at index res, number of 1s = res + 1.
+        // If no 1 exists, res = -1, so returns 0.
+        return res + 1;
+    }
+
+    vector<int> kWeakestRows(vector<vector<int>>& mat, int k) {
+        int n = mat.size();    // Number of rows
+        int m = mat[0].size(); // Number of columns
+
+        // Max heap.
+        // Stores {number of soldiers, row index}.
+        // The strongest row will be at the top.
+        priority_queue<pair<int, int>> pq;
+
+        for (int i = 0; i < n; i++) {
+            // Count the number of soldiers in the current row.
+            int sum = binarySearch(mat[i], m);
+
+            // Add {soldiers, row index} to the heap.
+            pq.push({sum, i});
+
+            // Keep only the k weakest rows.
+            // The strongest row is removed when size exceeds k.
+            if (pq.size() > k)
+                pq.pop();
+        }
+
+        vector<int> res;
+
+        // The heap contains the k weakest rows,
+        // but in strongest-to-weakest order.
+        while (!pq.empty()) {
+            res.push_back(pq.top().second);
+            pq.pop();
+        }
+
+        // Reverse to get weakest-to-strongest order.
+        return reverse(res.begin(), res.end()), res;
+    }
+};
