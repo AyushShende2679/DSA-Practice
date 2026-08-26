@@ -1,0 +1,67 @@
+/* Logic
+We have multiple sorted arrays. We need to merge them into one sorted array.
+Use a min-heap so that we always get the smallest available element.
+Store three things in the heap:
+ - value
+ - row
+ - column
+Step-by-step
+Put the first element of every row into the min-heap.
+Take the smallest element from the heap.
+Add it to ans.
+Find which row and column that element came from.
+Move to the next element in the same row.
+If that element exists, push it into the heap.
+Repeat until the heap is empty.
+
+Continue this process until every element is processed.
+
+Core idea to remember:
+Remove the smallest element → add it to answer → insert the next element from the same row.
+
+*/
+
+class Solution {
+	public:
+	vector<int> mergeArrays(vector<vector<int>> &mat) {
+		
+		// Heap stores: {value, {row, column}}
+		// greater<> makes it a min-heap
+		typedef pair<int, pair<int, int>> p;
+		
+		priority_queue<p, vector<p>, greater<p>> pq;
+		
+		// Insert the first element of every row
+		// Only one element from each row is kept in the heap
+		for (int i = 0; i < mat.size(); i++) {
+			if (!mat[i].empty()) {
+				pq.push({mat[i][0], {i, 0}});
+			}
+		}
+		
+		vector<int> ans;
+		
+		// Continue until all elements are processed
+		while (!pq.empty()) {
+			
+			// Get the smallest element
+			auto [val, pos] = pq.top();
+			pq.pop();
+			
+			// Get the row and column of this element
+			int row = pos.first;
+			int col = pos.second;
+			
+			// Add the smallest element to the answer
+			ans.push_back(val);
+			
+			// If there is another element in the same row,
+			// push it into the heap
+			if (col + 1 < mat[row].size()) {
+				pq.push({mat[row][col + 1], {row, col + 1}});
+			}
+		}
+		
+		return ans;
+	}
+};
