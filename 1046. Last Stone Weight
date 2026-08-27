@@ -1,0 +1,54 @@
+/* Logic
+Use a max heap so we can always get the two heaviest stones.
+Insert all stones into the priority queue.
+While there are at least two stones:
+Remove the largest stone first.
+Remove the second-largest stone second.
+If first == second, both stones are destroyed.
+Otherwise, first - second remains, so insert that difference back into the heap.
+When the process ends:
+If the heap is empty, return 0.
+Otherwise, return the remaining stone's weight.
+*/
+
+class Solution {
+public:
+    int lastStoneWeight(vector<int>& stones) {
+        // Max heap: largest stone is always at the top
+        priority_queue<int> pq;
+
+        int ans = 0;
+
+        // Add all stones to the max heap
+        for (int i : stones)
+            pq.push(i);
+
+        // Keep smashing the two heaviest stones
+        while (pq.size() > 1) {
+            // Get the heaviest stone
+            int first = pq.top();
+            pq.pop();
+
+            // Get the second heaviest stone
+            int second = pq.top();
+            pq.pop();
+
+            // If both stones have the same weight,
+            // both are destroyed, so nothing is added back
+            if (first - second == 0) {
+                continue;
+            }
+
+            // Otherwise, the remaining weight is added back
+            pq.push(first - second);
+        }
+
+        // If one stone remains, return its weight
+        if (pq.size() != 0) {
+            ans = pq.top();
+            pq.pop();
+        }
+
+        return ans;
+    }
+};
