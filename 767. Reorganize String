@@ -1,0 +1,107 @@
+/* Logic
+
+The idea is to rearrange the characters so that no two same characters are adjacent.
+
+Count frequency of every character.
+
+If any character occurs more than (n + 1) / 2 times, return "" because it is impossible to arrange.
+
+Put all characters and their frequencies into a max heap.
+
+The character with the highest frequency stays on top.
+
+Repeatedly take the two most frequent characters from the heap.
+
+Add both to the result.
+Decrease their frequencies.
+Put them back into the heap if they still have occurrences left.
+
+Why take two at a time?
+
+The two characters are different.
+Therefore, adding them consecutively can never create something like "aa".
+
+When only one character remains:
+
+Add it to the result.
+The initial frequency check guarantees that this won't create an invalid arrangement.
+
+Time Complexity: O(n log 26) → effectively O(n)
+Space Complexity: O(26) → O(1)
+*/
+
+class Solution {
+public:
+    // Pair stores:
+    // first  -> frequency of character
+    // second -> character
+    using p = pair<int, char>;
+
+    string reorganizeString(string s) {
+        int n = s.length();
+
+        // mp[i] stores the frequency of character ('a' + i)
+        vector<int> mp(26, 0);
+
+        // Count frequency of every character
+        for (char c : s) {
+            mp[c - 'a']++;
+
+            // If any character appears more than half the string,
+            // it is impossible to rearrange without adjacent duplicates.
+            if (mp[c - 'a'] > (n + 1) / 2)
+                return "";
+        }
+
+        // Max heap:
+        // Character with the highest frequency comes first.
+        priority_queue<p> pq;
+
+        // Put all characters with their frequencies into the heap
+        for (int i = 0; i < 26; i++) {
+            if (mp[i] > 0) {
+                pq.push({mp[i], char('a' + i)});
+            }
+        }
+
+        string res = "";
+
+        // Always take the two most frequent characters.
+        // Since they are different, placing them consecutively
+        // guarantees that we don't create adjacent equal characters.
+        while (pq.size() >= 2) {
+            // Get the character with the highest frequency
+            auto p1 = pq.top();
+            pq.pop();
+
+            // Get the character with the second-highest frequency
+            auto p2 = pq.top();
+            pq.pop();
+
+            // Add both different characters to the answer
+            res.push_back(p1.second);
+            res.push_back(p2.second);
+
+            // We have used one occurrence of each character
+            p1.first--;
+            p2.first--;
+
+            // If occurrences are still remaining,
+            // put the characters back into the heap.
+            if (p1.first > 0)
+                pq.push(p1);
+
+            if (p2.first > 0)
+                pq.push(p2);
+        }
+
+        // At most one character can remain.
+        // Because of our initial frequency check, it is safe
+        // to put this character at the end.
+        if (!pq.empty()) {
+            res.push_back(pq.top().second);
+        }
+
+        return res;
+    }
+};
