@@ -1,0 +1,92 @@
+/* Logic :
+Start with the fuel you already have.
+Visit each petrol station one by one.
+Put every station's fuel into a max heap.
+If you don't have enough fuel to reach the next station:
+Take the station with the most fuel from the heap.
+Add that fuel to your car.
+Increase the number of stops.
+We don't refuel immediately when we reach a station. We save its fuel as an option for later.
+After all stations, do the same thing until we reach the target.
+If the heap is empty and we still can't reach the next point, return -1.
+Otherwise, return the number of refueling stops.
+
+In one line :-
+Whenever we need fuel, use the biggest fuel amount from the stations we have already passed.
+*/
+
+
+class Solution {
+public:
+    int minRefuelStops(int target, int startFuel,
+                       vector<vector<int>>& stations) {
+
+        // Fuel currently available in the car
+        int currentFuel = startFuel;
+
+        // Number of times we have refueled
+        int count = 0;
+
+        // Max-heap to store fuel amounts of stations
+        // that we have already passed.
+        // The station with the maximum fuel will be on top.
+        priority_queue<int> pq;
+
+        // Visit each station one by one
+        for (int i = 0; i < stations.size(); i++) {
+
+            int nextStation = stations[i][0];
+            int fuelStation = stations[i][1];
+
+            // If we don't have enough fuel to reach this station,
+            // we must refuel from one of the stations we have
+            // already passed.
+            while (currentFuel < nextStation) {
+
+                // If there is no previously passed station
+                // available for refueling, the target is unreachable.
+                if (pq.empty())
+                    return -1;
+
+                // Take the station with the maximum fuel.
+                // Greedy choice: use the largest available fuel
+                // to minimize the total number of stops.
+                int maxFuel = pq.top();
+                pq.pop();
+
+                // Add that fuel to our current fuel.
+                currentFuel += maxFuel;
+
+                // We made one refueling stop.
+                count++;
+            }
+
+            // We have reached this station, so store its fuel
+            // in the max-heap for possible future use.
+            // We don't refuel immediately.
+            pq.push(fuelStation);
+        }
+
+        // After visiting all stations, check whether we can
+        // reach the final target.
+        while (currentFuel < target) {
+
+            // No fuel source is left, so target is unreachable.
+            if (pq.empty())
+                return -1;
+
+            // Use the station with the maximum available fuel.
+            int maxFuel = pq.top();
+            pq.pop();
+
+            // Add its fuel.
+            currentFuel += maxFuel;
+
+            // Count this refueling stop.
+            count++;
+        }
+
+        // Minimum number of refueling stops required.
+        return count;
+    }
+};
