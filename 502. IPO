@@ -1,0 +1,67 @@
+/* Logic:
+Sort projects by capital required.
+Add all affordable projects (capital <= w) to a max-heap.
+Pick the project with maximum profit.
+Add its profit to w.
+Repeat this k times.
+If no project is affordable, return w.
+
+Goal: Always choose the most profitable project currently affordable.
+*/
+
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits,
+                             vector<int>& capital) {
+
+        int n = profits.size();
+
+        // Store each project as:
+        // {required capital, profit}
+        vector<pair<int, int>> vec;
+
+        for (int i = 0; i < n; i++) {
+            vec.push_back({capital[i], profits[i]});
+        }
+
+        // Sort projects by required capital.
+        // This allows us to easily find all projects
+        // that become affordable as our capital increases.
+        sort(begin(vec), end(vec));
+
+        // 'i' points to the next project that hasn't
+        // been added to the priority queue yet.
+        int i = 0;
+
+        // Max-heap: stores profits of all currently
+        // affordable projects.
+        priority_queue<int> pq;
+
+        // We can select at most k projects.
+        while (k--) {
+
+            // Add every project whose required capital
+            // is <= our current capital 'w'.
+            while (i < n && vec[i].first <= w) {
+                pq.push(vec[i].second);
+                i++;
+            }
+
+            // If there are no affordable projects,
+            // we cannot continue.
+            if (pq.empty())
+                return w;
+
+            // Choose the affordable project with
+            // the maximum profit.
+            w += pq.top();
+
+            // Remove the selected project from the heap.
+            pq.pop();
+        }
+
+        // Return the maximum capital after selecting
+        // at most k projects.
+        return w;
+    }
+};
