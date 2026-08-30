@@ -1,0 +1,80 @@
+/* Logic:
+
+1. **Sort all courses by their deadline** in increasing order.
+2. Maintain:
+
+   * `total` = total time taken by selected courses.
+   * `pq` = max heap storing durations of selected courses.
+3. Go through each course:
+
+   * Add its duration to `total`.
+   * Add its duration to the max heap.
+4. If `total > deadline`:
+
+   * We cannot finish all selected courses on time.
+   * Remove the **longest-duration course** from the heap.
+   * Subtract its duration from `total`.
+5. Continue for all courses.
+6. At the end, `pq.size()` gives the **maximum number of courses** we can complete.
+
+### 🧠 Why remove the longest?
+
+If we have to remove **one course**, removing the longest course gives us the **maximum free time** while losing only one course.
+
+**Remember:**
+
+> **Sort by deadline → Add course → If deadline exceeded → Remove longest course.**
+*?
+
+class Solution {
+public:
+    int scheduleCourse(vector<vector<int>>& courses) {
+
+        // Number of courses
+        int n = courses.size();
+
+        // Sort courses by their deadline (lastDay)
+        // Course with smaller deadline comes first
+        sort(courses.begin(), courses.end(),
+             [](const vector<int>& a, const vector<int>& b) {
+                 return a[1] < b[1];
+             });
+
+        // Stores the total time taken by all selected courses
+        int total = 0;
+
+        // Max Heap
+        // It keeps the course with the largest duration at the top
+        // We remove the longest course whenever we exceed a deadline
+        priority_queue<int> pq;
+
+        // Process each course in increasing order of deadline
+        for (int i = 0; i < n; i++) {
+
+            // Duration of current course
+            int duration = courses[i][0];
+
+            // Last day by which current course must be completed
+            int last = courses[i][1];
+
+            // Take the current course
+            total += duration;
+
+            // Store its duration in the max heap
+            pq.push(duration);
+
+            // If total time exceeds the current course's deadline
+            if (total > last) {
+
+                // Remove the longest-duration course
+                // This frees up the maximum possible time
+                total -= pq.top();
+                pq.pop();
+            }
+        }
+
+        // Number of courses remaining in the heap
+        // represents the maximum number of courses we can complete
+        return pq.size();
+    }
+};
