@@ -1,0 +1,96 @@
+/* Logic — Find Median from Data Stream
+
+1. Use **two heaps**:
+
+   * `left` → **Max Heap**, stores the smaller half.
+   * `right` → **Min Heap**, stores the larger half.
+
+2. When a number comes:
+
+   * If it is smaller than or equal to `left.top()`, put it in `left`.
+   * Otherwise, put it in `right`.
+
+3. **Balance both heaps**:
+
+   * If `right` has more elements → move `right.top()` to `left`.
+   * If `left` has more than one extra element → move `left.top()` to `right`.
+
+4. Find median:
+
+   * If `left` has one extra element → `left.top()` is the median.
+   * If both heaps have equal size → median is:
+
+   ```cpp
+   (left.top() + right.top()) / 2.0
+   ```
+
+**Shortcut:**
+
+> **Max heap keeps the largest of the smaller half, Min heap keeps the smallest of the larger half.**
+*/
+
+class MedianFinder {
+public:
+    // Max heap -> stores the smaller half of the numbers
+    // The largest number of the smaller half is at the top
+    priority_queue<int> left;
+
+    // Min heap -> stores the larger half of the numbers
+    // The smallest number of the larger half is at the top
+    priority_queue<int, vector<int>, greater<int>> right;
+
+    MedianFinder() {
+
+    }
+
+    void addNum(int num) {
+
+        // If left is empty OR num belongs to the smaller half,
+        // insert it into the max heap
+        if (left.empty() || num <= left.top()) {
+            left.push(num);
+        } else {
+            // Otherwise, num belongs to the larger half
+            right.push(num);
+        }
+
+        // If right has more elements than left,
+        // move the smallest element of right to left
+        if (right.size() > left.size()) {
+            left.push(right.top());
+            right.pop();
+        } else {
+
+            // The size difference should not be greater than 1.
+            // If left has 2 or more extra elements,
+            // move the largest element of left to right.
+            if (left.size() - 1 > right.size()) {
+                right.push(left.top());
+                left.pop();
+            }
+        }
+    }
+
+    double findMedian() {
+
+        // If left has one extra element,
+        // its top element is the middle element
+        if (left.size() > right.size())
+            return left.top();
+
+        else {
+
+            // If both heaps have equal size,
+            // median is the average of their top elements
+            double mean = (left.top() + right.top()) / 2.0;
+
+            return mean;
+        }
+    }
+};
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
