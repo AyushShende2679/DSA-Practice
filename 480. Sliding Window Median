@@ -1,0 +1,149 @@
+/*  Logic 
+
+Think of the problem as **two sorted halves** of the current window.
+
+```text
+left  → smaller half
+right → larger half
+```
+
+We use `multiset` because it keeps elements sorted and allows easy insertion/removal.
+
+### Steps
+
+1. **Add the new number**
+
+   * Put it in `right`.
+   * Move the smallest element of `right` to `left`.
+
+2. **Balance the sets**
+
+   * `left` can have **at most 1 extra element**.
+   * If `left` becomes too big, move its largest element to `right`.
+
+3. **When window size becomes `k`**
+
+   * If `k` is odd:
+
+     ```cpp
+     median = *left.rbegin();
+     ```
+   * If `k` is even:
+
+     ```cpp
+     median = (*left.rbegin() + *right.begin()) / 2.0;
+     ```
+
+4. **Remove the element that goes out of the window**
+
+   * Find it in `left`.
+   * If not there, remove it from `right`.
+
+5. **Balance again** after removal.
+
+6. Move to the next window.
+*/
+
+
+class Solution {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+
+        // left  -> stores the smaller half of the window
+        // right -> stores the larger half of the window
+      
+        // multiset keeps elements sorted and also allows duplicates
+        multiset<int> left, right;
+
+        // Stores the median of every sliding window
+        vector<double> ans;
+
+        // Traverse through all elements
+        for (int i = 0; i < nums.size(); i++) {
+
+            // Insert current element into right
+            right.insert(nums[i]);
+
+            // Move the smallest element of right to left
+            // This keeps left as the smaller half
+            left.insert(*right.begin());
+            right.erase(right.begin());
+
+            // Balance the two sets
+            // left can have at most ONE more element than right
+            while (left.size() - 1 > right.size()) {
+
+                // Move the largest element of left to right
+                right.insert(*left.rbegin());
+
+                // Remove that element from left
+                left.erase(prev(left.end()));
+            }
+
+            // Once we have a complete window of size k
+            if (i >= k - 1) {
+
+                // If k is odd,
+                // left has one extra element
+                // Its largest element is the median
+                if (k % 2 == 1) {
+                    ans.push_back(*left.rbegin());
+                }
+
+                // If k is even,
+                // median is the average of:
+                // largest element of left
+                // smallest element of right
+                else {
+                    double median =
+                        ((double)*left.rbegin() + *right.begin()) / 2.0;
+
+                    ans.push_back(median);
+                }
+
+                // Remove the element that is leaving the sliding window
+                //
+                // Example:
+                // nums = [1, 3, -1], k = 3
+                // After processing this window,
+                // 1 will leave when the window moves
+                int remove = nums[i - k + 1];
+
+                // Check whether the element exists in left
+                auto it = left.find(remove);
+
+                if (it != left.end()) {
+
+                    // Remove only ONE occurrence
+                    // Important because multiset can contain duplicates
+                    left.erase(it);
+                } else {
+
+                    // If it is not in left, it must be in right
+                    // Remove only ONE occurrence
+                    right.erase(right.find(remove));
+                }
+
+                // After removing an element, the sizes may become
+                // unbalanced, so fix them again.
+
+                while (left.size() < right.size()) {
+
+                    // Move smallest element of right to left
+                    left.insert(*right.begin());
+                    right.erase(right.begin());
+                }
+
+                while (left.size() > right.size() + 1) {
+
+                    // Move largest element of left to right
+                    right.insert(*left.rbegin());
+                    left.erase(prev(left.end()));
+                }
+            }
+        }
+
+        // Return medians of all sliding windows
+        return ans;
+    }
+};
