@@ -1,0 +1,36 @@
+/* Logic:
+Take the input n.
+If n == 0, return 0.
+If n == 1, return 1.
+Otherwise, calculate:
+fib(n - 1) + fib(n - 2)
+The function keeps calling itself until it reaches 0 or 1.
+Add the returned values to get the Fibonacci number.
+
+Example: For n = 5
+
+fib(5)
+= fib(4) + fib(3)
+= 3 + 2
+= 5
+
+
+So, fib(5) = 5.
+*/
+
+class Solution {
+public:
+    int fib(int n) {
+        // Base case: Fibonacci of 0 is 0
+        if (n == 0)
+            return 0;
+
+        // Base case: Fibonacci of 1 is 1
+        if (n == 1)
+            return 1;
+
+        // Recursive case:
+        // F(n) = F(n - 1) + F(n - 2)
+        return fib(n - 1) + fib(n - 2);
+    }
+};
