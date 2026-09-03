@@ -1,0 +1,62 @@
+/* LOGIC: 
+ * 
+ * 1. INITIALIZATION:
+ *    The wrapper function starts two markers at opposite ends of the string:
+ *    - Left pointer (i) at index 0.
+ *    - Right pointer (j) at the last valid index (length - 1).
+ * 
+ * 2. RECURSIVE VERIFICATION LOOP:
+ *    With each call, the algorithm evaluates three conditions in order:
+ * 
+ *    - SUCCESS CASE: If the pointers meet (i == j) or cross past each other 
+ *      (i > j), every outer pair has matched perfectly. The string is a palindrome.
+ * 
+ *    - MISMATCH CASE: If the characters at the current pointers do not match 
+ *      (s[i] != s[j]), symmetry is broken. Stop immediately and return false.
+ * 
+ *    - SHRINK & REPEAT: If they do match, strip away the validated outer layers. 
+ *      Move the left pointer inward (i + 1), move the right pointer inward (j - 1), 
+ *      and pass the smaller inside window back into the function.
+ */
+
+/**
+ * Helper function that recursively checks if a substring is a palindrome.
+ * s: The input string
+ * i: The starting index (left pointer)
+ * j: The ending index (right pointer)
+ */
+bool check(const char s[], int i, int j) { 
+    // Base Case 1: Pointers met or crossed in the middle. 
+    // All paired characters matched successfully.
+    if (i >= j) return true; 
+    
+    // Base Case 2: Mismatch found. 
+    // Not a palindrome, exit early.
+    if (s[i] != s[j]) return false; 
+    
+    // Recursive Step: Shrink the window.
+    // Move left pointer forward and right pointer backward.
+    return check(s, i + 1, j - 1); 
+} 
+
+
+bool isPalindrome(const char s[]) { 
+    // Start checking from the first index (0) to the last valid character index
+    return check(s, 0, strlen(s) - 1); 
+}
+
+
+/*  OR 
+bool isPalindrome(char s[]) {
+	int n = strlen(s);
+	int i = 0, j = n - 1;
+	
+	while (i<j) {
+		if (s[i] != s[j])
+			return false;
+		i++;
+		j--;
+	}
+	return true;
+}
+*/
