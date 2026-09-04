@@ -1,0 +1,45 @@
+/*Logic
+Start checking from the second element of the array (i = 1).
+Compare the current element with the previous element.
+If arr[i-1] > arr[i], the array is not sorted, so return false.
+Otherwise, move to the next element using recursion (i + 1).
+When i == n, it means all elements have been checked, so return true.
+*/
+class Solution {
+	public:
+	
+	// Main function to check whether the array is sorted
+	bool isSorted(vector<int>& arr) {
+		// Start checking from index 1
+		// arr.size() gives the total number of elements
+		return check(arr, arr.size(), 1);
+	}
+	
+	// Recursive function to check adjacent elements
+	bool check(vector<int>& arr, int n, int i) {
+		
+		// Base case:
+		// If i reaches n, all adjacent elements have been checked
+		// and no unsorted pair was found
+		if (i == n)
+			return true;
+		
+		// If the previous element is greater than the current element,
+		// the array is not sorted
+		if (arr[i - 1] > arr[i])
+			return false;
+		
+		// Move to the next pair of elements
+		return check(arr, n, i + 1);
+	}
+};
+
+/*
+bool isSorted(vector<int>& arr) {
+    for (int i = 1; i < arr.size(); i++) {
+        if (arr[i - 1] > arr[i])
+            return false;
+    }
+    return true;
+}
+*/
