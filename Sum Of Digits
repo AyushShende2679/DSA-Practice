@@ -1,0 +1,57 @@
+/* Logic:
+
+1. If `n == 0`, return `0` — this is the **base case**.
+2. Find the last digit using `n % 10`.
+3. Remove the last digit using `n / 10`.
+4. Recursively find the sum of the remaining digits.
+5. Add the last digit to the recursive result.
+6. Return the final sum.
+
+ Example:
+
+```
+1234 → 4 + sumOfDigits(123)
+     → 4 + 3 + sumOfDigits(12)
+     → 4 + 3 + 2 + sumOfDigits(1)
+     → 4 + 3 + 2 + 1
+     → 10
+```
+*/
+class Solution {
+	public:
+	int sumOfDigits(int n) {
+		// Base case:
+		// If n becomes 0, there are no more digits to add.
+		if (n == 0)
+			return 0;
+		
+		// Get the last digit of n.
+		int d = n % 10;
+		
+		// Remove the last digit from n.
+		n = n / 10;
+		
+		// Recursively calculate the sum of the remaining digits.
+		int ans = sumOfDigits(n);
+		
+		// Add the current digit to the sum of remaining digits.
+		return ans + d;
+	}
+};
+
+
+/*
+class Solution {
+	public:
+	int sumOfDigits(int n) {
+		int sum = 0;
+		
+		while (n != 0) {
+			sum += n%10;
+			
+			n = n / 10;
+			
+		}
+		return sum;
+	}
+}; */
