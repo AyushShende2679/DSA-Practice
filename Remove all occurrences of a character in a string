@@ -1,0 +1,67 @@
+/* Logic:
+
+ - Take the original string `s` and create an empty string `out`.
+- Start checking the string from index `0`.
+- For every character:
+  - If the character is **not equal** to `c`, add it to `out`.
+  - If the character is equal to `c`, simply skip it.
+- Recursively move to the next index `i + 1`.
+- When `i` reaches the end of the string, stop the recursion.
+- Finally, assign `out` back to `s`.
+
+*/
+
+class Solution {
+public:
+    // Function to remove all occurrences of character 'c' from the string
+    void removeCharacter(string &s, char c) {
+        // Create an empty string to store the characters
+        // that are not equal to 'c'
+        string out = "";
+
+        // Start recursion from index 0
+        remove(s, c, 0, out);
+
+        // Copy the resulting string back into the original string
+        s = out;
+    }
+
+    // Recursive function to process the string
+    // i    -> current index
+    // c    -> character that needs to be removed
+    // out  -> string storing the final result
+    void remove(string &s, char c, int i, string &out) {
+
+        // Base case:
+        // If we have reached the end of the string,
+        // stop the recursion
+        if (i == s.size())
+            return;
+
+        // If the current character is NOT equal to 'c',
+        // add it to the output string
+        if (s[i] != c)
+            out.push_back(s[i]);
+
+        // Recursively process the next character
+        remove(s, c, i + 1, out);
+    }
+};
+
+/*
+class Solution {
+	public:
+	// Function to remove all occurrences of the character from the string
+	void removeCharacter(string &s, char c) {
+		int n = s.size();
+		
+		for (int i = 0; i<n;) {
+			if (s[i] == c)
+				s.erase(i, 1);
+			else
+				i++;
+		}
+		
+	}
+};
+*?
