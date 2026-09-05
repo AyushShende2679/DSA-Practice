@@ -48,7 +48,8 @@ public:
     }
 };
 
-/*
+/* Time: O(n²) worst case
+   Space: O(1)
 class Solution {
 	public:
 	// Function to remove all occurrences of the character from the string
