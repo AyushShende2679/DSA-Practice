@@ -1,0 +1,111 @@
+/* Logic:
+
+ - We need to generate **`n` pairs of parentheses**, so the final string length must be `2 * n`.
+- Maintain two counters:
+  - `open` → number of `(` used.
+  - `close` → number of `)` used.
+- If `open < n`, we can add an opening bracket `(`.
+- We can add a closing bracket `)` only when `close < open`. This ensures we never create an invalid prefix.
+- After adding a bracket, recursively continue.
+- After the recursive call, remove the bracket using `pop_back()` to **backtrack** and try another possibility.
+- When the length becomes `2 * n`, the string is a valid combination, so add it to `result`.
+
+ ### In one line
+
+ **Try `(` if available, try `)` only when it won't make the parentheses invalid, and backtrack after each choice.**
+*/
+
+class Solution {
+public:
+    vector<string> result;
+    
+    void solve(string& curr, int n, int open, int close) {
+
+        // If the string has 2*n brackets,
+        // we have formed one valid combination.
+        if (curr.length() == 2 * n) {
+            result.push_back(curr);
+            return;
+        }
+
+        // We can add '(' as long as we have used
+        // fewer than n opening brackets.
+        if (open < n) {
+            curr.push_back('(');
+
+            // Choose '(' and move to the next position.
+            solve(curr, n, open + 1, close);
+
+            // Backtrack: remove the last character
+            // so we can try another possibility.
+            curr.pop_back();
+        }
+
+        // We can add ')' only when there is an
+        // unmatched '(' available.
+        if (close < open) {
+            curr.push_back(')');
+
+            // Choose ')' and move to the next position.
+            solve(curr, n, open, close + 1);
+
+            // Backtrack.
+            curr.pop_back();
+        }
+    }
+
+    vector<string> generateParenthesis(int n) {
+        // Start with an empty string.
+        string curr = "";
+
+        // Initially, we have used 0 '(' and 0 ')'.
+        solve(curr, n, 0, 0);
+
+        return result;
+    }
+};
+
+
+/*   Brute force approach : 
+
+    Time: O(n4^n)
+    space: (2*n)
+class Solution {
+public:
+    vector<string> result;
+    bool isValid(string& s) {
+        int count = 0;
+
+        for (char ch : s) {
+            if (ch == '(')
+                count++;
+            else
+                count--;
+
+            if (count < 0)
+                return false;
+        }
+        return count == 0;
+    }
+    void solve(string& curr, int n) {
+        if (curr.length() == 2 * n) {
+            if (isValid(curr)) {
+                result.push_back(curr);
+            }
+            return;
+        }
+        curr.push_back('(');
+        solve(curr, n);
+        curr.pop_back();
+
+        curr.push_back(')');
+        solve(curr, n);
+        curr.pop_back();
+    }
+    vector<string> generateParenthesis(int n) {
+        string curr = "";
+
+        solve(curr, n);
+        return result;
+    }
+}; */
