@@ -1,0 +1,133 @@
+/* Logic of the Code
+
+ The logic is simply:
+
+ 1. **Create a mapping** of each digit to its possible letters.
+
+   ```
+   2 → abc
+   3 → def
+   4 → ghi
+   ...
+   ```
+2. Start from the **first digit** using `idx = 0`.
+3. For the current digit, get all its possible letters.
+4. **Try each letter one by one**:
+   - Add the letter to `temp`.
+   - Recursively move to the **next digit** using `idx + 1`.
+   - After the recursive call returns, remove the letter using `pop_back()`.
+5. When `idx` reaches `digits.length()`, it means:
+   - We have selected one letter for every digit.
+   - `temp` is a complete combination.
+   - Add it to `result`.
+
+ ### In one line
+
+ > **For every digit, try every possible letter, recursively process the next digit, and backtrack by removing the chosen letter.**
+
+ For `"23"`:
+
+```
+2 → a → 3 → d → "ad" ✓
+         → e → "ae" ✓
+         → f → "af" ✓
+
+2 → b → 3 → d → "bd" ✓
+         → e → "be" ✓
+         → f → "bf" ✓
+
+2 → c → 3 → d → "cd" ✓
+         → e → "ce" ✓
+         → f → "cf" ✓
+```
+
+ The entire pattern is:
+
+```
+Choose → Recursive call → Backtrack
+```
+
+```
+temp.push_back(s[i]);   // Choose
+solve(idx + 1, ...);    // Explore next digit
+temp.pop_back();        // Undo / Backtrack
+```
+*/
+class Solution {
+public:
+    // Stores all the possible combinations
+    vector<string> result;
+
+    // Recursive function to generate combinations
+    void solve(int idx, string& digits, string& temp,
+               unordered_map<char, string>& mp) {
+
+        // Base case:
+        // If we have processed all digits,
+        // temp contains one complete combination.
+        if (idx >= digits.length()) {
+            result.push_back(temp);
+            return;
+        }
+
+        // Get the current digit
+        char ch = digits[idx];
+
+        // Get all letters corresponding to this digit
+        string s = mp[ch];
+
+        // Try every possible letter for the current digit
+        for (int i = 0; i < s.length(); i++) {
+
+            // Choose:
+            // Add the current letter to temp
+            temp.push_back(s[i]);
+
+            // Explore:
+            // Move to the next digit
+            //
+            // idx + 1 creates a new recursive call.
+            // When it returns, we come back to this
+            // function call where idx still has its old value.
+            solve(idx + 1, digits, temp, mp);
+
+            // Backtrack / Undo:
+            // Remove the last chosen character
+            // so that we can try the next letter.
+            temp.pop_back();
+        }
+    }
+
+    vector<string> letterCombinations(string digits) {
+
+        // If digits is empty, there are no combinations
+        if (digits.empty())
+            return {};
+
+        // Clear previous results in case the same
+        // Solution object is used more than once
+        result.clear();
+
+        // Mapping of phone digits to letters
+        unordered_map<char, string> mp;
+
+        mp['2'] = "abc";
+        mp['3'] = "def";
+        mp['4'] = "ghi";
+        mp['5'] = "jkl";
+        mp['6'] = "mno";
+        mp['7'] = "pqrs";
+        mp['8'] = "tuv";
+        mp['9'] = "wxyz";
+
+        // Temporary string used to build
+        // one combination at a time
+        string temp = "";
+
+        // Start recursion from index 0
+        solve(0, digits, temp, mp);
+
+        // Return all generated combinations
+        return result;
+    }
+};
