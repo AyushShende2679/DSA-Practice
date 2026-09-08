@@ -1,0 +1,84 @@
+/* Logic:
+
+ 1. Start from index `0`. At each index, decide **which element should be placed there**.
+2. Run a loop from `idx` to `n-1`, because elements before `idx` are already fixed.
+3. Swap `nums[idx]` with `nums[i]` to place the chosen element at position `idx`.
+4. Recursively solve for `idx + 1`.
+5. After recursion, swap back to **undo the choice** and restore the original array.
+6. When `idx == n`, all positions are fixed, so store the current permutation in `res`.
+
+ ### In one line
+
+ > **Choose → Swap → Recurse → Undo → Try next choice.**
+*/
+
+class Solution {
+public:
+    // Stores all generated permutations
+    vector<vector<int>> res;
+
+    // idx = position for which we need to choose an element
+    void solve(vector<int>& nums, int idx) {
+
+        // If idx reaches the end, we have formed one complete permutation
+        if (idx == nums.size()) {
+            res.push_back(nums);
+            return;
+        }
+
+        // Try every element from idx to n-1
+        // as the element to be placed at position idx
+        for (int i = idx; i < nums.size(); i++) {
+
+            // Put nums[i] at position idx
+            swap(nums[idx], nums[i]);
+
+            // Now move to the next position
+            solve(nums, idx + 1);
+
+            // Backtrack:
+            // Restore nums to its previous state
+            swap(nums[idx], nums[i]);
+        }
+    }
+
+    vector<vector<int>> permute(vector<int>& nums) {
+
+        // Start generating permutations from index 0
+        solve(nums, 0);
+
+        return res;
+    }
+};
+
+
+/*
+class Solution {
+public:
+    vector<vector<int>> res;
+    unordered_set<int> st;
+    void solve(vector<int>& temp, vector<int>& nums) {
+        if (temp.size() >= nums.size()) {
+            res.push_back(temp);
+            return;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (st.find(nums[i]) == st.end()) {
+                temp.push_back(nums[i]);
+                st.insert(nums[i]);
+
+                solve(temp, nums);
+
+                temp.pop_back();
+                st.erase(nums[i]);
+            }
+        }
+    }
+    vector<vector<int>> permute(vector<int>& nums) {
+
+        vector<int> temp;
+        solve(temp, nums);
+        return res;
+    }
+};
+*/
