@@ -1,0 +1,141 @@
+/* Logic:
+
+ At every index, we have two choices:
+
+ 1. Include the current element.
+   - Add it to `temp`.
+   - Subtract its value from `target`.
+   - Keep the same index because we can use the same element again.
+2. Exclude the current element.
+   - Don't add it to `temp`.
+   - Keep `target` unchanged.
+   - Move to the next index.
+
+ Base cases:
+
+ - If `target == 0`, we found a valid combination.
+- If `target < 0` or `idx` reaches the end, stop that path.
+
+ In short:
+
+ Include → target decreases, index stays same.
+
+ Exclude → target stays same, index increases.
+*/
+
+class Solution {
+public:
+    vector<vector<int>> res;
+
+    void solve(vector<int>& a, int target, int idx, vector<int>& temp) {
+
+        // Base case:
+        // If target becomes 0, we found a valid combination
+        if (target == 0) {
+            res.push_back(temp);
+            return;
+        }
+
+        // If we reach the end of the array
+        // or target becomes negative, this path is invalid
+        if (idx >= a.size() || target < 0)
+            return;
+
+        // ---------------- INCLUDE ----------------
+        // Choose the current element
+        temp.push_back(a[idx]);
+
+        // Since an element can be used multiple times,
+        // we keep the same idx
+        solve(a, target - a[idx], idx, temp);
+
+        // Backtrack:
+        // Remove the current element before exploring
+        // the next possibility
+        temp.pop_back();
+
+        // ---------------- EXCLUDE ----------------
+        // Don't choose the current element
+        // Move to the next element
+        // Target remains unchanged because we didn't take a[idx]
+        solve(a, target, idx + 1, temp);
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+
+        vector<int> temp;
+
+        // Start recursion from index 0
+        solve(candidates, target, 0, temp);
+
+        return res;
+    }
+};
+
+
+/*class Solution {
+public:
+   void sumHelper(vector<int>& candidates, int idx, int target,
+            vector<int>& temp, vector<vector<int>>& ans) {
+
+    if (target == 0) {
+        ans.push_back(temp);
+        return;
+    }
+
+    for (int i = idx; i < candidates.size(); i++) {
+        if (candidates[i] > target) break;
+
+        temp.push_back(candidates[i]);
+        sumHelper(candidates, i, target - candidates[i], temp, ans);
+        temp.pop_back();
+    }
+}
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        sort(candidates.begin(), candidates.end());
+        vector<vector<int>> ans;
+        vector<int> temp;
+
+        sumHelper(candidates, 0, target,temp,ans);
+        return ans;
+    }
+};
+*/
+/*class Solution {
+public:
+    vector<vector<int>> res;
+
+    void solve(vector<int>& a, int target, int idx, int sum,
+               vector<int>& temp) {
+        if (sum == target) {
+            res.push_back(temp);
+            return;
+        }
+
+        for (int i = idx; i < a.size(); i++) {
+            if (sum + a[i] > target)
+                break;
+
+            temp.push_back(a[i]);
+            sum += a[i];
+
+            solve(a, target, i, sum, temp);
+
+            temp.pop_back();
+            sum -= a[i];
+        }
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        res.clear();
+
+        sort(candidates.begin(), candidates.end());
+
+        vector<int> temp;
+        solve(candidates, target, 0, 0, temp);
+
+        return res;
+    }
+};
+*/
