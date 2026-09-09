@@ -1,0 +1,33 @@
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int n = s.size(), m = t.size();
+        int l = 0, r = 0, minLen = INT_MAX;
+        int count = 0, sidx = -1; // staring idx
+        unordered_map<char, int> mp;
+
+        // Store frequency of characters required from t
+        for (int i = 0; i < m; i++) {
+            mp[t[i]]++;
+        }
+        while (r < n) {
+            if (mp[s[r]] > 0)
+                count++;
+            mp[s[r]]--; // decrement all storing values
+
+            // When all characters of t are matched
+            while (count == m) {
+                if ((r - l + 1) < minLen) {
+                    minLen = r - l + 1;
+                    sidx = l; // update starting idx
+                }
+                mp[s[l]]++; // increment the storing value
+                if (mp[s[l]] > 0)
+                    count--;
+                l++; // shrink
+            }
+            r++;
+        }
+        return sidx == -1 ? "" : s.substr(sidx, minLen);
+    }
+};
