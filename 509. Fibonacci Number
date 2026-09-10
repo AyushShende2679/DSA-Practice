@@ -1,7 +1,6 @@
 /* Logic:
 Take the input n.
-If n == 0, return 0.
-If n == 1, return 1.
+If n <= 1, return n.
 Otherwise, calculate:
 fib(n - 1) + fib(n - 2)
 The function keeps calling itself until it reaches 0 or 1.
@@ -21,10 +20,7 @@ So, fib(5) = 5.
 class Solution {
 public:
     int fib(int n) {
-        // Base case: Fibonacci of 0 is 0
-        if (n == 0)
-            return 0;
-
+      
         // Base case: Fibonacci of 1 is 1
         if (n == 1)
             return 1;
