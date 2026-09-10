@@ -1,0 +1,35 @@
+/* Logic
+
+ - A power of 2 is always divisible by `2`, except `1`.
+- Keep dividing `n` by `2`.
+- If we eventually reach `1`, then `n` is a power of 2.
+- If `n` becomes odd before reaching `1`, it is not a power of 2.
+- `n <= 0` is also not a power of 2.
+
+ Example:
+
+```
+8 → 4 → 2 → 1 → true
+16 → 8 → 4 → 2 → 1 → true
+10 → 5 → odd → false
+12 → 6 → 3 → odd → false
+```
+*/
+
+class Solution {
+public:
+    bool isPowerOfTwo(int n) {
+        // Base case
+        if (n == 1)
+            return true;
+
+        // 0, negative numbers, and odd numbers
+        // (except 1) cannot be powers of 2.
+        if (n <= 0 || n % 2 != 0)
+            return false;
+
+        // Divide by 2 and check again
+        return isPowerOfTwo(n / 2);
+    }
+};
+
