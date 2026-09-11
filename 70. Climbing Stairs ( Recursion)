@@ -1,0 +1,61 @@
+ /* Logic:
+
+1. If `n == 1`, there is only **1 way**.
+2. If `n == 2`, there are **2 ways**.
+3. For every `n > 2`:
+   - We can reach the current step by taking **1 step** from `n-1`.
+   - Or by taking **2 steps** from `n-2`.
+4. Therefore:
+
+```
+ways(n) = ways(n-1) + ways(n-2)
+```
+
+ 5. Keep applying this recursively until we reach the base cases.
+
+ **Example:**
+
+```
+n = 4
+
+ways(4)
+= ways(3) + ways(2)
+= (ways(2) + ways(1)) + ways(2)
+= (2 + 1) + 2
+= 5
+```
+*/
+
+// This will give TLE , since TC: 2^n
+class Solution {
+public: 
+    int climbStairs(int n) {
+        // in constraints n>=1 , so n == 0 is not convienent
+        // if (n == 0)
+        //   return 0;
+
+        // Base case:
+        // If there is only 1 step, there is only 1 way to climb it.
+        if (n == 1)
+            return 1;
+
+        // Base case:
+        // If there are 2 steps, we can either:
+        // 1. Take 1 step + 1 step
+        // 2. Take 2 steps at once
+        // So, there are 2 ways.
+        if (n == 2)
+            return 2;
+
+        // For n steps, the last move can be:
+        // 1 step  -> climbStairs(n - 1)
+        // 2 steps -> climbStairs(n - 2)
+        //
+        // Therefore, total ways =
+        // ways to reach (n - 1) + ways to reach (n - 2)
+        int ans = climbStairs(n - 1) + climbStairs(n - 2);
+
+        // Return the total number of ways.
+        return ans;
+    }
+};
