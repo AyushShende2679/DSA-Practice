@@ -42,3 +42,46 @@ public:
         return -1;
     }
 };
+/* using Recursion 
+class Solution {
+private:
+    // Recursive function to perform binary search
+    int solve(vector<int>& nums, int target, int low, int high) {
+
+        // Base case:
+        // If low crosses high, the target does not exist
+        if (low > high)
+            return -1;
+
+        // Find the middle index
+        // This formula avoids possible integer overflow
+        int mid = low + (high - low) / 2;
+
+        // If middle element is the target, return its index
+        if (nums[mid] == target)
+            return mid;
+
+        // If middle element is smaller than target,
+        // search in the right half
+        else if (nums[mid] < target)
+            low = mid + 1;
+
+        // If middle element is greater than target,
+        // search in the left half
+        else
+            high = mid - 1;
+
+        // Recursively search in the remaining half
+        return solve(nums, target, low, high);
+    }
+
+public:
+    // Main function
+    int search(vector<int>& nums, int target) {
+
+        // Start binary search from the first
+        // element (index 0) to the last element
+        return solve(nums, target, 0, nums.size() - 1);
+    }
+};
+*/
