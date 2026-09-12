@@ -1,0 +1,54 @@
+/* Logic:
+
+ - For every character, we have **2 choices**:
+  - Include the character.
+  - Exclude the character.
+- If we include it, add it to `temp` and move to the next character.
+- After that, remove the character from `temp` (**backtracking**).
+- Then try the exclude case and move to the next character.
+- When all characters are processed, add `temp` to the result.
+- Finally, sort the result to get the power set in lexicographical order.
+
+ **In short:**\
+ **Include → Recursion → Remove → Exclude → Recursion**.
+*/
+
+class Solution {
+	public:
+	void solve(string &s, int idx, string& temp, vector<string>& res) {
+		
+		// Base case: all characters have been processed
+		if (idx >= s.size()) {
+			res.push_back(temp);
+			return;
+		}
+		
+		// include - exclude pattern:
+		// include
+		temp.push_back(s[idx]);
+		
+		// Move to the next character after including current character
+		solve(s, idx + 1, temp, res);
+		
+		// Backtracking: remove the current character
+		// so that we can explore the exclude case
+		temp.pop_back();
+		
+		// exclude
+		// Current character is not included in temp
+		solve(s, idx + 1, temp, res);
+	}
+	
+	vector<string> powerSet(string &s) {
+		vector<string> res;
+		string temp = "";
+		
+		// Start recursion from the first character
+		solve(s, 0, temp, res);
+		
+		// Sort the power set in lexicographical order
+		sort(res.begin(), res.end());
+		
+		return res;
+	}
+};
