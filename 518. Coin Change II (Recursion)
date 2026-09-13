@@ -1,0 +1,60 @@
+/* Logic
+
+ - We start from `idx = 0` and try to make the target `amount`.
+- At every coin, we have **two choices**:
+
+ 1. **Include the current coin**
+   - Subtract its value from `amount`.
+   - Stay at the **same `idx`** because we can use the same coin unlimited times.
+   - `solve(amount - coins[idx], coins, idx)`
+2. **Exclude the current coin**
+   - Don't use the current coin.
+   - Move to the **next coin**.
+   - `solve(amount, coins, idx + 1)`
+
+ - If `amount == 0`, we found one valid combination, so return `1`.
+- If `amount < 0` or there are no coins left, the combination is invalid, so return `0`.
+- Finally, add both possibilities:
+  - `includeAns + excludeAns`
+
+ ### In one line
+
+ > **Include → amount decreases, index stays same. Exclude → amount stays same, index increases.**
+*/
+
+class Solution {
+public:
+    int solve(int amount, vector<int>& coins, int idx) {
+        // Base case:
+        // If amount becomes exactly 0, we found one valid combination.
+        if (amount == 0)
+            return 1;
+
+        // If amount becomes negative, this combination is invalid.
+        // If idx reaches the end, there are no more coins to choose from.
+        if (amount < 0 || idx >= coins.size())
+            return 0;
+
+        // include - exclude pattern
+
+        // Take the current coin.
+        // We stay at the same idx because we can use
+        // the same coin unlimited times.
+        int includeAns = solve(amount - coins[idx], coins, idx);
+
+        // Don't take the current coin.
+        // Move to the next coin.
+        // so amount is unchanged
+        int excludeAns = solve(amount, coins, idx + 1);
+
+        // sum up all include and exclude cases
+        int res = includeAns + excludeAns;
+
+        return res;
+    }
+    int change(int amount, vector<int>& coins) {
+        int idx = 0;
+        int ans = solve(amount, coins, idx);
+        return ans;
+    }
+};
