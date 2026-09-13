@@ -1,0 +1,29 @@
+// It will throw TLE , since time complexity : 2^n
+class Solution {
+public:
+    int solve(vector<int>& nums, int idx) {
+        // Base case:
+        // If index goes beyond the last house,
+        // there is nothing left to rob.
+        if (idx >= nums.size())
+            return 0;
+
+        // Include the current house:
+        // If we rob the current house, we cannot rob
+        // the next adjacent house, so move to idx + 2.
+        int includeAns = nums[idx] + solve(nums, idx + 2);
+
+        // Exclude the current house:
+        // Skip this house and move to the next house.
+        int excludeAns = solve(nums, idx + 1);
+
+        // Return the maximum amount between
+        // robbing and skipping the current house.
+        return max(includeAns, excludeAns);
+    }
+
+    int rob(vector<int>& nums) {
+        // Start from the first house (index 0).
+        return solve(nums, 0);
+    }
+};
