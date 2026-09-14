@@ -1,0 +1,61 @@
+/* Logic
+
+ - We have a matrix where we need to **select exactly one element from each row**.
+- Start with `row = 0` and `sum = 0`.
+- For every element in the current row:
+  - Select that element.
+  - Add it to `sum`.
+  - Recursively move to the next row.
+- When all rows are processed, calculate:\
+   `abs(target - sum)`
+- Among all possible selections, keep the **minimum difference**.
+- Return that minimum difference as the answer.
+
+ ### In one line
+
+ **Try every possible combination of one element from each row and return the minimum `|target - sum|`.**
+*/
+
+class Solution {
+public:
+    // Recursive function to find the minimum difference
+    // between target and the sum obtained by selecting
+    // exactly one element from each row.
+    int solve(vector<vector<int>>& mat, int target, int row, int sum) {
+
+        // Base case:
+        // If we have processed all rows, calculate the
+        // absolute difference between target and current sum.
+        if (row >= mat.size()) {
+            return abs(target - sum);
+        }
+
+        // Store the minimum difference found for this row.
+        int mini = INT_MAX;
+
+        // Try every element from the current row.
+        for (int i : mat[row]) {
+
+            // Choose the current element 'i' and move
+            // to the next row.
+            int ans = solve(mat, target, row + 1, sum + i);
+
+            // Keep the minimum difference among all choices.
+            mini = min(mini, ans);
+        }
+
+        return mini;
+    }
+
+    int minimizeTheDifference(vector<vector<int>>& mat, int target) {
+
+        // Start from the first row with an initial sum of 0.
+        int row = 0;
+        int sum = 0;
+
+        // Find the minimum possible difference.
+        int ans = solve(mat, target, row, sum);
+
+        return ans;
+    }
+};
