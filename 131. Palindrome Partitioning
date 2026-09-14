@@ -1,0 +1,87 @@
+/* Logic:
+
+ The main idea is to **partition the string into smaller substrings such that every substring is a palindrome.
+
+ 1. Start from the beginning of the string.
+2. Try every possible prefix:
+   - First character
+   - First two characters
+   - First three characters
+   - And so on.
+3. Check whether the selected prefix is a palindrome.
+4. If it is a palindrome:
+   - Add it to the current partition `temp`.
+   - Recursively solve the remaining part of the string.
+5. When the remaining string becomes empty, the current partition is complete, so add it to `res`.
+6. After the recursive call, remove the selected substring from `temp` and try another possibility. This is **backtracking**.
+*/
+
+class Solution {
+public:
+    // Checks whether the given string is a palindrome
+    bool isPalindrome(string& s) {
+
+        // Create a copy of the string
+        string s2 = s;
+
+        // Reverse the copied string
+        reverse(s2.begin(), s2.end());
+
+        // If original and reversed strings are same,
+        // then the string is a palindrome
+        return s == s2;
+    }
+
+    // Backtracking function to find all possible
+    // palindrome partitions
+    void solve(string s, vector<vector<string>>& res, vector<string>& temp) {
+
+        // Base case:
+        // If no characters are left, we have found
+        // one complete valid partition
+        if (s.size() == 0) {
+            res.push_back(temp);
+            return;
+        }
+
+        // Try every possible prefix of the string
+        for (int i = 0; i < s.size(); i++) {
+
+            // Take substring from index 0 to i
+            string part = s.substr(0, i + 1);
+
+            // Only continue if the selected substring
+            // is a palindrome
+            if (isPalindrome(part)) {
+
+                // Choose:
+                // Add the palindrome substring to current partition
+                temp.push_back(part);
+
+                // Explore:
+                // Recursively partition the remaining string
+                solve(s.substr(i + 1), res, temp);
+
+                // Backtrack:
+                // Remove the last substring so that we can
+                // try another possible partition
+                temp.pop_back();
+            }
+        }
+    }
+
+    vector<vector<string>> partition(string s) {
+
+        // Stores all possible palindrome partitions
+        vector<vector<string>> res;
+
+        // Stores the current partition being constructed
+        vector<string> temp;
+
+        // Start the backtracking process
+        solve(s, res, temp);
+
+        // Return all valid palindrome partitions
+        return res;
+    }
+};
