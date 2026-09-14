@@ -1,0 +1,87 @@
+/* Logic:
+
+ The logic is based on **Include / Exclude recursion**.
+
+ 1. Start with the first coin (`idx = 0`).
+2. For every coin, make **two choices**:
+   - **Include** the current coin.
+   - **Exclude** the current coin.
+3. If we **include** the coin:
+   - Subtract its value from `amount`.
+   - Keep the same `idx` because a coin can be used unlimited times.
+   - Add `1` to the number of coins used.
+4. If we **exclude** the coin:
+   - Don't change `amount`.
+   - Move to the next coin using `idx + 1`.
+5. If `amount == 0`, the required amount has been formed, so return `0`.
+6. If `amount < 0` or there are no coins left, that path is invalid, so return `INT_MAX`.
+7. Take the minimum of the **include** and **exclude** answers.
+8. Finally:
+   - If the answer is `INT_MAX`, return `-1`.
+   - Otherwise, return the minimum number of coins.
+
+ ### In one line
+
+ **For every coin, either take it and stay on the same coin, or skip it and move to the next coin; return the minimum number of coins needed to make the amount.**
+*/
+
+class Solution {
+public:
+    // Recursive function to find the minimum number of coins
+    // needed to make the given 'amount' starting from index 'idx'.
+    int solve(vector<int>& coins, int amount, int idx) {
+
+        // Base case:
+        // If amount becomes 0, we have successfully formed
+        // the required amount, so no more coins are needed.
+        if (amount == 0)
+            return 0;
+
+        // If amount becomes negative, this combination is invalid.
+        // If idx goes beyond the last coin, no more coins are available.
+        // Return INT_MAX to represent "impossible".
+        if (amount < 0 || idx >= coins.size())
+            return INT_MAX;
+
+        // INCLUDE the current coin.
+        //
+        // We subtract the current coin's value from amount.
+        // idx remains the same because we can use the same coin
+        // multiple times (unlimited supply).
+        int includeAns = solve(coins, amount - coins[idx], idx);
+
+        // If including the coin was possible,
+        // add 1 to count the current coin.
+        //
+        // We don't add 1 to INT_MAX because that could cause
+        // integer overflow.
+        if (includeAns != INT_MAX)
+            includeAns += 1;
+
+        // EXCLUDE the current coin.
+        //
+        // Move to the next coin using idx + 1.
+        int excludeAns = solve(coins, amount, idx + 1);
+
+        // Choose the better of the two choices:
+        // 1. Include current coin
+        // 2. Exclude current coin
+        int ans = min(includeAns, excludeAns);
+
+        return ans;
+    }
+
+    int coinChange(vector<int>& coins, int amount) {
+
+        // Start considering coins from index 0.
+        int idx = 0;
+
+        // Find the minimum number of coins required.
+        int ans = solve(coins, amount, idx);
+
+        // If answer is INT_MAX, it means the amount cannot
+        // be formed using the given coins.
+        // Otherwise, return the minimum number of coins.
+        return ans == INT_MAX ? -1 : ans;
+    }
+};
