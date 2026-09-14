@@ -1,0 +1,81 @@
+/* Logic — Combination Sum III
+
+ Use **Backtracking with Include/Exclude**.
+
+ 1. We have numbers from **1 to 9**.
+2. At every index, we have two choices:
+   - **Include** the current number.
+   - **Exclude** the current number.
+3. If we **include**:
+   - Add the number to `temp`.
+   - Subtract it from `target`.
+   - Increase `count`.
+   - Move to `idx + 1` because a number can be used only once.
+4. After the include recursion, **backtrack** using `pop_back()`.
+5. Then **exclude** the current number and move to `idx + 1`.
+6. If:
+     then we found the required combination.
+   - `target == 0`
+   - and `count == k`
+7. Stop if:
+   - `target < 0`
+   - `count > k`
+   - `idx >= 9`
+*/
+
+class Solution {
+public:
+    vector<vector<int>> res;
+
+    void solve(int a[], int target, int idx, vector<int>& temp, int count,
+               int k) {
+
+        // Base case:
+        // If target becomes 0 and we have exactly k numbers,
+        // we found a valid combination.
+        if (target == 0 && count == k) {
+            res.push_back(temp);
+            return;
+        }
+
+        // Invalid case:
+        // More than k numbers, target becomes negative,
+        // or all numbers are checked.
+        if (count > k || target < 0 || idx >= 9)
+            return;
+
+        // ================= INCLUDE =================
+
+        // Include the current number
+        temp.push_back(a[idx]);
+
+        // Move to next index because
+        // each number can be used only once.
+        solve(a, target - a[idx], idx + 1, temp, count + 1, k);
+
+        // Backtrack: remove the included number
+        temp.pop_back();
+
+        // ================= EXCLUDE =================
+
+        // Exclude the current number
+        // and move to the next number.
+        solve(a, target, idx + 1, temp, count, k);
+    }
+
+    vector<vector<int>> combinationSum3(int k, int n) {
+
+        // Clear previous results
+        res.clear();
+
+        // Numbers available are 1 to 9
+        int candidates[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+        vector<int> temp;
+
+        // Start recursion from index 0
+        solve(candidates, n, 0, temp, 0, k);
+
+        return res;
+    }
+};
