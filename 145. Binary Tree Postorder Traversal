@@ -1,0 +1,51 @@
+/* Logic
+
+1. Create an empty vector `res` to store the postorder traversal.
+2. Start traversal from the root node.
+3. If the current node is `nullptr`, return.
+4. Recursively traverse the **left subtree**.
+5. Recursively traverse the **right subtree**.
+6. Finally, add the **current/root node's value** to `res`.
+7. Continue this process for every node.
+8. Return `res` after the complete traversal.
+
+**Postorder Traversal:**
+`Left → Right → Root`
+
+**Time Complexity:** `O(n)` — every node is visited once.
+
+**Space Complexity:** `O(h)` — recursion stack, where `h` is the height of the tree.
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ * right(right) {}
+ * };
+ */
+class Solution {
+private:
+    void postOrder(TreeNode* root, vector<int>& res) {
+        if (root == nullptr)
+            return;
+
+        // postOrder : left + right + root
+
+        postOrder(root->left, res);
+        postOrder(root->right, res);
+        res.push_back(root->val);
+    }
+
+public:
+    vector<int> postorderTraversal(TreeNode* root) {
+        vector<int> res;
+        postOrder(root, res);
+        return res;
+    }
+};
