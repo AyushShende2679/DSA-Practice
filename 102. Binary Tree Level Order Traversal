@@ -1,0 +1,92 @@
+/* Logic:
+
+ - First, check if the tree is empty. If it is, return an empty answer.
+- Use a **queue** because we need to visit nodes **level by level**.
+- Put the root node into the queue.
+- Keep processing while the queue is not empty.
+- At the start of each level, find the number of nodes currently in the queue: `n = q.size()`.
+- Use a `for` loop to process exactly those `n` nodes. These are the nodes belonging to the **current level**.
+- For every node:
+  - Remove it from the queue.
+  - Store its value in the current level vector.
+  - Add its left child to the queue if it exists.
+  - Add its right child to the queue if it exists.
+- After processing all `n` nodes, add the current level vector to the result.
+- Repeat until the queue becomes empty.
+- Return the result.
+
+ ### In one line
+
+ **Use BFS with a queue, and process `q.size()` nodes at a time so that each iteration of the `while` loop represents one level of the tree.**
+*/
+
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left),
+ *     right(right) {}
+ * };
+ */
+
+class Solution {
+public:
+    vector<vector<int>> levelOrder(TreeNode* root) {
+
+        // Stores the final answer
+        // Each inner vector represents one level
+        vector<vector<int>> res;
+
+        // If tree is empty, return empty result
+        if (root == nullptr)
+            return res;
+
+        // Queue is used for BFS (level-by-level traversal)
+        queue<TreeNode*> q;
+
+        // Start by putting the root into the queue
+        q.push(root);
+
+        while (!q.empty()) {
+
+            // Stores values of nodes at the current level
+            vector<int> temp;
+
+            // Number of nodes currently in the queue
+            // These nodes belong to the current level
+            int n = q.size();
+
+            // Process exactly 'n' nodes
+            // This for loop is important because it ensures
+            // we process only the current level at a time
+            for (int i = 0; i < n; i++) {
+
+                // Get the first node from the queue
+                TreeNode* node = q.front();
+                q.pop();
+
+                // Add left child to queue
+                // It will be processed in the next level
+                if (node->left != nullptr)
+                    q.push(node->left);
+
+                // Add right child to queue
+                // It will also be processed in the next level
+                if (node->right != nullptr)
+                    q.push(node->right);
+
+                // Store current node's value
+                temp.push_back(node->val);
+            }
+
+            // After processing all nodes of this level,
+            // add that level to the final answer
+            res.push_back(temp);
+        }
+        return res;
+    }
+};
