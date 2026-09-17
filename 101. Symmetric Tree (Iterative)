@@ -1,0 +1,110 @@
+/* Logic:
+
+1. **Check if the tree is empty**
+
+   * If `root == nullptr`, return `true`.
+
+2. **Create two queues**
+
+   * `q1` stores nodes from the **left subtree**.
+   * `q2` stores corresponding nodes from the **right subtree**.
+
+3. **Put the first pair into the queues**
+
+   * `root->left` → `q1`
+   * `root->right` → `q2`
+
+4. **Process both queues together**
+
+   * Take one node from each queue.
+
+5. **Handle `NULL` nodes**
+
+   * If both are `NULL`, they are symmetric → continue.
+   * If only one is `NULL`, return `false`.
+
+6. **Compare node values**
+
+   * If `node1->val != node2->val`, return `false`.
+
+7. **Add mirror children**
+
+   * `node1->left` ↔ `node2->right`
+   * `node1->right` ↔ `node2->left`
+
+8. **Repeat until queues are empty**
+
+   * If every corresponding pair matches, return `true`.
+
+### In short
+
+**Compare left and right subtrees in mirror order:**
+
+```text
+left->left   ↔ right->right
+left->right  ↔ right->left
+```
+
+If all values and `NULL` positions match → **symmetric (`true`)**. Otherwise → **not symmetric (`false`)**.
+
+*/
+
+
+class Solution {
+public:
+    bool isSymmetric(TreeNode* root) {
+
+        // If the tree is empty, it is symmetric
+        if (root == nullptr)
+            return true;
+
+        // Two queues:
+        // q1 stores nodes from the left subtree
+        // q2 stores corresponding mirror nodes from the right subtree
+        queue<TreeNode*> q1;
+        queue<TreeNode*> q2;
+
+        // Start with root's left and right children
+        q1.push(root->left);
+        q2.push(root->right);
+
+        // Process both queues together
+        while (!q1.empty() && !q2.empty()) {
+
+            // Get the front nodes from both queues
+            TreeNode* node1 = q1.front();
+            q1.pop();
+
+            TreeNode* node2 = q2.front();
+            q2.pop();
+
+            // If both nodes are NULL,
+            // they are symmetric, so continue
+            if (node1 == nullptr && node2 == nullptr)
+                continue;
+
+            // If only one node is NULL,
+            // the tree is not symmetric
+            if (node1 == nullptr || node2 == nullptr)
+                return false;
+
+            // If their values are different,
+            // the tree is not symmetric
+            if (node1->val != node2->val)
+                return false;
+
+            // Compare mirror/opposite children
+            // left of node1 <-> right of node2
+            q1.push(node1->left);
+            q2.push(node2->right);
+
+            // right of node1 <-> left of node2
+            q1.push(node1->right);
+            q2.push(node2->left);
+        }
+
+        // Both queues should be empty
+        // if the tree is symmetric
+        return q1.empty() && q2.empty();
+    }
+};
