@@ -1,0 +1,73 @@
+/* Logic:
+
+1. **Check if the tree is empty**
+
+   * If `root == nullptr`, there is nothing to invert, so return `nullptr`.
+
+2. **Use a queue for BFS**
+
+   * Put the root into the queue.
+   * We will visit every node one by one.
+
+3. **Process each node**
+
+   * Take the front node from the queue.
+   * Swap its `left` and `right` children.
+
+4. **Add children to the queue**
+
+   * If the node has a left child, add it.
+   * If the node has a right child, add it.
+
+5. **Repeat**
+
+   * Continue until the queue becomes empty.
+   * This means every node has been inverted.
+
+6. **Return the root**
+
+   * The original tree has now been modified into its inverted form.
+
+### In one line
+
+**BFS traversal + swap left and right child of every node = inverted binary tree.**
+
+*/
+// Iterative approach: 
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        // If the tree is empty, return nullptr
+        if (root == nullptr)
+            return nullptr;
+
+        // Queue is used for BFS (level-order traversal)
+        queue<TreeNode*> q;
+
+        // Start BFS from the root
+        q.push(root);
+
+        // Process nodes until the queue becomes empty
+        while (!q.empty()) {
+
+            // Get the front node and remove it from the queue
+            TreeNode* node = q.front();
+            q.pop();
+
+            // Swap the left and right children
+            // This inverts the current node
+            swap(node->left, node->right);
+
+            // Add the left child to the queue if it exists
+            if (node->left)
+                q.push(node->left);
+
+            // Add the right child to the queue if it exists
+            if (node->right)
+                q.push(node->right);
+        }
+
+        // Return the root of the inverted tree
+        return root;
+    }
+};
