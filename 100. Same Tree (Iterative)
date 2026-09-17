@@ -1,0 +1,87 @@
+/* Logic:
+
+1. Start with the **root nodes of both trees**.
+
+2. Put both roots into **separate queues**.
+
+3. Take one node from each queue at the same time.
+
+4. Check the nodes:
+
+   * If **both are `NULL`**, continue.
+   * If **only one is `NULL`**, return `false`.
+   * If their **values are different**, return `false`.
+
+5. If both nodes are valid and have the same value:
+
+   * Put their **left children** into the queues.
+   * Put their **right children** into the queues.
+
+6. Continue until all corresponding nodes are checked.
+
+7. If no difference is found, return `true`.
+
+### Easy way to remember
+
+> **Same position → same value → same children**
+
+For every pair:
+
+**NULL check → value check → left with left → right with right.**
+
+*/
+
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+
+        // If both trees are empty, they are the same
+        if (p == nullptr && q == nullptr)
+            return true;
+
+        queue<TreeNode*> q1;
+        queue<TreeNode*> q2;
+
+        // Start BFS from both root nodes
+        q1.push(p);
+        q2.push(q);
+
+        // Process both queues together
+        while (!q1.empty() && !q2.empty()) {
+
+            // Get the front nodes from both queues
+            TreeNode* node1 = q1.front();
+            q1.pop();
+
+            TreeNode* node2 = q2.front();
+            q2.pop();
+
+            // If both nodes are NULL,
+            // there is nothing to compare
+            if (node1 == nullptr && node2 == nullptr)
+                continue;
+
+            // If only one node is NULL,
+            // the structures of the trees are different
+            if (node1 == nullptr || node2 == nullptr)
+                return false;
+
+            // If values are different,
+            // the trees are not the same
+            if (node1->val != node2->val)
+                return false;
+
+            // Compare left child with left child
+            q1.push(node1->left);
+            q2.push(node2->left);
+
+            // Compare right child with right child
+            q1.push(node1->right);
+            q2.push(node2->right);
+        }
+
+        // If both queues are empty,
+        // all nodes matched successfully
+        return q1.empty() && q2.empty();
+    }
+};
