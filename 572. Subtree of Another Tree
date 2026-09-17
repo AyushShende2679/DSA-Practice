@@ -1,0 +1,66 @@
+/* Logic:
+
+1. We need to check whether `subRoot` exists somewhere inside `root`.
+2. Start traversing the `root` tree recursively.
+3. At every node:
+
+   * If the current node's value is equal to `subRoot->val`, call `isSameTree()` to check whether the two trees are completely identical.
+4. `isSameTree()`:
+
+   * If both nodes are `nullptr` → trees are same.
+   * If one is `nullptr` → trees are different.
+   * If values are different → trees are different.
+   * Otherwise, recursively compare both **left** and **right** children.
+5. If the trees match at any node, return `true`.
+6. Otherwise, continue searching in:
+
+   * `root->left`
+   * `root->right`
+7. If neither side contains the subtree, return `false`.
+
+### In one line
+
+**Traverse `root` → find a node with the same value as `subRoot` → compare both trees completely → if no match, search left and right.**
+*/
+
+class Solution {
+public:
+    // Checks whether two binary trees are exactly the same.
+    // They must have the same structure and the same node values.
+    bool isSameTree(TreeNode* root, TreeNode* subRoot) {
+
+        // If both nodes are NULL, both trees have ended at this point.
+        if (root == nullptr && subRoot == nullptr)
+            return true;
+
+        // If only one node is NULL, the tree structures are different.
+        if (root == nullptr || subRoot == nullptr)
+            return false;
+
+        // If the values are different, the trees cannot be the same.
+        if (root->val != subRoot->val)
+            return false;
+
+        // Recursively check both left and right subtrees.
+        return isSameTree(root->left, subRoot->left) &&
+               isSameTree(root->right, subRoot->right);
+    }
+
+    // Checks whether subRoot exists as a subtree inside root.
+    bool isSubtree(TreeNode* root, TreeNode* subRoot) {
+
+        // If both are NULL, they are considered the same.
+        // If root is NULL but subRoot isn't, subRoot cannot exist here.
+        if (root == nullptr || subRoot == nullptr)
+            return root == subRoot;
+
+        // If current nodes have the same value,
+        // check whether the complete trees starting here are identical.
+        if (root->val == subRoot->val && isSameTree(root, subRoot))
+            return true;
+
+        // Otherwise, search for subRoot in the left or right subtree.
+        return isSubtree(root->left, subRoot) ||
+               isSubtree(root->right, subRoot);
+    }
+};
