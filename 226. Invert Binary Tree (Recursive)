@@ -1,0 +1,53 @@
+/* Logic:
+
+1. **Check if the root is `NULL`**
+
+   * If `root == nullptr`, return `nullptr`.
+   * This is the **base case** for recursion.
+
+2. **Swap left and right**
+
+   * Swap the left child with the right child of the current node.
+
+3. **Recursively invert the left subtree**
+
+   * Call `invertTree(root->left)`.
+
+4. **Recursively invert the right subtree**
+
+   * Call `invertTree(root->right)`.
+
+5. **Return the root**
+
+   * After both subtrees are inverted, return `root`.
+
+### In short:
+
+**For every node → Swap left & right → Recursively invert left → Recursively invert right → Return root.**
+
+**Time:** `O(n)`
+**Space:** `O(h)` where `h` is the height of the tree.
+*/
+
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+
+        // Base case:
+        // If the tree/subtree is empty, there is nothing to invert
+        if (root == nullptr)
+            return nullptr;
+
+        // Swap the left and right children of the current node
+        swap(root->left, root->right);
+
+        // Recursively invert the left subtree
+        invertTree(root->left);
+
+        // Recursively invert the right subtree
+        invertTree(root->right);
+
+        // Return the root of the inverted tree
+        return root;
+    }
+};
