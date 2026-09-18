@@ -1,0 +1,44 @@
+/* Logic:
+
+ - Start from the `root`.
+- If `root == nullptr`, the value is not present, so return `nullptr`.
+- If `root->val == val`, we found the required node, so return `root`.
+- If `val < root->val`, go to the **left subtree** because smaller values are on the left.
+- Otherwise, `val > root->val`, so go to the **right subtree** because larger values are on the right.
+- Repeat the same process recursively until the value is found or the tree becomes empty.
+
+ ### In one line
+
+ **Compare → Decide left/right → Repeat until found or NULL.**
+*/
+
+class Solution {
+public:
+    // In a BST:
+    // - All values in the left subtree are smaller than root->val
+    // - All values in the right subtree are greater than root->val
+    //
+    // Therefore, at each node we can decide which subtree to search.
+
+    TreeNode* searchBST(TreeNode* root, int val) {
+
+        // Base case:
+        // If the tree/subtree is empty, the value does not exist.
+        if (root == nullptr)
+            return root;
+
+        // If the current node contains the required value,
+        // return this node.
+        if (root->val == val)
+            return root;
+
+        // If val is smaller than the current node,
+        // it can only exist in the left subtree.
+        if (val < root->val)
+            return searchBST(root->left, val);
+
+        // If val is greater than the current node,
+        // it can only exist in the right subtree.
+        return searchBST(root->right, val);
+    }
+};
