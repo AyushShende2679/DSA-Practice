@@ -1,0 +1,57 @@
+/* Logic:
+
+1. If root is NULL, return NULL.
+2. If root is p or q, return root.
+3. Search for p and q in the left subtree.
+4. Search for p and q in the right subtree.
+5. If both left and right are not NULL:
+   - One node is on the left.
+   - One node is on the right.
+   - So current root is the LCA.
+6. If only left is not NULL:
+   - Return left.
+7. Otherwise:
+   - Return right.
+
+ Simple idea:
+
+ Search left + search right.
+
+ If both sides find something, current node is the answer.
+*/
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+
+        // If root is NULL, there is no node in this subtree
+        if (root == nullptr)
+            return nullptr;
+
+        // If current node is either p or q,
+        // we have found one of the target nodes
+        if (root == p || root == q)
+            return root;
+
+        // Search for p and q in the left subtree
+        TreeNode* left = lowestCommonAncestor(root->left, p, q);
+
+        // Search for p and q in the right subtree
+        TreeNode* right = lowestCommonAncestor(root->right, p, q);
+
+        // If both left and right are non-NULL,
+        // one node is present on the left and the other on the right.
+        // Therefore, current root is the Lowest Common Ancestor.
+        if (left != nullptr && right != nullptr)
+            return root;
+
+        // If only left is non-NULL,
+        // return whatever LCA was found in the left subtree.
+        else if (left != nullptr)
+            return left;
+
+        // If left is NULL, return the result from the right subtree.
+        else
+            return right;
+    }
+};
