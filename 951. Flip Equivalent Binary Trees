@@ -1,0 +1,64 @@
+/* Logic:
+
+ The idea is to compare the two trees **recursively**.
+
+ 1. If both nodes are `NULL`, they are equivalent → `true`.
+2. If one node is `NULL`, they cannot be equivalent → `false`.
+3. If their values are different, they cannot be equivalent → `false`.
+4. Now there are **two possibilities**:
+   - **No flip:**\
+      `root1->left` matches `root2->left` **and** `root1->right` matches `root2->right`.
+   - **Flip:**\
+      `root1->left` matches `root2->right` **and** `root1->right` matches `root2->left`.
+5. If **either** possibility is true, the trees are flip equivalent.
+
+ In short:
+
+```
+Same value
+    |
+    +-- No Flip:
+    |      left  ↔ left
+    |      right ↔ right
+    |
+    +-- Flip:
+           left  ↔ right
+           right ↔ left
+
+If either case is true → Flip Equivalent
+```
+*/
+ The important point is: **inside each case use `&&`, between the two cases use `||`.**
+
+class Solution {
+public:
+    bool flipEquiv(TreeNode* root1, TreeNode* root2) {
+
+        // If both nodes are NULL, they are equivalent
+        if (root1 == nullptr && root2 == nullptr)
+            return true;
+
+        // If only one node is NULL, they are not equivalent
+        if (root1 == nullptr || root2 == nullptr)
+            return false;
+
+        // If the values are different, trees cannot be equivalent
+        if (root1->val != root2->val)
+            return false;
+
+        // Case 1: No flip
+        // left of root1  <-> left of root2
+        // right of root1 <-> right of root2
+        bool noflip = flipEquiv(root1->left, root2->left) &&
+                      flipEquiv(root1->right, root2->right);
+
+        // Case 2: Flip
+        // left of root1  <-> right of root2
+        // right of root1 <-> left of root2
+        bool flip = flipEquiv(root1->left, root2->right) &&
+                    flipEquiv(root1->right, root2->left);
+
+        // Trees are equivalent if either we flip or don't flip
+        return flip || noflip;
+    }
+};
