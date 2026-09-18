@@ -1,0 +1,41 @@
+/* Logic:
+
+ - Start from the `root`.
+- Compare the values of `p` and `q` with `root`.
+- If **both `p` and `q` are smaller** than `root`, their LCA must be in the **left subtree**, so move left.
+- If **both `p` and `q` are greater** than `root`, their LCA must be in the **right subtree**, so move right.
+- Otherwise, `p` and `q` are on **different sides of root**, or one of them is the `root` itself.
+- Therefore, the current `root` is the **Lowest Common Ancestor**.
+
+ ### Easy to remember
+
+```
+Both smaller → LEFT
+Both greater → RIGHT
+Different sides → ROOT is LCA
+```
+
+ **Key idea:** Use the **BST property** to eliminate half of the tree at every step.
+*/
+
+
+class Solution {
+public:
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+
+        // If both p and q are smaller than root,
+        // then both nodes must lie in the left subtree.
+        if (p->val < root->val && q->val < root->val)
+            return lowestCommonAncestor(root->left, p, q);
+
+        // If both p and q are greater than root,
+        // then both nodes must lie in the right subtree.
+        if (p->val > root->val && q->val > root->val)
+            return lowestCommonAncestor(root->right, p, q);
+
+        // Otherwise, p and q are on different sides of root,
+        // or root is equal to p or q.
+        // Therefore, root is the Lowest Common Ancestor.
+        return root;
+    }
+};
