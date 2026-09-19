@@ -1,0 +1,87 @@
+/* Logic:
+
+ 1. **Convert BST into sorted array**
+   - Perform an **inorder traversal**: Left → Root → Right.
+   - Since it is a BST, the resulting array will be in **ascending order**.
+2. **Use two pointers**
+   - Put one pointer `i` at the beginning (smallest value).
+   - Put another pointer `j` at the end (largest value).
+3. **Check their sum**
+   - Calculate `arr[i] + arr[j]`.
+   - If it equals `k`, return `true`.
+   - If it is **less than `k`**, move `i` forward to get a larger sum.
+   - If it is **greater than `k`**, move `j` backward to get a smaller sum.
+4. **Stop condition**
+   - Continue while `i < j`.
+   - If the pointers meet without finding a pair, return `false`.
+
+ ### In one line
+
+ **BST → Inorder sorted array → Two pointers → Find two values whose sum is `k`.**
+*/
+
+class Solution {
+public:
+    // Stores the inorder traversal of the BST.
+    // Inorder traversal of a BST gives elements in sorted order.
+    vector<int> arr;
+
+    // Performs inorder traversal of the binary search tree.
+    void inOrder(TreeNode* root) {
+        // Base case: if the node is NULL, stop recursion.
+        if (root == nullptr)
+            return;
+
+        // Visit the left subtree.
+        inOrder(root->left);
+
+        // Store the current node's value.
+        arr.push_back(root->val);
+
+        // Visit the right subtree.
+        inOrder(root->right);
+    }
+
+    // Uses the two-pointer technique to check
+    // whether two elements add up to the target.
+    bool TwoSum(vector<int>& arr, int target) {
+        // Left pointer starts at the smallest element.
+        int i = 0;
+
+        // Right pointer starts at the largest element.
+        int j = arr.size() - 1;
+
+        // Continue until the two pointers meet.
+        while (i < j) {
+            // Calculate the sum of the two selected elements.
+            int sum = arr[i] + arr[j];
+
+            // If the sum equals the target, we found the pair.
+            if (sum == target)
+                return true;
+
+            // If the sum is too small, move the left pointer
+            // to get a larger value.
+            else if (sum < target)
+                i++;
+
+            // If the sum is too large, move the right pointer
+            // to get a smaller value.
+            else
+                j--;
+        }
+
+        // No pair was found whose sum equals the target.
+        return false;
+    }
+
+    // Main function to check whether the BST contains
+    // two nodes whose values add up to k.
+    bool findTarget(TreeNode* root, int k) {
+        // Convert the BST into a sorted array using inorder traversal.
+        inOrder(root);
+
+        // Apply the two-pointer approach on the sorted array.
+        return TwoSum(arr, k);
+    }
+};
