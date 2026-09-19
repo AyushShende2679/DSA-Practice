@@ -1,0 +1,137 @@
+/* Logic
+
+ - For every node, recursively find the **deepest leaf** in its left and right subtrees.
+- For each subtree, return two things:
+  - the **depth** of its deepest leaf
+  - the **LCA** of all deepest leaves at that depth
+- Compare the depths of the left and right subtrees:
+  - If both depths are equal, the current node is the LCA of the deepest leaves.
+  - If the left depth is greater, the LCA lies in the left subtree.
+  - If the right depth is greater, the LCA lies in the right subtree.
+- Add `1` to the selected depth while returning to the parent.
+- Finally, `lcaDeepestLeaves()` returns the LCA stored in the pair.
+
+ ### In one line
+
+ **Find the maximum depth on both sides; if equal, current node is LCA, otherwise move toward the deeper side.**
+*/
+
+class Solution {
+public:
+    // Returns a pair:
+    // first  -> depth of the deepest leaf in this subtree
+    // second -> LCA of all deepest leaves
+    pair<int, TreeNode*> LCA(TreeNode* root) {
+
+        // Base case:
+        // If the node is NULL, depth is 0
+        // and there is no LCA.
+        if (root == nullptr)
+            return {0, root};
+
+        // Find the deepest leaf and its LCA
+        // in the left subtree.
+        auto left = LCA(root->left);
+
+        // Find the deepest leaf and its LCA
+        // in the right subtree.
+        auto right = LCA(root->right);
+
+        // If both sides have deepest leaves at
+        // the same depth, the current node is
+        // the LCA of those deepest leaves.
+        if (left.first == right.first)
+            return {left.first + 1, root};
+
+        // If the left subtree is deeper,
+        // the LCA must be in the left subtree.
+        else if (left.first > right.first)
+            return {left.first + 1, left.second};
+
+        // If the right subtree is deeper,
+        // the LCA must be in the right subtree.
+        else
+            return {right.first + 1, right.second};
+    }
+
+    // Returns the smallest subtree containing
+    // all the deepest nodes of the tree.
+    TreeNode* subtreeWithAllDeepest(TreeNode* root) { 
+        return LCA(root).second; 
+    }
+};
+
+/*  OR
+class Solution {
+public:
+    // Stores: node value -> depth of that node
+    unordered_map<int, int> mp;
+
+    // Maximum depth found in the tree
+    int maxDepth = 0;
+
+    // Finds the LCA of all nodes having depth = maxDepth
+    TreeNode* LCA(TreeNode* root, int maxDepth) {
+        // If the node doesn't exist, return NULL
+        if (root == nullptr)
+            return root;
+
+        // If this node itself is at the maximum depth,
+        // it is one of the deepest leaves.
+        if (mp[root->val] == maxDepth)
+            return root;
+
+        // Search for deepest nodes in the left subtree
+        TreeNode* left = LCA(root->left, maxDepth);
+
+        // Search for deepest nodes in the right subtree
+        TreeNode* right = LCA(root->right, maxDepth);
+
+        // If deepest nodes exist on both sides,
+        // current node is their Lowest Common Ancestor.
+        if (left != NULL && right != NULL)
+            return root;
+
+        // If only the left subtree contains a deepest node,
+        // return the result from the left subtree.
+        else if (left != NULL)
+            return left;
+
+        // Otherwise, return the result from the right subtree.
+        else
+            return right;
+    }
+
+    // Calculates the depth of every node
+    // and finds the maximum depth in the tree.
+    void depth(TreeNode* root, int d) {
+        // Base case: no node
+        if (root == nullptr)
+            return;
+
+        // Update the maximum depth encountered so far
+        maxDepth = max(maxDepth, d);
+
+        // Store the depth of the current node
+        mp[root->val] = d;
+
+        // Traverse the left subtree
+        depth(root->left, d + 1);
+
+        // Traverse the right subtree
+        depth(root->right, d + 1);
+    }
+
+    // Main function
+    TreeNode* lcaDeepestLeaves(TreeNode* root) {
+
+        // First traversal:
+        // Calculate depth of every node and find maxDepth.
+        depth(root, 0);
+
+        // Second traversal:
+        // Find the LCA of all nodes at maxDepth.
+        return LCA(root, maxDepth);
+    }
+};
+*/
