@@ -71,3 +71,45 @@ public:
     }
 };
 */
+/*
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+
+        // Empty tree has depth 0
+        if (root == nullptr)
+            return 0;
+
+        queue<TreeNode*> q;
+        q.push(root);
+
+        int depth = 0;
+
+        // Process tree level by level
+        while (!q.empty()) {
+
+            // Number of nodes in current level
+            int size = q.size();
+
+            // Process all nodes of this level
+            while (size--) {
+
+                TreeNode* node = q.front();
+                q.pop();
+
+                // Add left child
+                if (node->left)
+                    q.push(node->left);
+
+                // Add right child
+                if (node->right)
+                    q.push(node->right);
+            }
+
+            // One complete level processed
+            depth++;
+        }
+
+        return depth;
+    }
+};*/
