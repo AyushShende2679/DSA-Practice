@@ -1,0 +1,73 @@
+/* Logic:
+
+1. If `root == NULL`, return `0`.
+2. Recursively calculate the **maximum depth of the left subtree**.
+3. Recursively calculate the **maximum depth of the right subtree**.
+4. If both children are `NULL`, the current node is a leaf, so return its current depth `d`.
+5. If the left subtree is empty, return the depth of the right subtree.
+6. If the right subtree is empty, return the depth of the left subtree.
+7. If both subtrees exist, return the **larger depth**:
+
+   ```cpp
+   max(left, right)
+   ```
+8. Start the root at depth `1`.
+*/
+
+class Solution {
+private:
+    // Returns the maximum depth of the subtree
+    // rooted at 'root'
+    int solve(TreeNode* root, int d) {
+
+        // Empty tree has depth 0
+        if (root == nullptr)
+            return 0;
+
+        // Find maximum depth of left subtree
+        int left = solve(root->left, d + 1);
+
+        // Find maximum depth of right subtree
+        int right = solve(root->right, d + 1);
+
+        // If both children are NULL,
+        // current node is a leaf
+        if (left == 0 && right == 0)
+            return d;
+
+        // If left subtree is empty,
+        // take the right subtree depth
+        if (left == 0)
+            return right;
+
+        // If right subtree is empty,
+        // take the left subtree depth
+        if (right == 0)
+            return left;
+
+        // If both subtrees exist,
+        // take the larger depth
+        return max(left, right);
+    }
+
+public:
+    int maxDepth(TreeNode* root) {
+
+        // Root starts at depth 1
+        return solve(root, 1);
+    }
+};
+
+/*
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if(root==nullptr){
+          return 0 ;
+        }
+        int x=maxDepth(root->left);
+        int y=maxDepth(root->right);
+        return max(x,y)+1;
+    }
+};
+*/
