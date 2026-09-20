@@ -1,0 +1,78 @@
+/* Logic:
+
+- In a **Binary Search Tree (BST)**, inorder traversal visits nodes in **ascending order**.
+- Perform an inorder traversal: **Left → Root → Right**.
+- Maintain a `count` variable to track how many nodes have been visited.
+- Every time a node is visited, increment `count`.
+- When `count == k`, the current node is the **k-th smallest element**.
+- Store its value in `ans` and stop further traversal.
+- Finally, return `ans`.
+
+*/
+
+class Solution {
+public:
+    int ans = 0, count = 0;
+
+    // Performs inorder traversal of the BST.
+    // Inorder traversal of a BST gives elements in sorted order.
+    void inOrder(TreeNode* root, int k) {
+
+        // Base case: if the node is NULL, return.
+        if (root == nullptr)
+            return;
+
+        // First, visit the left subtree.
+        // All elements in the left subtree are smaller than root.
+        inOrder(root->left, k);
+
+        // If we have already found the kth element,
+        // stop processing further nodes.
+        if (count >= k)
+            return;
+
+        // Count the current node.
+        count++;
+
+        // If this is the kth visited node,
+        // it is the kth smallest element.
+        if (count == k) {
+            ans = root->val;
+            return;
+        }
+
+        // Finally, visit the right subtree.
+        // All elements in the right subtree are greater than root.
+        inOrder(root->right, k);
+    }
+
+    int kthSmallest(TreeNode* root, int k) {
+
+        // Start inorder traversal from the root.
+        inOrder(root, k);
+
+        // Return the kth smallest value.
+        return ans;
+    }
+};
+
+
+/* class Solution {
+public:
+    vector<int> arr;
+
+    void inOrder(TreeNode* root) {
+        if (root == nullptr)
+            return;
+
+        inOrder(root->left);
+        arr.push_back(root->val);
+        inOrder(root->right);
+    }
+
+    int kthSmallest(TreeNode* root, int k) {
+        inOrder(root);
+        return arr[k - 1];
+    }
+};
+*/
