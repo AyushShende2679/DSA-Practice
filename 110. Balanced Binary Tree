@@ -1,0 +1,57 @@
+/* Logic:
+
+1. Start from the root and recursively go to the left and right subtrees.
+2. For every node, find:
+
+   * height of left subtree
+   * height of right subtree
+3. Check the difference between both heights.
+
+   * If difference is **more than 1**, the tree is unbalanced.
+4. Use `-1` to indicate that a subtree is already unbalanced.
+5. If either left or right subtree returns `-1`, directly return `-1`.
+6. Otherwise, return the height of the current subtree:
+   **`max(left, right) + 1`**
+7. Finally:
+
+   * `solve(root) == -1` → unbalanced
+   * otherwise → balanced
+
+### Simple way to remember
+
+> **Find height → check difference → if balanced return height, otherwise return -1.**
+
+This avoids calculating the height again and again, so the time complexity is **O(n)**.
+*/
+
+class Solution {
+private:
+    int solve(TreeNode* root) {
+        // Empty tree has height 0
+        if (root == nullptr)
+            return 0;
+
+        // Find height of left subtree
+        int left = solve(root->left);
+
+        // Find height of right subtree
+        int right = solve(root->right);
+
+        // If any subtree is already unbalanced
+        if (left == -1 || right == -1)
+            return -1;
+
+        // If height difference is more than 1, tree is unbalanced
+        if (abs(left - right) > 1)
+            return -1;
+
+        // Return height of current node
+        return max(left, right) + 1;
+    }
+
+public:
+    bool isBalanced(TreeNode* root) {
+        // -1 means tree is unbalanced
+        return solve(root) != -1;
+    }
+};
