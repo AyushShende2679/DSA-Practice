@@ -1,0 +1,46 @@
+/* Logic:
+
+1. Start from the root and recursively find the **height of the left and right subtree**.
+2. At every node:
+
+   * `left` = height of left subtree
+   * `right` = height of right subtree
+3. The diameter passing through the current node is:
+   **`left + right`**
+4. Compare it with the previously found maximum diameter and update `maximum`.
+5. Return the height of the current node:
+   **`max(left, right) + 1`**
+6. After the complete traversal, `maximum` contains the diameter of the tree.
+*/
+
+
+class Solution {
+private:
+    int solve(TreeNode* root, int& maximum) {
+        // Empty tree has height 0
+        if (root == nullptr)
+            return 0;
+
+        // Find height of left subtree
+        int left = solve(root->left, maximum);
+
+        // Find height of right subtree
+        int right = solve(root->right, maximum);
+
+        // Diameter through current node = left height + right height
+        maximum = max(maximum, left + right);
+
+        // Return height of current subtree
+        return max(left, right) + 1;
+    }
+
+public:
+    int diameterOfBinaryTree(TreeNode* root) {
+        int maximum = 0;
+
+        // Calculate height and update maximum diameter
+        solve(root, maximum);
+
+        return maximum;
+    }
+};
