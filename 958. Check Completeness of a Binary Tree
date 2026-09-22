@@ -1,0 +1,58 @@
+/* Logic
+
+ - Use **level-order traversal (BFS)** with a queue.
+- Add the root to the queue.
+- Traverse every node from left to right.
+- When you encounter a `NULL` node, set a flag `past = true`.
+- After that, if you encounter **any non-NULL node**, the tree is not complete.
+- Otherwise, if all remaining nodes are `NULL`, the tree is complete.
+- Return `true` at the end.
+
+ ### In one line
+
+ **A complete binary tree must not have a non-NULL node after a NULL node in level-order traversal.**
+*/
+
+class Solution {
+public:
+    bool isCompleteTree(TreeNode* root) {
+        // An empty tree is considered a complete binary tree
+        if (root == nullptr)
+            return true;
+
+        // Queue is used for level-order traversal (BFS)
+        queue<TreeNode*> q;
+        q.push(root);
+
+        // Once we encounter a NULL node, every node after it
+        // in level-order traversal must also be NULL
+        bool seen = false;
+
+        while (!q.empty()) {
+            // Get the front node from the queue
+            TreeNode* node = q.front();
+            q.pop();
+
+            // If the current node is NULL,
+            // mark that we have encountered a missing node
+            if (node == nullptr) {
+                seen = true;
+            } else {
+                // If we already encountered a NULL node
+                // and now find a valid node, the tree is not complete
+                if (seen)
+                    return false;
+
+                // Add left and right children to the queue
+                // Even if they are NULL, we add them so that
+                // we can detect gaps in the tree
+                q.push(node->left);
+                q.push(node->right);
+            }
+        }
+
+        // No valid node appeared after a NULL node,
+        // so the tree is complete
+        return true;
+    }
+};
