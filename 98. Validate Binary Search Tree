@@ -1,0 +1,74 @@
+/* Logic:
+
+1. A **Binary Search Tree (BST)** follows this rule:
+
+   * Every node in the left subtree is **smaller** than the current node.
+   * Every node in the right subtree is **greater** than the current node.
+
+2. To verify this, maintain a valid range `(mini, maxi)` for every node.
+
+3. Initially, the root can contain any value:
+
+   ```cpp
+   mini = LLONG_MIN
+   maxi = LLONG_MAX
+   ```
+
+4. For the current node:
+
+   * If `root == nullptr`, return `true`.
+   * If `root->val <= mini` or `root->val >= maxi`, the BST property is violated → return `false`.
+
+5. For the **left subtree**, the maximum allowed value becomes the current node's value:
+
+   ```cpp
+   solve(root->left, mini, root->val)
+   ```
+
+6. For the **right subtree**, the minimum allowed value becomes the current node's value:
+
+   ```cpp
+   solve(root->right, root->val, maxi)
+   ```
+
+7. Both subtrees must be valid:
+
+   ```cpp
+   left && right
+   ```
+
+### In one line
+
+**Keep a valid range for every node, narrow the range for the left and right subtrees, and return false whenever a node falls outside its allowed range.**
+*/
+
+class Solution {
+public:
+    // Checks whether the tree follows the BST property
+    // within the given range (mini, maxi)
+    bool solve(TreeNode* root, long long mini, long long maxi) {
+
+        // An empty tree is a valid BST
+        if (root == nullptr)
+            return true;
+
+        // Current node must be strictly between mini and maxi
+        if (root->val <= mini || root->val >= maxi)
+            return false;
+
+        // Left subtree:
+        // All values must be smaller than root->val
+        //
+        // Right subtree:
+        // All values must be greater than root->val
+        return solve(root->left, mini, root->val) &&
+               solve(root->right, root->val, maxi);
+    }
+
+    bool isValidBST(TreeNode* root) {
+
+        // Initially, root can have any integer value
+        // long long is used so INT_MIN and INT_MAX are also valid node values
+        return solve(root, LLONG_MIN, LLONG_MAX);
+    }
+};
