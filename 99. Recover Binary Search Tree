@@ -1,0 +1,91 @@
+/* Logic:
+Inorder traversal of a BST is sorted.
+For a correct BST, the inorder sequence should be in increasing order.
+
+During inorder traversal, keep track of the previous node using prev.
+
+Check:
+
+root->val < prev->val
+
+If this happens, the BST order is broken.
+
+At the first violation:
+
+first = prev
+
+second = root
+
+If there is a second violation, update:
+
+second = root
+
+This handles both cases:
+
+Swapped nodes are adjacent in inorder.
+
+Swapped nodes are not adjacent.
+
+After traversal, we have found the two incorrect nodes.
+
+Swap their values:
+
+swap(first->val, second->val);
+*/
+
+class Solution {
+public:
+    // Stores the first incorrectly placed node
+    TreeNode* first = NULL;
+
+    // Stores the second incorrectly placed node
+    TreeNode* second = NULL;
+
+    // Keeps track of the previously visited node
+    // during inorder traversal
+    TreeNode* prev = NULL;
+
+    void inOrder(TreeNode* root) {
+        // Base case
+        if (root == nullptr)
+            return;
+
+        // Visit left subtree
+        inOrder(root->left);
+
+        // Inorder traversal of a valid BST should
+        // produce values in increasing order.
+        // If current value is smaller than previous value,
+        // we have found a violation.
+        if (prev != NULL && root->val < prev->val) {
+
+            // For the first violation, the previous node
+            // is the first incorrect node.
+            if (first == NULL) {
+                first = prev;
+            }
+
+            // The current node is the second incorrect node.
+            // This also handles the case where the swapped
+            // nodes are not adjacent in inorder traversal.
+            second = root;
+        }
+
+        // Update previous node
+        prev = root;
+
+        // Visit right subtree
+        inOrder(root->right);
+    }
+
+    void recoverTree(TreeNode* root) {
+
+        // Find the two nodes whose values are swapped
+        inOrder(root);
+
+        // Swap their values to restore the BST.
+        // We swap the values, NOT the pointers.
+        swap(first->val, second->val);
+    }
+};
+
