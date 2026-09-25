@@ -1,0 +1,51 @@
+/* Logic:
+Start from the root with sum = 0.
+
+For every node, add its value to the number formed so far:
+
+sum = sum * 10 + root->val;
+
+Continue recursively to the left and right children.
+
+When a leaf node is reached, the complete root-to-leaf number has been formed.
+
+Add that number to res.
+*/
+
+After traversing the entire tree, return res.
+class Solution {
+public:
+    int res = 0; // Stores the total sum of all root-to-leaf numbers
+
+    void solve(TreeNode* root, int sum) {
+        // If the current node is NULL, there is nothing to process
+        if (root == nullptr)
+            return;
+
+        // Add the current digit to the number formed so far
+        // Example: sum = 12, root->val = 3
+        // New sum = 12 * 10 + 3 = 123
+        sum = sum * 10 + root->val;
+
+        // Check if the current node is a leaf node
+        if (root->left == nullptr && root->right == nullptr) {
+            // We have formed a complete root-to-leaf number
+            res += sum;
+            return;
+        }
+
+        // Recursively process the left subtree
+        solve(root->left, sum);
+
+        // Recursively process the right subtree
+        solve(root->right, sum);
+    }
+
+    int sumNumbers(TreeNode* root) {
+        // Start traversal with sum = 0
+        solve(root, 0);
+
+        // Return the sum of all root-to-leaf numbers
+        return res;
+    }
+};
