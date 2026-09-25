@@ -1,0 +1,81 @@
+/* Logic:
+
+Create a res vector to store all valid root-to-leaf paths.
+
+Create a temp vector to store the current path.
+
+Use a recursive function solve() to perform DFS.
+
+If the current node is nullptr, return.
+
+Add the current node's value to:
+
+sum → current path sum
+
+temp → current path
+
+Check whether the current node is a leaf node.
+
+If it is a leaf and sum == targetSum, add temp to res.
+
+Recursively traverse the left subtree.
+
+Recursively traverse the right subtree.
+
+After both subtrees are processed, remove the current node from temp using pop_back().
+
+This is called backtracking.
+
+Finally, return res.
+
+In one line
+Use DFS to build each root-to-leaf path, keep its running sum, store the path when the sum matches at a leaf, and backtrack after exploring each node.
+*/
+
+
+class Solution {
+public:
+    void solve(TreeNode* root, int targetSum, int sum, vector<vector<int>>& res,
+               vector<int>& temp) {
+
+        // If node doesn't exist, stop
+        if (root == nullptr)
+            return;
+
+        // Add current node value to the path sum
+        sum = sum + root->val;
+
+        // Add current node to the current path
+        temp.push_back(root->val);
+
+        // Check if current node is a leaf
+        if (root->left == nullptr && root->right == nullptr) {
+
+            // If root-to-leaf sum matches target,
+            // store this path in the result
+            if (sum == targetSum)
+                res.push_back(temp);
+        }
+
+        // Explore left subtree
+        solve(root->left, targetSum, sum, res, temp);
+
+        // Explore right subtree
+        solve(root->right, targetSum, sum, res, temp);
+
+        // BACKTRACK:
+        // Remove current node before returning to parent
+        temp.pop_back();
+    }
+
+    vector<vector<int>> pathSum(TreeNode* root, int targetSum) {
+
+        vector<vector<int>> res; // Stores all valid paths
+        vector<int> temp;        // Stores current path
+
+        // Start DFS from root with sum = 0
+        solve(root, targetSum, 0, res, temp);
+
+        return res;
+    }
+};
