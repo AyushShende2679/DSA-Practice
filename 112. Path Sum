@@ -1,0 +1,80 @@
+/* Logic:
+If root == nullptr, return false because there is no path.
+ 
+Use a queue for BFS (level-order traversal).
+
+Store each node along with the sum of values from the root to that node.
+
+Start by inserting the root with root->val.
+
+For every node:
+
+Remove it from the queue.
+
+If it is a leaf node:
+
+Check whether its path sum equals targetSum.
+
+If yes, return true.
+
+If a left child exists, add it to the queue with:
+currentSum + leftChild->val
+
+If a right child exists, add it to the queue with:
+currentSum + rightChild->val
+
+If the queue becomes empty without finding a matching leaf, return false.
+
+In one line
+Traverse every root-to-leaf path using BFS while carrying the path sum, and return true if any leaf has a sum equal to targetSum.
+*/
+
+// you can also use recursion to solve this
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum) {
+        // If the tree is empty, there is no path
+        if (root == nullptr)
+            return false;
+
+        // Queue stores:
+        // 1. The current node
+        // 2. The sum of values from root to that node
+        queue<pair<TreeNode*, int>> q;
+
+        // Start with the root and its value as the initial path sum
+        q.push({root, root->val});
+
+        // BFS / Level-order traversal
+        while (!q.empty()) {
+
+            // Get the front node and its current path sum
+            auto [node, sum] = q.front();
+            q.pop();
+
+            // Check if the current node is a leaf node
+            // A leaf has no left and no right child
+            if (node->left == nullptr && node->right == nullptr) {
+
+                // If the path sum equals targetSum,
+                // we found a valid root-to-leaf path
+                if (sum == targetSum)
+                    return true;
+            }
+
+            // If left child exists, add it to the queue
+            // Update the path sum by adding the left child's value
+            if (node->left)
+                q.push({node->left, sum + node->left->val});
+
+            // If right child exists, add it to the queue
+            // Update the path sum by adding the right child's value
+            if (node->right)
+                q.push({node->right, sum + node->right->val});
+        }
+
+        // No root-to-leaf path has the required sum
+        return false;
+    }
+};
+
