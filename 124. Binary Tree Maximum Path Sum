@@ -1,0 +1,50 @@
+/* Logic:
+
+ 1. Start from the bottom of the tree using recursion.
+2. For each node, find the maximum path sum from its left and right child.
+3. If a child gives a negative sum, ignore it using `max(0, ...)`.
+4. A path passing through the current node can use **both** left and right:
+
+   ```
+   left + root->val + right
+   ```
+    Update `maximum` with this value.
+5. For the parent, we can return only **one side**, because a path cannot branch:
+
+   ```
+   root->val + max(left, right)
+   ```
+6. Continue this for every node and return `maximum`.
+
+ ### In one line
+
+ > **At each node, calculate the best path passing through it, update the answer, and return the best one-sided path to its parent.**
+*/
+
+class Solution {
+public:
+    int solve(TreeNode* root, int& maximum) {
+        // No node, so there is no contribution to the path
+        if (root == nullptr)
+            return 0;
+
+        // Ignore negative paths because they will only reduce the sum
+        int left = max(0, solve(root->left, maximum));
+        int right = max(0, solve(root->right, maximum));
+
+        // The path can go through the current node using both sides
+        maximum = max(maximum, left + right + root->val);
+
+        // Return the best one-sided path to the parent
+        return root->val + max(left, right);
+    }
+
+    int maxPathSum(TreeNode* root) {
+        // Start with the smallest value since all nodes can be negative
+        int maximum = INT_MIN;
+
+        solve(root, maximum);
+
+        return maximum;
+    }
+};
