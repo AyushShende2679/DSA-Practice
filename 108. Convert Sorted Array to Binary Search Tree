@@ -1,0 +1,64 @@
+/* Logic:
+
+ The goal is to convert a **sorted array into a height-balanced Binary Search Tree (BST)**.
+
+ 1. Since the array is sorted, choose the **middle element** as the root.
+   - This keeps roughly half of the elements on each side.
+   - Therefore, the tree remains height-balanced.
+2. Find the middle index:
+
+   ```
+   int mid = (low + high) / 2;
+   ```
+3. Create the root using `nums[mid]`.
+4. All elements **before `mid`** are smaller than the root, so they form the **left subtree**:
+
+   ```
+   root->left = solve(nums, low, mid - 1);
+   ```
+5. All elements **after `mid`** are greater than the root, so they form the **right subtree**:
+
+   ```
+   root->right = solve(nums, mid + 1, high);
+   ```
+6. Continue recursively until:
+
+   ```
+   low > high
+   ```
+    At that point, there are no elements left, so return `nullptr`.
+
+*/
+class Solution {
+public:
+    TreeNode* solve(vector<int>& nums, int low, int high) {
+        // If the range is invalid, there is no node to create.
+        if (low > high)
+            return nullptr;
+
+        // Choose the middle element as the root.
+        // This keeps the BST height-balanced.
+        int mid = (low + high) / 2;
+
+        // Create the root node using the middle element.
+        TreeNode* root = new TreeNode(nums[mid]);
+
+        // Elements before mid are smaller than the root,
+        // so they form the left subtree.
+        root->left = solve(nums, low, mid - 1);
+
+        // Elements after mid are greater than the root,
+        // so they form the right subtree.
+        root->right = solve(nums, mid + 1, high);
+
+        // Return the constructed subtree.
+        return root;
+    }
+
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        int n = nums.size();
+
+        // Build the BST using the complete array.
+        return solve(nums, 0, n - 1);
+    }
+};
