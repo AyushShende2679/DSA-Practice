@@ -1,0 +1,83 @@
+/* Logic
+
+ The main idea is to use **postorder to find the root** and **inorder to divide the tree into left and right subtrees**.
+
+ 1. **Postorder traversal**
+   - Postorder follows:\
+      `Left → Right → Root`
+   - Therefore, the **last element is the root**.
+   - We start from `n - 1` and move backwards using `idx--`.
+2. **Inorder traversal**
+   - Inorder follows:\
+      `Left → Root → Right`
+   - Find the root's position in inorder using the hashmap.
+   - Elements **after the root** belong to the right subtree.
+   - Elements **before the root** belong to the left subtree.
+3. **Build right subtree first**
+
+   ```
+   Root → Right → Left
+   ```
+    So after creating the root, we must recursively build the **right subtree first**, then the left subtree.
+   - Since we are traversing postorder backwards:
+4. **Base condition**
+   - If `low > high`, there are no elements in the current inorder range.
+   - Return `nullptr`.
+*/
+
+class Solution {
+public:
+    // Stores the index of each value in the inorder traversal.
+    unordered_map<int, int> mp;
+
+    // Points to the current element in postorder.
+    // We start from the last element because the last element is the root.
+    int idx;
+
+    TreeNode* solve(vector<int>& postorder, int low, int high) {
+        // No elements in this range means no subtree.
+        if (low > high)
+            return nullptr;
+
+        // In postorder:
+        // Left -> Right -> Root
+        // So when traversing from the end, we get:
+        // Root -> Right -> Left
+        TreeNode* root = new TreeNode(postorder[idx]);
+
+        // Move to the previous element in postorder.
+        idx--;
+
+        // Find the root's position in inorder.
+        int id = mp[root->val];
+
+        // Since we are traversing postorder from right to left,
+        // we must construct the RIGHT subtree first.
+        
+        // Elements after root in inorder belong to right subtree.
+        root->right = solve(postorder, id + 1, high);
+
+        // Elements before root in inorder belong to left subtree.
+        root->left = solve(postorder, low, id - 1);
+
+        // Return the constructed subtree.
+        return root;
+    }
+
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        int n = postorder.size();
+
+        // Store the index of every value in inorder
+        // for O(1) average lookup.
+        for (int i = 0; i < n; i++) {
+            mp[inorder[i]] = i;
+        }
+
+        // Start from the last element of postorder
+        // because it is the root.
+        idx = n - 1;
+
+        // Build the tree using the complete inorder range.
+        return solve(postorder, 0, n - 1);
+    }
+};
