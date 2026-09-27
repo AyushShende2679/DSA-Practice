@@ -1,0 +1,75 @@
+/* Logic:
+
+ The main idea is to use **preorder to find the root** and **inorder to divide the tree into left and right subtrees**.
+
+ 1. **Preorder traversal**
+   - In preorder, the order is:\
+      `Root → Left → Right`
+   - Therefore, the first unused element in preorder is always the root of the current subtree.
+   - `idx` keeps track of that element.
+2. **Inorder traversal**
+   - In inorder, the order is:\
+      `Left → Root → Right`
+   - Once we know the root, find its position in inorder.
+   - Elements **before** the root belong to the left subtree.
+   - Elements **after** the root belong to the right subtree.
+3. **Hashmap**
+   - Store every value's index in inorder using `mp`.
+   - This lets us find the root's position in `O(1)` average time.
+4. **Recursion**
+   - Recursively construct the left subtree using the left portion of inorder.
+   - Recursively construct the right subtree using the right portion of inorder.
+   - Continue until `low > high`, meaning there are no elements left.
+*/
+
+class Solution {
+public:
+    // Stores the index of each value in the inorder traversal.
+    // Example: inorder = [9, 3, 15, 20, 7]
+    // mp[3] = 1, mp[20] = 3, etc.
+    unordered_map<int, int> mp;
+
+    // Points to the current element in preorder traversal.
+    int idx = 0;
+
+    TreeNode* solve(vector<int>& preorder, int low, int high) {
+        // If the inorder range is invalid,
+        // there is no node to create.
+        if (low > high)
+            return nullptr;
+
+        // In preorder, the first element is always
+        // the root of the current subtree.
+        TreeNode* root = new TreeNode(preorder[idx]);
+
+        // Move to the next element in preorder
+        // for the next recursive call.
+        idx++;
+
+        // Find the root's position in inorder.
+        int id = mp[root->val];
+
+        // All elements before the root in inorder
+        // belong to the left subtree.
+        root->left = solve(preorder, low, id - 1);
+
+        // All elements after the root in inorder
+        // belong to the right subtree.
+        root->right = solve(preorder, id + 1, high);
+
+        // Return the constructed subtree.
+        return root;
+    }
+
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int n = inorder.size();
+
+        // Store the index of every value in inorder
+        // for O(1) average lookup.
+        for (int i = 0; i < n; i++)
+            mp[inorder[i]] = i;
+
+        // Build the tree using the complete inorder range.
+        return solve(preorder, 0, n - 1);
+    }
+};
