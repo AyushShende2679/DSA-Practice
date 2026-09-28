@@ -1,0 +1,58 @@
+/* Logic:
+
+1. Create an adjacency list with `V` empty vectors, one for each vertex.
+2. Traverse every edge `(src, dest)`.
+3. Add `dest` to `src`'s adjacency list.
+4. Because the graph is **undirected**, also add `src` to `dest`'s adjacency list.
+5. Return the completed adjacency list.
+
+ For an edge `(u, v)`:
+
+```
+u → v
+v → u
+```
+
+ ## Complexity
+
+ Let **V** = number of vertices and **E** = number of edges.
+
+ - **Time Complexity:** `O(V + E)`
+  - Creating the adjacency list: `O(V)`
+  - Processing all edges: `O(E)`
+  - Each edge is processed once.
+- **Space Complexity:** `O(V + E)`
+  - `O(V)` for the vertices/empty lists.
+  - `O(2E)` entries are stored because every undirected edge is added in both directions.
+  - `O(V + E)` overall.
+*/
+
+class Solution {
+	public:
+	vector<vector<int>> printGraph(int V, vector<pair<int, int>> & edges) {
+		
+		// Create an adjacency list for V vertices.
+		// Initially, every vertex has an empty list of neighbours.
+		vector<vector<int>> adjList(V);
+		
+		// Traverse through all the edges.
+		for (int i = 0; i < edges.size(); i++) {
+			
+			// Since edges[i] is a pair<int, int>,
+			// use .first for the source vertex
+			// and .second for the destination vertex.
+			int src = edges[i].first;
+			int dest = edges[i].second;
+			
+			// Add destination to source's neighbour list.
+			adjList[src].push_back(dest);
+			
+			// Since this is an undirected graph,
+			// add source to destination's neighbour list as well.
+			adjList[dest].push_back(src);
+		}
+		
+		// Return the completed adjacency list.
+		return adjList;
+	}
+};
