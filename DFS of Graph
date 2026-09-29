@@ -1,0 +1,65 @@
+/* DFS Logic:
+
+1. **Start from node `0`.**
+2. Mark the current node as **visited**.
+3. Add the current node to the **result**.
+4. Look at all the **neighbors** of the current node.
+5. For each neighbor:
+   - If it is **not visited**, call DFS recursively on that neighbor.
+6. Continue until there are no unvisited neighbors.
+7. Return the traversal result.
+
+ In simple words:
+
+ > **Visit a node → mark it visited → store it → visit each unvisited neighbor recursively.**
+
+ Think of recursion as:
+ `"I am at this node; let me completely explore one unvisited neighbor before coming back and exploring the next one."`
+*/
+
+class Solution {
+	private:
+	
+	// Helper function to perform DFS starting from 'node'
+	void dfsHelper(vector<vector<int>> & adj, int node,
+	int visit[], vector<int>& res) {
+		
+		// Mark the current node as visited
+		visit[node] = 1;
+		
+		// Add the current node to the DFS result
+		res.push_back(node);
+		
+		// adj[node] contains all the neighbours of the current node.
+		
+		for (int neigh : adj[node]) {
+			
+			// If this neighbour has NOT been visited yet,
+			// recursively perform DFS from that neighbour.
+			if (!visit[neigh]) {
+				dfsHelper(adj, neigh, visit, res);
+			}
+		}
+	}
+	
+	public:
+	
+	vector<int> dfs(vector<vector<int>> & adj) {
+		
+		// Number of vertices in the graph
+		int n = adj.size();
+		
+		// Stores the DFS traversal
+		vector<int> res;
+		
+		// visited array
+		// Initially all nodes are marked as 0 (not visited)
+		int visit[n] = {0};
+		
+		// Start DFS from node 0
+		dfsHelper(adj, 0, visit, res);
+		
+		// Return the DFS traversal
+		return res;
+	}
+};
