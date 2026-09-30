@@ -1,0 +1,68 @@
+/* BFS Logic:
+
+1. Start from vertex `0`.
+2. Mark vertex `0` as visited and put it into a queue.
+3. While the queue is not empty:
+   - Remove the front vertex from the queue.
+   - Add it to the result.
+   - Check all its adjacent/neighbouring vertices.
+   - If a neighbour is not visited:
+     - Mark it as visited.
+     - Add it to the queue.
+4. Continue until the queue becomes empty.
+5. The result contains the vertices in **BFS traversal order**.
+*/
+
+class Solution {
+	public:
+	vector<int> bfs(vector<vector<int>> &adj) {
+		
+		// Number of vertices in the graph
+		int n = adj.size();
+		
+		// Stores the BFS traversal
+		vector<int> res;
+		
+		// visited[i] = 1 means vertex i has already been visited
+		vector<int> visit(n, 0);
+		
+		// Queue is used to implement BFS
+		queue<int> q;
+		
+		// Start BFS from vertex 0
+		q.push(0);
+		visit[0] = 1;
+		
+		// Continue until the queue becomes empty
+		while (!q.empty()) {
+			
+			// Get the front vertex and remove it from queue
+			int node = q.front();
+			q.pop();
+			
+			// Add the current vertex to the result
+			res.push_back(node);
+			
+			// Visit all neighbours of the current vertex
+			for (int i = 0; i < adj[node].size(); i++) {
+				
+				// Get the neighbouring vertex
+				int neigh = adj[node][i];
+				
+				// If the neighbour has not been visited
+				if (!visit[neigh]) {
+					
+					// Mark the neighbour as visited
+					// IMPORTANT: use neigh, not i
+					visit[neigh] = 1;
+					
+					// Add the neighbour to the queue
+					q.push(neigh);
+				}
+			}
+		}
+		
+		// Return the BFS traversal
+		return res;
+	}
+};
