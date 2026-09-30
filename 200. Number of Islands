@@ -1,0 +1,92 @@
+/* Logic :
+
+ The basic idea is:
+
+1. Traverse every cell of the grid.
+2. If the current cell is `'0'`, ignore it because it is water.
+3. If the current cell is `'1'` and not visited, we have found a **new island**.
+4. Increase the island count by `1`.
+5. Use DFS from that cell to visit all connected `'1'` cells.
+6. Mark every visited land cell so that the same island is not counted again.
+7. From each land cell, check its **4 directions**:
+   - Up
+   - Right
+   - Down
+   - Left
+8. Continue until the entire grid is processed.
+9. Return the total island count.
+
+ ### In simple words
+
+ > **Whenever we find an unvisited land cell, count one island and use DFS to mark the entire connected island as visited.**
+*/
+
+class Solution {
+private:
+    // DFS to visit all connected land cells ('1')
+    // belonging to the current island.
+    void dfs(int row, int col, vector<vector<char>>& grid,
+             vector<vector<bool>>& visit, int n, int m) {
+
+        // Stop DFS if:
+        // 1. We go outside the grid
+        // 2. The cell has already been visited
+        // 3. The cell is water ('0')
+        if (row < 0 || col < 0 || row >= n || col >= m || visit[row][col] ||
+            grid[row][col] == '0')
+            return;
+
+        // Mark the current land cell as visited
+        visit[row][col] = true;
+
+        dfs(row - 1, col, grid, visit, n, m); // top
+
+        dfs(row, col + 1, grid, visit, n, m); // right
+
+        dfs(row + 1, col, grid, visit, n, m); // down
+
+        dfs(row, col - 1, grid, visit, n, m); // left
+    }
+
+public:
+    int numIslands(vector<vector<char>>& grid) {
+
+        // Handle an empty grid
+        if (grid.empty() || grid[0].empty())
+            return 0;
+
+        // Number of rows
+        int n = grid.size();
+
+        // Number of columns
+        int m = grid[0].size();
+
+        // Stores the total number of islands
+        int no_of_islands = 0;
+
+        // Keeps track of cells that have already been visited
+        vector<vector<bool>> visit(n, vector<bool>(m, false));
+
+        // Traverse every cell in the grid
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                // If we find an unvisited land cell,
+                // it means we have found a new island.
+                if (grid[i][j] == '1' && !visit[i][j]) {
+
+                    // Visit all connected land cells
+                    // belonging to this island.
+                    dfs(i, j, grid, visit, n, m);
+
+                    // Increment island count after
+                    // completely exploring the island.
+                    no_of_islands++;
+                }
+            }
+        }
+
+        // Return the total number of islands
+        return no_of_islands;
+    }
+};
