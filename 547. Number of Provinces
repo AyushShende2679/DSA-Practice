@@ -1,0 +1,75 @@
+/* Logic:
+
+1. Treat each **city as a node** in a graph.
+2. `isConnected[i][j] == 1` means city `i` and city `j` are directly connected.
+3. Maintain a `visit` array to keep track of cities already visited.
+4. Loop through every city.
+5. If a city is **not visited**, it means we have found a **new province**.
+6. Start DFS from that city.
+7. In DFS:
+   - Mark the current city as visited.
+   - Check every other city.
+   - If it is connected and unvisited, recursively visit it.
+8. DFS visits **all cities belonging to that province**.
+9. After DFS finishes, increment `no_of_provinces`.
+10. Continue until all cities are processed.
+11. Return the total number of provinces.
+
+ ### In one line
+
+ **Every time we find an unvisited city, start DFS to visit its entire connected component and count that component as one province.**
+*/
+
+
+class Solution {
+
+    // DFS to visit all cities belonging to the same province
+    void dfs(int i, vector<vector<int>>& isConnected, vector<bool>& visit) {
+
+        // Mark the current city as visited
+        visit[i] = true;
+
+        // Check all cities connected to city i
+        for (int j = 0; j < isConnected[i].size(); j++) {
+
+            // If city j is directly connected to city i
+            // and city j has not been visited yet
+            if (isConnected[i][j] == 1 && !visit[j]) {
+
+                // Visit city j and all cities connected to it
+                dfs(j, isConnected, visit);
+            }
+        }
+    }
+
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+
+        // Number of cities
+        int n = isConnected.size();
+
+        // Count of provinces
+        int no_of_provinces = 0;
+
+        // visit[i] tells whether city i has already been visited
+        vector<bool> visit(n, false);
+
+        // Try starting DFS from every city
+        for (int i = 0; i < n; i++) {
+
+            // If city i hasn't been visited,
+            // it belongs to a new province
+            if (!visit[i]) {
+
+                // Visit the entire connected component
+                // containing city i
+                dfs(i, isConnected, visit);
+
+                // One complete province has been found
+                no_of_provinces++;
+            }
+        }
+
+        return no_of_provinces;
+    }
+};
