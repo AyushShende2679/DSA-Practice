@@ -1,0 +1,115 @@
+/* Logic :
+
+ 1. Create a **directed adjacency list**.
+
+   ```
+   adj[u].push_back(v)
+   ```
+   - For an edge `u → v`, add only:
+2. Maintain two arrays:
+   - `visit[node]` → whether the node has ever been visited.
+   - `pathVisit[node]` → whether the node is currently present in the DFS recursion path.
+3. For every unvisited node, start DFS.
+4. In DFS:
+   - Mark the current node as visited.
+   - Mark it as part of the current DFS path.
+5. Check every neighbor:
+   - If the neighbor is **not visited**, recursively call DFS.
+   - If the neighbor is already visited **and is currently in the DFS path**, a cycle exists.
+6. After processing all neighbors, remove the current node from the current DFS path:
+
+   ```
+   pathVisit[node] = false;
+   ```
+7. If any DFS detects a cycle, return `true`.
+8. If all nodes are processed without finding a cycle, return `false`.
+
+ ### Core idea
+
+```
+Not visited
+    ↓
+DFS into neighbor
+
+Already visited
+    ↓
+Is it in current DFS path?
+    ↓
+Yes → Cycle
+No  → No cycle
+```
+*/
+
+class Solution {
+	private:
+	bool dfs(int node,
+	vector<vector<int>> & adj,
+	vector<bool>& visit,
+	vector<bool>& pathVisit) {
+		
+		// Mark node as visited
+		visit[node] = true;
+		
+		// Mark node as part of the current DFS path
+		pathVisit[node] = true;
+		
+		// Traverse all neighbors
+		for (auto neigh : adj[node]) {
+			
+			// If neighbor has not been visited,
+			// explore it using DFS
+			if (!visit[neigh]) {
+				
+				if (dfs(neigh, adj, visit, pathVisit))
+					return true;
+			}
+			
+			// If neighbor is already in the current DFS path,
+			// we found a cycle
+			else if (pathVisit[neigh]) {
+				return true;
+			}
+		}
+		
+		// Remove node from current DFS path
+		pathVisit[node] = false;
+		
+		return false;
+	}
+	
+	public:
+	bool isCyclic(int V, vector<vector<int>> & edges) {
+		
+		// Create adjacency list
+		vector<vector<int>> adj(V);
+		
+		// Build directed graph
+		for (int i = 0; i < edges.size(); i++) {
+			
+			int src = edges[i][0];
+			int dest = edges[i][1];
+			
+			// Only one direction because graph is directed
+			adj[src].push_back(dest);
+		}
+		
+		// visit = node has been visited before
+		vector<bool> visit(V, false);
+		
+		// pathVisit = node is currently in DFS recursion path
+		vector<bool> pathVisit(V, false);
+		
+		// Check every connected component
+		for (int i = 0; i < V; i++) {
+			
+			if (!visit[i]) {
+				
+				if (dfs(i, adj, visit, pathVisit))
+					return true;
+			}
+		}
+		
+		// No cycle found
+		return false;
+	}
+};
