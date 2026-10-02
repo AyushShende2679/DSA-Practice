@@ -1,0 +1,127 @@
+/* Logic:
+
+ 1. Traverse the grid and:
+   - Put every **rotten orange (`2`)** into the queue with time `0`.
+   - Count the total number of **fresh oranges (`1`)**.
+2. Use **BFS** because rot spreads to neighboring oranges one minute at a time.
+3. For every orange removed from the queue:
+   - Check its **4 directions**: up, right, down, left.
+   - If the neighboring cell contains a fresh orange:
+     - Mark it visited.
+     - Add it to the queue with time `current_time + 1`.
+     - Decrease the fresh-orange count.
+4. Keep updating `time` with the maximum BFS time.
+5. After BFS:
+   - If `fresh_remain > 0`, some fresh oranges could not be reached → return `-1`.
+   - Otherwise, return `time`.
+
+ ### In one line
+
+ **Put all rotten oranges into a queue → BFS in 4 directions → rot fresh oranges level by level → count minutes → if any fresh orange remains, return `-1`.**
+*/
+
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+
+        // Get the number of rows and columns
+        int n = grid.size();
+        int m = grid[0].size();
+
+        // Stores the maximum time taken to rot all oranges
+        int time = 0;
+
+        // Count of fresh oranges
+        int fresh_remain = 0;
+
+        // Queue stores:
+        // {{row, col}, time}
+        //
+        // It is a multi-source BFS because all initially
+        // rotten oranges are added to the queue at time 0.
+        queue<pair<pair<int, int>, int>> q;
+
+        // Keeps track of cells that have already been visited
+        vector<vector<bool>> visit(n, vector<bool>(m, false));
+
+        // Traverse the entire grid
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                // If the orange is already rotten,
+                // add it to the queue with time = 0
+                if (grid[i][j] == 2) {
+                    q.push({{i, j}, 0});
+                    visit[i][j] = true;
+                }
+
+                // If the orange is fresh, increase the count
+                else if (grid[i][j] == 1) {
+                    fresh_remain++;
+                }
+            }
+        }
+
+        // Four possible directions:
+        //      up
+        // left    right
+        //      down
+        int drow[] = {-1, 0, 1, 0};
+        int dcol[] = {0, 1, 0, -1};
+
+        // Perform BFS
+        //
+        // We continue until the queue becomes empty.
+        // We don't stop based on fresh_remain because the last
+        // rotten orange still needs to be processed.
+        while (!q.empty()) {
+
+            // Get the front element from the queue
+            // pos = {row, col}
+            // t   = time at which this orange became rotten
+            auto [pos, t] = q.front();
+            q.pop();
+
+            int r = pos.first;
+            int c = pos.second;
+
+            // Keep track of the maximum time
+            time = max(time, t);
+
+            // Check all 4 neighboring cells
+            for (int k = 0; k < 4; k++) {
+
+                int row = r + drow[k];
+                int col = c + dcol[k];
+
+                // Check that:
+                // 1. The row is inside the grid
+                // 2. The column is inside the grid
+                // 3. The cell has not been visited
+                // 4. The cell contains a fresh orange
+                if (row >= 0 && col >= 0 && row < n && col < m &&
+                    !visit[row][col] && grid[row][col] == 1) {
+
+                    // Mark the fresh orange as visited
+                    visit[row][col] = true;
+
+                    // This orange becomes rotten after 1 minute
+                    // compared to the current orange
+                    q.push({{row, col}, t + 1});
+
+                    // One less fresh orange remains
+                    fresh_remain--;
+                }
+            }
+        }
+
+        // If fresh oranges are still remaining,
+        // they could not be reached by any rotten orange.
+        if (fresh_remain > 0)
+            return -1;
+
+        // All oranges have successfully rotted.
+        // 'time' contains the total number of minutes required.
+        return time;
+    }
+};
