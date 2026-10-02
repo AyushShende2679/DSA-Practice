@@ -1,0 +1,99 @@
+/* Logic:
+
+1. Create an **adjacency list** for the undirected graph.
+2. Maintain a `visit` array to keep track of visited nodes.
+3. For every unvisited node, start a **BFS** because the graph may contain multiple disconnected components.
+4. Store each node in the queue along with its **parent**:
+   - Starting node has parent `-1`.
+   - When visiting a neighbor for the first time, mark it visited and set the current node as its parent.
+5. While doing BFS:
+   - If a neighbor is **not visited**, visit it and store its parent.
+   - If a neighbor is **already visited** and it is **not the current node's parent**, then a cycle exists.
+6. If BFS finishes without finding a cycle, continue checking other disconnected components.
+7. If no cycle is found in any component, return `false`.
+
+ ### Core idea
+
+```
+Visited neighbor + not my parent = Cycle
+```
+ ### Complexity
+
+ - **Time:** `O(V + E)`
+- **Space:** `O(V + E)`
+*/
+
+class Solution {
+	bool bfs(int src, vector<vector<int>> & adj, vector<int>& visit) {
+		
+		queue<pair<int, int>> q;
+		
+		// Mark source as visited
+		visit[src] = 1;
+		
+		// Source has no parent, so parent = -1
+		q.push({src, -1});
+		
+		while (!q.empty()) {
+			
+			auto [node, parent] = q.front();
+			q.pop();
+			
+			// Check all adjacent nodes
+			for (auto neigh : adj[node]) {
+				
+				// If neighbor is not visited,
+				// mark it and store current node as its parent
+				if (!visit[neigh]) {
+					visit[neigh] = 1;
+					q.push({neigh, node});
+				}
+				
+				// If neighbor is already visited and
+				// it is NOT the parent of current node,
+				// then we found a cycle
+				else if (parent != neigh) {
+					return true;
+				}
+			}
+		}
+		
+		// No cycle found in this component
+		return false;
+	}
+	
+	public:
+	bool isCycle(int V, vector<vector<int>> & edges) {
+		
+		// Create adjacency list for V vertices
+		vector<vector<int>> adj(V);
+		
+		// Build the undirected graph
+		for (int i = 0; i < edges.size(); i++) {
+			
+			int src = edges[i][0];
+			int dest = edges[i][1];
+			
+			adj[src].push_back(dest);
+			adj[dest].push_back(src);
+		}
+		
+		// Visited array
+		vector<int> visit(V, 0);
+		
+		// Check every connected component
+		for (int i = 0; i < V; i++) {
+			
+			if (!visit[i]) {
+				
+				// If BFS finds a cycle
+				if (bfs(i, adj, visit)) {
+					return true;
+				}
+			}
+		}
+		
+		// No cycle anywhere in the graph
+		return false;
+	}
+};
