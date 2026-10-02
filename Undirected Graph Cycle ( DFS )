@@ -1,0 +1,116 @@
+/* Logic:
+
+1. Create an **adjacency list** for the undirected graph.
+2. Maintain a `visit` array to track visited nodes.
+3. For every unvisited node, start a **DFS** with:
+   - `node` = current node
+   - `parent` = node from which we reached the current node
+4. Mark the current node as visited.
+5. Traverse all neighbors of the current node:
+   - If the neighbor is **not visited**, recursively call DFS on it and make the current node its parent.
+   - If the neighbor is **already visited** and it is **not the parent**, then a cycle exists.
+6. If DFS finds a cycle, return `true`.
+7. Continue checking all disconnected components.
+8. If no cycle is found anywhere, return `false`.
+
+ ### Core idea
+
+```
+For every neighbor:
+
+    If not visited
+        → DFS(neighbor, current node)
+
+    Else if neighbor != parent
+        → Cycle found
+```
+
+ ### Why parent is needed
+
+ Suppose:
+
+```
+0 ---- 1
+```
+
+ When DFS goes:
+
+```
+0 → 1
+```
+
+ node `1` sees `0` as already visited.
+
+ But `0` is just its **parent**, so this is **not a cycle**.
+
+ That's why we check:
+
+```
+neigh != parent
+```
+
+ If a visited neighbor is **not** the parent, there must be another path back to an already visited node → **cycle**.
+*/
+
+class Solution {
+	bool dfs(int node, int parent, vector<vector<int>> & adj, vector<int>& visit) {
+		
+		// Mark source as visited
+		visit[node] = 1;
+		
+		for (auto neigh : adj[node]) {
+			
+			// If neighbor is not visited,
+			// recursively visit it
+			if (!visit[neigh]) {
+				
+				if (dfs(neigh, node, adj, visit))
+					return true;
+			}
+			
+			// If neighbor is already visited
+			// and it is not the parent,
+			// then a cycle exists
+			else if (neigh != parent) {
+				return true;
+			}
+		}
+		// No cycle found in this component
+		return false;
+	}
+	
+	public:
+	bool isCycle(int V, vector<vector<int>> & edges) {
+		
+		// Create adjacency list for V vertices
+		vector<vector<int>> adj(V);
+		
+		// Build the undirected graph
+		for (int i = 0; i < edges.size(); i++) {
+			
+			int src = edges[i][0];
+			int dest = edges[i][1];
+			
+			adj[src].push_back(dest);
+			adj[dest].push_back(src);
+		}
+		
+		// Visited array
+		vector<int> visit(V, 0);
+		
+		// Check every connected component
+		for (int i = 0; i < V; i++) {
+			
+			if (!visit[i]) {
+				
+				// If BFS finds a cycle
+				if (dfs(i, -1, adj, visit)) {
+					return true;
+				}
+			}
+		}
+		
+		// No cycle anywhere in the graph
+		return false;
+	}
+};
