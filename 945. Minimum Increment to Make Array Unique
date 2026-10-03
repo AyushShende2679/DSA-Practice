@@ -1,0 +1,49 @@
+/* Logic:
+
+1. **Sort the array** so duplicate/smaller elements are next to each other.
+2. Start from index `1` and compare `nums[i]` with `nums[i-1]`.
+3. If `nums[i] > nums[i-1]`, it is already unique, so do nothing.
+4. If `nums[i] <= nums[i-1]`, increase `nums[i]` to `nums[i-1] + 1`.
+5. The number of increments required is:
+
+   ```
+   nums[i - 1] - nums[i] + 1
+   ```
+6. Add these increments to `moves`.
+7. Return `moves`.
+
+
+ **Core idea:** After sorting, always make the current number at least **1 greater than the previous number**.
+*/
+
+class Solution {
+public:
+    int minIncrementForUnique(vector<int>& nums) {
+        // Sort the array so we can handle duplicates
+        // and smaller values first.
+        sort(nums.begin(), nums.end());
+
+        int moves = 0;
+
+        // Start from the second element and compare
+        // it with the previous element.
+        for (int i = 1; i < nums.size(); i++) {
+
+            // If the current number is less than or equal
+            // to the previous number, it is not unique.
+            if (nums[i - 1] >= nums[i]) {
+
+                // Calculate how many increments are needed
+                // to make the current number = previous + 1.
+                moves += ((nums[i - 1] - nums[i]) + 1);
+
+                // Update the current number to the next
+                // available unique value.
+                nums[i] = nums[i - 1] + 1;
+            }
+        }
+
+        // Return the total number of increments performed.
+        return moves;
+    }
+};
