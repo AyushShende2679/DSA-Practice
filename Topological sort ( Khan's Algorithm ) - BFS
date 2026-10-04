@@ -1,0 +1,80 @@
+/*
+## Main Idea — Topological Sort Using BFS
+
+ Topological Sort using BFS is based on **Kahn's Algorithm**.
+
+ - First, calculate the **indegree** of every node.
+- Put all nodes with **indegree = 0** into a queue.
+- Take a node from the queue and add it to `ans`.
+- Remove that node's outgoing edges by decreasing the indegree of its neighbours.
+- If any neighbour's indegree becomes `0`, add it to the queue.
+- Continue until the queue becomes empty.
+- The order in which we remove nodes from the queue is the **topological order**.
+
+ **In simple words:**
+
+ > Start with nodes having no incoming edges, process them one by one, and keep adding nodes whose incoming edges become zero.
+*/
+class Solution {
+public:
+    vector<int> topoSort(int V, vector<vector<int>>& edges) {
+
+        // Create adjacency list
+        vector<vector<int>> adj(V);
+
+        // Build the graph
+        for (auto it : edges) {
+            int src = it[0];
+            int dest = it[1];
+
+            adj[src].push_back(dest);
+        }
+
+        // Store indegree of every node
+        vector<int> indegree(V, 0);
+
+        // Calculate indegree
+        for (int i = 0; i < V; i++) {
+            for (auto neigh : adj[i]) {
+                indegree[neigh]++;
+            }
+        }
+
+        // Queue for nodes having indegree 0
+        queue<int> q;
+
+        // Add all nodes with indegree 0
+        for (int i = 0; i < V; i++) {
+            if (indegree[i] == 0)
+                q.push(i);
+        }
+
+        vector<int> ans;
+
+        // BFS traversal
+        while (!q.empty()) {
+
+            // Take a node from the queue
+            int node = q.front();
+            q.pop();
+
+            // Add it to the topological order
+            ans.push_back(node);
+
+            // Remove the current node's outgoing edges
+            for (auto neigh : adj[node]) {
+
+                // Decrease indegree of neighbour
+                indegree[neigh]--;
+
+                // If indegree becomes 0,
+                // add it to the queue
+                if (indegree[neigh] == 0)
+                    q.push(neigh);
+            }
+        }
+
+        // Return topological ordering
+        return ans;
+    }
+};
