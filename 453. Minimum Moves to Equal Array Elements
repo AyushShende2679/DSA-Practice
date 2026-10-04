@@ -1,0 +1,54 @@
+/* Logic:
+
+1. Find the **minimum element** in the array.
+2. We can think of increasing `n-1` elements as equivalent to **decreasing one element**.
+3. Therefore, we need to make every element equal to the **minimum element**.
+4. For each element, calculate:\
+    `nums[i] - minimum`
+5. Add all these differences to `moves`.
+6. Return `moves`.
+
+ ### Example
+
+```
+nums = [1, 2, 3]
+
+minimum = 1
+
+moves = (1-1) + (2-1) + (3-1)
+      = 0 + 1 + 2
+      = 3
+```
+
+ **Logic in one line:**
+
+ > Find the minimum and add the difference between every element and the minimum.
+
+*/
+
+
+class Solution {
+public:
+    int minMoves(vector<int>& nums) {
+
+        // Find the minimum element in the array
+        int minimum = *min_element(nums.begin(), nums.end());
+
+        // Get the size of the array
+        int n = nums.size();
+
+        // Variable to store the total number of moves
+        int moves = 0;
+
+        // Traverse through all elements
+        for (int i = 0; i < n; i++) {
+
+            // Calculate how much the current element
+            // is greater than the minimum element
+            moves += (nums[i] - minimum);
+        }
+
+        // Return the total number of moves
+        return moves;
+    }
+};
