@@ -1,0 +1,154 @@
+/* Logic:
+
+ 1. Convert the `edges` list into an **adjacency list**.
+   - If edge is `[u, v]`, add `v` to `adj[u]`.
+   - This means `u → v`.
+2. Maintain a `visit[]` array to keep track of visited nodes.
+3. Run DFS from every unvisited node.
+4. During DFS:
+   - Mark the current node as visited.
+   - Visit all its unvisited neighbours.
+   - **After visiting all neighbours, push the current node into the stack.**
+5. Finally, pop elements from the stack to get the topological ordering.
+
+ ### Why do we push after DFS?
+
+ Suppose:
+
+```
+0 → 1 → 2
+```
+
+ DFS starts from `0`:
+
+```
+0
+ ↓
+1
+ ↓
+2
+```
+
+ Node `2` has no unvisited neighbour, so:
+
+```
+push(2)
+```
+
+ Then:
+
+```
+push(1)
+push(0)
+```
+
+ Stack logically contains:
+
+```
+0
+1
+2
+```
+
+ When we pop:
+
+```
+0 → 1 → 2
+```
+
+ which is the required topological order.
+
+ ### Your key line
+
+```
+st.push(node);
+```
+
+ This is done **after all neighbours are processed**, which is the main idea behind DFS-based topological sorting.
+
+ ### Complexity
+
+ - Building adjacency list: **O(E)**
+- DFS traversal: **O(V + E)**
+- Creating answer from stack: **O(V)**
+- Overall: **O(V + E)**
+- Space: **O(V + E)**
+
+Main idea:
+Topological Sort using DFS is basically a DFS traversal with a stack.
+First, visit all the neighbours of the current node.
+After all neighbours are visited, push the current node into the stack.
+Finally, pop all elements from the stack and store them in ans.
+This automatically gives us the topological order.
+*/
+
+class Solution {
+private:
+
+    // DFS function for topological sorting
+    void dfs(int node, vector<vector<int>> &adj, int visit[], stack<int> &st) {
+        
+        // Mark the current node as visited
+        visit[node] = 1;
+
+        // Visit all the neighbours of the current node
+        for (auto neigh : adj[node]) {
+            
+            // If the neighbour is not visited,
+            // recursively perform DFS on it
+            if (!visit[neigh])
+                dfs(neigh, adj, visit, st);
+        }
+
+        // After visiting all neighbours,
+        // push the current node into the stack
+        st.push(node);
+    }
+
+public:
+
+    vector<int> topoSort(int V, vector<vector<int>> &edges) {
+
+        // Create an adjacency list for the graph
+        vector<vector<int>> adj(V);
+
+        // Convert edges into adjacency list
+        // If edge is [src, dest], it means src -> dest
+        for (auto it : edges) {
+            int src = it[0];
+            int dest = it[1];
+
+            // Add destination to source's neighbour list
+            adj[src].push_back(dest);
+        }
+
+        // Array to keep track of visited nodes
+        int visit[V] = {0};
+
+        // Stack to store nodes after DFS
+        stack<int> st;
+
+        // Perform DFS for every unvisited node
+        for (int i = 0; i < V; i++) {
+            
+            // If the node is not visited,
+            // start DFS from this node
+            if (!visit[i])
+                dfs(i, adj, visit, st);
+        }
+
+        // Store the topological ordering
+        vector<int> ans;
+
+        // Pop elements from the stack
+        // to get the topological order
+        while (!st.empty()) {
+            ans.push_back(st.top());
+            st.pop();
+        }
+
+        // Return the topological ordering
+        return ans;
+    }
+};
+
