@@ -1,0 +1,84 @@
+/* Logic — DFS Bipartite Graph
+
+ 1. Create a `color` array of size `n`.
+   - `-1` → node is not visited
+   - `0` → first color
+   - `1` → second color
+2. Since the graph can have **multiple disconnected components**, run DFS from every unvisited node.
+3. When DFS starts at a node:
+   - Assign the given color to that node.
+   - Example: `color[node] = 0`.
+4. Traverse all neighbors of the current node.
+5. For every neighbor:
+   - If it is **unvisited**, assign it the **opposite color** and recursively call DFS.
+   - If it is already colored and has the **same color** as the current node, return `false`.
+6. If any recursive DFS returns `false`, propagate `false` back.
+7. If all nodes are colored without any conflict, return `true`.
+
+ ### In short
+
+ > **Color the current node → visit neighbors → give unvisited neighbors the opposite color → if any adjacent nodes have the same color, return false.**
+*/
+
+class Solution {
+private:
+    // DFS to check whether the graph can be colored
+    // using two colors: 0 and 1
+    bool dfs(int node, int col, vector<vector<int>>& graph,
+             vector<int>& color) {
+
+        // Assign the current color to the current node
+        color[node] = col;
+
+        // Visit all neighbors of the current node
+        for (auto neigh : graph[node]) {
+
+            // If neighbor is not colored yet
+            if (color[neigh] == -1) {
+
+                // Give the neighbor the opposite color
+                // 0 -> 1
+                // 1 -> 0
+                if (!dfs(neigh, !col, graph, color)) {
+                    return false;
+                }
+            }
+
+            // If neighbor already has the same color,
+            // then the graph is not bipartite
+            else if (color[node] == color[neigh]) {
+                return false;
+            }
+        }
+
+        // No conflict found
+        return true;
+    }
+
+public:
+    bool isBipartite(vector<vector<int>>& graph) {
+
+        int n = graph.size();
+
+        // -1 -> unvisited
+        //  0 -> color 0
+        //  1 -> color 1
+        vector<int> color(n, -1);
+
+        // Graph can have multiple disconnected components
+        for (int i = 0; i < n; i++) {
+
+            // If node is unvisited, start a new DFS
+            if (color[i] == -1) {
+
+                // Start with color 0
+                if (!dfs(i, 0, graph, color)) {
+                    return false;
+                }
+            }
+        }
+
+        // Every component was successfully 2-colored
+        return true;
+    }
+};
