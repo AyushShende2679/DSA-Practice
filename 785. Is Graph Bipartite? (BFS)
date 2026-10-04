@@ -1,0 +1,105 @@
+/* Logic:
+
+ 1. **Create a color array**
+   - Initially, every node is unvisited.
+   - `-1` means unvisited.
+   - `0` and `1` represent the two colors.
+2. **Start BFS from every unvisited node**
+   - The graph may have multiple disconnected components.
+   - Give the starting node color `0`.
+3. **Visit all neighbors**
+   - For every neighbor:
+     - If it is unvisited, give it the **opposite color** of the current node.
+     - Add it to the queue.
+4. **Check for conflict**
+   - If a neighbor is already colored and has the **same color** as the current node, return `false`.
+   - This means two adjacent nodes have the same color, so the graph is not bipartite.
+5. **Repeat for all components**
+   - If every component can be colored using two colors without conflict, return `true`.
+
+ ### In one line
+
+ > **BFS + 2-coloring: color each neighbor opposite to its node; if any edge connects same-colored nodes → not bipartite.**
+*/
+
+class Solution {
+private:
+    // BFS to check whether the connected component
+    // starting from 'start' can be colored using 2 colors
+    bool bfs(int start, vector<vector<int>>& graph, vector<int>& color) {
+
+        queue<int> q;
+
+        // Start BFS from the current unvisited node
+        q.push(start);
+
+        // Assign the first color (0) to the starting node
+        color[start] = 0;
+
+        while (!q.empty()) {
+            // Get the current node
+            int node = q.front();
+            q.pop();
+
+            // Visit all the neighbors of the current node
+            for (auto neigh : graph[node]) {
+
+                // If neighbor is not colored yet
+                if (color[neigh] == -1) {
+
+                    // Assign the opposite color to the neighbor
+                    // If current node is 0 -> neighbor becomes 1
+                    // If current node is 1 -> neighbor becomes 0
+                    if (color[node] == 1) {
+                        color[neigh] = 0;
+                    } else {
+                        color[neigh] = 1;
+                    }
+
+                    // Add the newly colored node to the queue
+                    q.push(neigh);
+                }
+
+                // If neighbor already has the same color as current node,
+                // then the graph cannot be bipartite
+                else if (color[node] == color[neigh]) {
+                    return false;
+                }
+            }
+        }
+
+        // No color conflict found in this component
+        return true;
+    }
+
+public:
+    bool isBipartite(vector<vector<int>>& graph) {
+
+        int n = graph.size();
+
+        // color[i] = -1 -> node is unvisited
+        // color[i] =  0 -> node has color 0
+        // color[i] =  1 -> node has color 1
+        vector<int> color(n, -1);
+
+        // The graph may contain multiple disconnected components,
+        // so we need to check every unvisited node.
+        for (int i = 0; i < n; i++) {
+
+            // If this node has not been visited yet,
+            // start BFS from this node.
+            if (color[i] == -1) {
+
+                // If any component is not bipartite,
+                // the entire graph is not bipartite.
+                if (bfs(i, graph, color) == false) {
+                    return false;
+                }
+            }
+        }
+
+        // All components are successfully colored
+        // using two colors, so the graph is bipartite.
+        return true;
+    }
+};
