@@ -1,0 +1,137 @@
+/* Logic:
+
+ The main idea is:
+
+ > **An `O` is safe if it is connected to an `O` on the boundary. Every other `O` is surrounded and should become `X`.**
+
+ ### Step 1: Find boundary `O`s
+
+ Look at all cells on:
+
+ - First row
+- Last row
+- First column
+- Last column
+
+ Any `O` on the boundary **cannot be surrounded**.
+
+ ### Step 2: DFS from boundary `O`s
+
+ For every boundary `O`, run DFS in 4 directions:
+
+```
+        Up
+        ↑
+Left ←  O  → Right
+        ↓
+       Down
+```
+
+ Mark every connected `O` as `#`.
+
+ Why `#`?
+
+ Because we need to remember:
+
+ > "This `O` is connected to the boundary, so don't change it."
+
+ ### Step 3: Process the entire board
+
+ Now there are only three possibilities:
+
+ - `O` → It was **not connected to the boundary**, so change it to `X`.
+- `#` → It was a safe `O`, so change it back to `O`.
+- `X` → Leave it as `X`.
+
+
+ ### In one line
+
+ **Start DFS from boundary `O`s → mark all connected `O`s as safe → convert remaining `O`s to `X` → restore safe cells back to `O`.**
+*/
+
+class Solution {
+private:
+    // DFS to mark all 'O's connected to the boundary
+    void dfs(int row, int col, vector<vector<char>>& board, int n, int m) {
+
+        // Stop if we go outside the board
+        // or if the current cell is not 'O'
+        if (row < 0 || row >= n || col < 0 || col >= m ||
+            board[row][col] != 'O')
+            return;
+
+        // Mark this 'O' as safe because it is connected
+        // to a boundary 'O'
+        board[row][col] = '#';
+
+        // Visit all 4 directions
+        dfs(row - 1, col, board, n, m); // Up
+        dfs(row, col + 1, board, n, m); // Right
+        dfs(row + 1, col, board, n, m); // Down
+        dfs(row, col - 1, board, n, m); // Left
+    }
+
+public:
+    void solve(vector<vector<char>>& board) {
+
+        // Handle empty board
+        if (board.empty() || board[0].empty())
+            return;
+
+        int n = board.size();    // Number of rows
+        int m = board[0].size(); // Number of columns
+
+        // ------------------------------------------------
+        // Step 1:
+        // Find all 'O's present on the first and last row.
+        // Start DFS from them because they cannot be surrounded.
+        // ------------------------------------------------
+        for (int col = 0; col < m; col++) {
+
+            // First row
+            if (board[0][col] == 'O')
+                dfs(0, col, board, n, m);
+
+            // Last row
+            if (board[n - 1][col] == 'O')
+                dfs(n - 1, col, board, n, m);
+        }
+
+        // ------------------------------------------------
+        // Step 2:
+        // Find all 'O's present on the first and last column.
+        // Start DFS from them as well.
+        // ------------------------------------------------
+        for (int row = 0; row < n; row++) {
+
+            // First column
+            if (board[row][0] == 'O')
+                dfs(row, 0, board, n, m);
+
+            // Last column
+            if (board[row][m - 1] == 'O')
+                dfs(row, m - 1, board, n, m);
+        }
+
+        // ------------------------------------------------
+        // Step 3:
+        // Now:
+        // 'O'  -> surrounded region, so convert it to 'X'
+        // '#'  -> safe region connected to boundary, restore to 'O'
+        // ------------------------------------------------
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                if (board[i][j] == 'O') {
+                    // This 'O' was not connected to the boundary
+                    // so it is completely surrounded.
+                    board[i][j] = 'X';
+                } else if (board[i][j] == '#') {
+                    // This was an 'O' connected to the boundary,
+                    // so it should remain 'O'.
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+};
