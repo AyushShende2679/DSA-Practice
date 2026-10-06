@@ -1,0 +1,118 @@
+/* Logic:
+
+ The main idea is to find all `1`s that are **connected to the boundary**.
+
+ A land cell connected to the boundary is **not an enclave**, because it can reach outside the grid.
+
+ ### Step-by-step
+
+ 1. **Find all boundary land cells**
+   - Check the first row, last row, first column, and last column.
+   - If the cell is `1`, put it into the BFS queue.
+   - Mark it as visited.
+2. **Run BFS**
+   - Take a boundary-connected land cell from the queue.
+   - Check its 4 neighbors: **up, right, down, left**.
+   - If a neighbor:
+       then mark it visited and add it to the queue.
+     - is inside the grid,
+     - is land (`1`),
+     - has not been visited,
+3. **Why BFS?**
+   - Starting from the boundary, BFS finds **every land cell that can reach the boundary**.
+   - These cells are not enclaves.
+4. **Count remaining land**
+   - Traverse the entire grid.
+   - If:
+
+     ```
+     grid[i][j] == 1 && visit[i][j] == 0
+     ```
+      then this land cell cannot reach the boundary.
+   - Therefore, it is an **enclave**.
+
+ ### In one line
+
+ > **Remove/mark all land connected to the boundary; whatever land remains is an enclave.**
+
+ */
+
+class Solution {
+public:
+    int numEnclaves(vector<vector<int>>& grid) {
+        int n = grid.size();
+        int m = grid[0].size();
+
+        // Queue for BFS
+        queue<pair<int, int>> q;
+
+        // visit[i][j] = 1 means this land cell is connected to the boundary
+        vector<vector<int>> visit(n, vector<int>(m, 0));
+
+        // Put all boundary land cells into the queue
+        // because land connected to the boundary cannot be an enclave.
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                // Check if current cell is on the boundary
+                if ((i == 0 || j == 0 || i == n - 1 || j == m - 1) &&
+                    grid[i][j] == 1) {
+
+                    q.push({i, j});
+
+                    // Mark it visited
+                    visit[i][j] = 1;
+                }
+            }
+        }
+
+        // Directions: up, right, down, left
+        int delrow[] = {-1, 0, 1, 0};
+        int delcol[] = {0, 1, 0, -1};
+
+        // BFS
+        while (!q.empty()) {
+
+            // Get the current cell
+            auto [row, col] = q.front();
+            q.pop();
+
+            // Check all 4 neighboring cells
+            for (int k = 0; k < 4; k++) {
+
+                int r = row + delrow[k];
+                int c = col + delcol[k];
+
+                // Check:
+                // 1. Neighbor is inside the grid
+                // 2. Neighbor is not visited
+                // 3. Neighbor is land
+                if (r >= 0 && c >= 0 && r < n && c < m && !visit[r][c] &&
+                    grid[r][c] == 1) {
+
+                    // Mark the land cell as connected to boundary
+                    visit[r][c] = 1;
+
+                    // Add it to the BFS queue
+                    q.push({r, c});
+                }
+            }
+        }
+
+        // Count land cells that were NOT visited.
+        // These land cells are completely surrounded by water,
+        // so they are enclaves.
+        int count = 0;
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+
+                if (grid[i][j] == 1 && visit[i][j] == 0) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+};
