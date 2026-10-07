@@ -1,0 +1,105 @@
+/* Logic:
+
+1. **Create an adjacency list**
+2. Convert the given edges into an adjacency list.
+3. Since the graph is undirected, add both `u → v` and `v → u`.
+
+2. **Initialize distance array**
+3. Create `dist[]` of size `V`.
+4. Set every distance to `INT_MAX`, meaning the node has not been visited.
+5. Set `dist[src] = 0`.
+
+3. **Start BFS**
+4. Put `src` into a queue.
+5. BFS explores nodes level by level.
+
+4. **Process each node**
+5. Remove a node from the queue.
+6. If the node is `dest`, return its distance.
+7. Otherwise, visit all its neighbours.
+
+5. **Visit unvisited neighbours**
+6. If `dist[neigh] == INT_MAX`, the neighbour hasn't been visited.
+7. Set:
+
+`cpp dist[neigh] = dist[node] + 1; `
+
+- Push the neighbour into the queue.
+
+6. **Why does this give the shortest path?**
+7. Every edge has equal weight (`1`).
+8. BFS visits all nodes at distance `0`, then distance `1`, then distance `2`, and so on.
+9. Therefore, the **first time we reach****`dest`**, we have found the shortest path.
+
+7. **If destination is never reached**
+8. BFS finishes without finding `dest`.
+9. Return `-1`.
+
+### In one line
+**Build adjacency list → BFS from****`src`****→ maintain distance → first time****`dest`****is reached, return its distance → otherwise return****`-1`****.**
+*/
+
+class Solution {
+	public:
+	int shortestPath(int V, vector<vector<int>> &edges, int src, int dest) {
+		
+		// Create an adjacency list for the graph.
+		// adj[i] contains all the vertices directly connected to vertex i.
+		vector<vector<int>> adj(V);
+		
+		// Build the adjacency list from the given edges.
+		// Since the graph is undirected, add both u -> v and v -> u.
+		for (auto &edge : edges) {
+			int u = edge[0];
+			int v = edge[1];
+			
+			adj[u].push_back(v);
+			adj[v].push_back(u);
+		}
+		
+		// dist[i] stores the shortest distance from src to vertex i.
+		// Initially, all vertices are unreachable, so set them to INT_MAX.
+		vector<int> dist(V, INT_MAX);
+		
+		// BFS queue.
+		// BFS explores the graph level by level.
+		queue<int> q;
+		
+		// Distance from src to itself is 0.
+		dist[src] = 0;
+		
+		// Start BFS from the source vertex.
+		q.push(src);
+		
+		while (!q.empty()) {
+			
+			// Get the next vertex from the queue.
+			int node = q.front();
+			q.pop();
+			
+			// BFS visits vertices in increasing order of distance.
+			// Therefore, the first time we reach dest,
+			// dist[dest] is guaranteed to be the shortest path.
+			if (node == dest)
+				return dist[node];
+			
+			// Visit all neighbours of the current vertex.
+			for (int neigh : adj[node]) {
+				
+				// If this neighbour has not been visited yet...
+				if (dist[neigh] == INT_MAX) {
+					
+					// Its distance is one more than the current node.
+					dist[neigh] = dist[node] + 1;
+					
+					// Add it to the queue for further exploration.
+					q.push(neigh);
+				}
+			}
+		}
+		
+		// If BFS finishes without reaching dest,
+		// there is no path from src to dest.
+		return - 1;
+	}
+};
