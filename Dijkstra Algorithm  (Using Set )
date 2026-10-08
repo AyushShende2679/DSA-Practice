@@ -1,0 +1,149 @@
+/* Dijkstra using `set` — Logic:
+
+Remember it in these steps:
+
+1. **Create adjacency list**
+   - Store `{neighbour, weight}` for every edge.
+
+2. **Create distance array**
+   - `dist[i]` = shortest distance from `src` to `i`.
+   - Initially, all are `INT_MAX`.
+   - `dist[src] = 0`.
+
+3. **Create a set**
+   - Store `{distance, node}`.
+   - The set automatically keeps the smallest distance at the beginning.
+
+4. **Insert source**
+
+```
+   st.insert({0, src});
+```
+
+5. **Take the node with minimum distance**
+
+```
+   auto it = st.begin();
+```
+
+Get its distance and node, then erase it from the set.
+
+6. **Check all neighbours**
+   - Calculate:
+
+```
+   newDist = dist[node] + wt;
+```
+
+7. **If a shorter path is found**
+
+```
+   if (newDist < dist[nextNode])
+```
+
+then:
+
+- Remove the old `{distance, node}` from the set.
+- Update `dist[nextNode]`.
+- Insert the new `{newDist, nextNode}`.
+
+8. **Repeat until set becomes empty.**
+
+### Core logic
+
+```
+Take minimum distance node
+        ↓
+Check all neighbours
+        ↓
+Is new distance smaller?
+        ↓
+      YES
+        ↓
+Remove old distance from set
+        ↓
+Update distance
+        ↓
+Insert new distance into set
+        ↓
+Repeat
+```
+
+### One-line memory trick
+
+> **Set gives minimum → relax neighbours → erase old distance → update → insert new distance.**
+*/
+
+class Solution {
+	public:
+	vector<int> dijkstra(int V, vector<vector<int>> &edges, int src) {
+		
+		// Adjacency list:
+		// adj[u] contains {v, weight}
+		vector<vector<pair<int, int>> > adj(V);
+		
+		// Build adjacency list
+		for (int i = 0; i < edges.size(); i++) {
+			int s = edges[i][0];
+			int d = edges[i][1];
+			int w = edges[i][2];
+			
+			// Undirected graph
+			adj[s].push_back({d, w});
+			adj[d].push_back({s, w});
+		}
+		
+		// dist[i] = shortest distance from src to i
+		vector<int> dist(V, INT_MAX);
+		
+		// Set stores {distance, node}
+		// It automatically keeps the smallest distance first.
+		set<pair<int, int>> st;
+		
+		// Distance from source to itself is 0.
+		dist[src] = 0;
+		
+		// Insert source into set.
+		st.insert({0, src});
+		
+		while (!st.empty()) {
+			
+			// Get the node with the smallest distance.
+			auto it = st.begin();
+			
+			int weight = it->first;
+			int node = it->second;
+			
+			// Remove it from the set.
+			st.erase(it);
+			
+			// Explore all neighbours.
+			for (auto neigh : adj[node]) {
+				
+				int nextNode = neigh.first;
+				int wt = neigh.second;
+				
+				// Calculate new distance.
+				int newDist = dist[node] + wt;
+				
+				// If we found a shorter path
+				if (newDist < dist[nextNode]) {
+					
+					// If nextNode already has a distance,
+					// remove its old {distance, node} pair.
+					if (dist[nextNode] != INT_MAX) {
+						st.erase({dist[nextNode], nextNode});
+					}
+					
+					// Update shortest distance.
+					dist[nextNode] = newDist;
+					
+					// Insert the new shorter distance.
+					st.insert({newDist, nextNode});
+				}
+			}
+		}
+		
+		return dist;
+	}
+};
