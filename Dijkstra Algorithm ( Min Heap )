@@ -1,0 +1,156 @@
+/* Dijkstra Logic:
+
+You can remember the logic in these **6 steps**:
+
+1. **Create adjacency list**
+   - Store every edge as `{neighbour, weight}`.
+   - Since the graph is undirected, add the edge in both directions.
+
+2. **Create distance array**
+   - `dist[i]` = shortest distance from `src` to node `i`.
+   - Initially set every distance to `INT_MAX`.
+   - Set `dist[src] = 0`.
+
+3. **Use a min-heap**
+   - Priority queue stores `{distance, node}`.
+   - The node with the smallest distance comes out first.
+
+4. **Take the closest node**
+
+```
+   int weight = pq.top().first;
+   int node = pq.top().second;
+   pq.pop();
+```
+
+5. **Relax every neighbour**
+   - Calculate the distance through the current node:
+
+```
+   newDist = dist[node] + wt;
+```
+
+- If it's smaller than the previously known distance:
+
+```
+   if (newDist < dist[nextNode]) {
+       dist[nextNode] = newDist;
+       pq.push({newDist, nextNode});
+   }
+```
+
+6. **Ignore outdated entries**
+
+```
+   if (weight > dist[node])
+       continue;
+```
+
+- A node may enter the priority queue multiple times.
+- If we later find a shorter path, the older entry becomes useless.
+
+### In one line
+
+> **Pick the nearest unprocessed node, try to improve the distances of all its neighbours, and whenever a distance improves, push the new distance into the min-heap.**
+
+### The core formula
+
+```
+distance to neighbour
+= distance to current node + edge weight
+```
+
+or:
+
+```
+dist[nextNode] = dist[node] + wt;
+```
+
+**Memory trick:** **Initialize → Push source → Pop minimum → Relax neighbours → Push updated distance → Repeat.**
+*/
+
+class Solution {
+	public:
+	vector<int> dijkstra(int V, vector<vector<int>> &edges, int src) {
+		
+		// Adjacency list:
+		// adj[u] contains {v, weight}, meaning there is an edge
+		// from u to v with the given weight.
+		vector<vector<pair<int, int>> > adj(V);
+		
+		// Build the adjacency list from the edge list.
+		// Each edge is represented as {source, destination, weight}.
+		for (int i = 0; i < edges.size(); i++) {
+			int s = edges[i][0]; // Source vertex
+			int d = edges[i][1]; // Destination vertex
+			int w = edges[i][2]; // Edge weight
+			
+			// Graph is undirected, so add the edge in both directions.
+			adj[s].push_back({d, w});
+			adj[d].push_back({s, w});
+		}
+		
+		// dist[i] = shortest distance from src to vertex i.
+		// Initially, all vertices are unreachable.
+		vector<int> dist(V, INT_MAX);
+		
+		// Min-heap priority queue.
+		// Each element is {distance, node}.
+		//
+		// The node with the smallest distance is processed first.
+		priority_queue<
+		pair<int, int>,
+		vector<pair<int, int>>,
+		greater<pair<int, int>>
+		> pq;
+		
+		// Distance from source to itself is 0.
+		dist[src] = 0;
+		
+		// Start Dijkstra from the source node.
+		pq.push({0, src});
+		
+		while (!pq.empty()) {
+			
+			// Get the node having the smallest known distance.
+			int weight = pq.top().first;
+			int node = pq.top().second;
+			
+			pq.pop();
+			
+			// If this entry is outdated, ignore it.
+			//
+			// A node can be inserted into the priority queue multiple
+			// times when we find better paths to it.
+			if (weight > dist[node])
+				continue;
+			
+			// Explore all neighbours of the current node.
+			for (auto neigh : adj[node]) {
+				
+				int nextNode = neigh.first; // Neighbouring vertex
+				int wt = neigh.second; // Edge weight
+				
+				// Try to find a shorter path to nextNode.
+				//
+				// Current distance:
+				//     dist[node]
+				//
+				// Distance through this edge:
+				//     dist[node] + wt
+				if (dist[node] + wt < dist[nextNode]) {
+					
+					// We found a shorter path.
+					dist[nextNode] = dist[node] + wt;
+					
+					// Push the updated distance and node into the
+					// priority queue for further processing.
+					pq.push({dist[node] + wt, nextNode});
+				}
+			}
+		}
+		
+		// Return shortest distances from src to every vertex.
+		return dist;
+	}
+};
