@@ -1,0 +1,112 @@
+/* Network Delay Time — Logic:
+
+1. **Build adjacency list**
+   - Store `{destination, weight}` for every directed edge.
+
+2. **Initialize distances**
+   - `dist[i] = INT_MAX`
+   - `dist[k] = 0`
+
+3. **Use a min-heap**
+   - Store `{distance, node}`.
+   - Always process the node with the smallest distance.
+
+4. **Relax neighbours**
+
+```
+   newDist = dist[node] + wt;
+```
+
+If `newDist` is smaller:
+
+```
+   dist[nextNode] = newDist;
+   pq.push({newDist, nextNode});
+```
+
+5. **Ignore outdated entries**
+
+```
+   if (weight > dist[node])
+       continue;
+```
+
+6. **Find maximum distance**
+   - The largest shortest distance is the network delay time.
+   - Check only `dist[1]` to `dist[n]` because node `0` is unused.
+
+7. **If any node is unreachable**
+   - Return `-1`.
+
+### Memory trick
+
+> **Build → Initialize → Push source → Pop minimum → Relax → Repeat → Find maximum.**
+*/
+
+// you can also use Set here instead of Min heap  
+class Solution {
+public:
+    // Dijkstra Algorithm
+    int networkDelayTime(vector<vector<int>>& times, int n, int k) {
+
+        // Build adjacency list
+        // Nodes are numbered from 1 to n,
+        // so we create n + 1 spaces.
+        vector<vector<pair<int, int>>> adj(n + 1);
+
+        for (auto edge : times) {
+            int u = edge[0];
+            int v = edge[1];
+            int wt = edge[2];
+
+            // Directed edge
+            adj[u].push_back({v, wt});
+        }
+
+        // Shortest distance from k
+        vector<int> dist(n + 1, INT_MAX);
+
+        // {distance, node}
+        priority_queue<pair<int, int>, vector<pair<int, int>>,
+                       greater<pair<int, int>>>
+            pq;
+
+        // Start from k
+        dist[k] = 0;
+        pq.push({0, k});
+
+        while (!pq.empty()) {
+
+            int weight = pq.top().first;
+            int node = pq.top().second;
+            pq.pop();
+
+            // Skip outdated entry
+            if (weight > dist[node])
+                continue;
+
+            // Relax neighbours
+            for (auto neigh : adj[node]) {
+
+                int nextNode = neigh.first;
+                int wt = neigh.second;
+
+                int newDist = dist[node] + wt;
+
+                if (newDist < dist[nextNode]) {
+                    dist[nextNode] = newDist;
+                    pq.push({newDist, nextNode});
+                }
+            }
+        }
+
+        // Ignore index 0
+        int ans = *max_element(dist.begin() + 1, dist.end());
+
+        // Some node is unreachable
+        if (ans == INT_MAX)
+            return -1;
+
+        return ans;
+    }
+};
