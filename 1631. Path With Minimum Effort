@@ -1,0 +1,97 @@
+/* Logic – Minimum Effort Path (Dijkstra's Algorithm)
+
+1. Initialize the min-heap: Store `{effort, {row, col}}` and push the starting cell `(0,0)` with effort `0`.
+
+2. Initialize the distance matrix: Set all cells to `INT_MAX`, except `dist[0][0] = 0`. The matrix stores the minimum effort required to reach each cell.
+
+3. Process the minimum effort cell: Pop the cell with the smallest effort from the min-heap.
+
+4. Skip outdated entries: If `diff > dist[row][col]`, skip the cell because a better path has already been found.
+
+5. Check the destination: If the current cell is `(n-1, m-1)`, return `diff`. Since we use a min-heap, this is the minimum possible effort.
+
+6. Explore four directions: Check the top, right, bottom, and left neighbors. Ignore any neighbor outside the grid.
+
+7. Calculate the new effort: For each valid neighbor, calculate the maximum of the current path effort and the absolute height difference between the two adjacent cells.
+
+$$
+\text{newEffort}=\max(\text{diff}, |h_1-h_2|)
+$$
+
+8. Relax the neighbor: If `newEffort < dist[r][c]`, update the distance and push the neighbor into the min-heap.
+
+9. Return the answer: Continue until the destination is reached and return its minimum effort.
+
+Key idea: We minimize the maximum height difference along the path, rather than minimizing the sum of differences.
+*/
+
+class Solution {
+public:
+    // {effort, {row, col}}
+    using p = pair<int, pair<int, int>>;
+
+    int minimumEffortPath(vector<vector<int>>& heights) {
+        int n = heights.size();
+        int m = heights[0].size();
+
+        // Min-heap: process the cell with the minimum effort first
+        priority_queue<p, vector<p>, greater<p>> pq;
+
+        // dist[i][j] stores the minimum effort required to reach cell (i, j)
+        vector<vector<int>> dist(n, vector<int>(m, INT_MAX));
+
+        // Starting cell requires zero effort
+        dist[0][0] = 0;
+        pq.push({0, {0, 0}});
+
+        // Directions: up, right, down, left
+        int delrow[] = {-1, 0, 1, 0};
+        int delcol[] = {0, 1, 0, -1};
+
+        while (!pq.empty()) {
+            // Get the cell with the smallest current effort
+            int diff = pq.top().first;
+            auto it = pq.top().second;
+            pq.pop();
+
+            int row = it.first;
+            int col = it.second;
+
+            // Skip this entry if a better effort was already found
+            if (diff > dist[row][col])
+                continue;
+
+            // The destination has been reached with its minimum possible effort
+            if (row == n - 1 && col == m - 1)
+                return diff;
+
+            // Explore all four neighboring cells
+            for (int k = 0; k < 4; k++) {
+                int r = row + delrow[k];
+                int c = col + delcol[k];
+
+                // Check whether the neighboring cell is inside the grid
+                if (r >= 0 && c >= 0 && r < n && c < m) {
+
+                    // Effort of this path is the maximum of:
+                    // 1. Effort required to reach the current cell
+                    // 2. Absolute height difference between adjacent cells
+                    int maxDiff =
+                        max(abs(heights[row][col] - heights[r][c]), diff);
+
+                    // Update only if this path requires less effort
+                    if (maxDiff < dist[r][c]) {
+                        dist[r][c] = maxDiff;
+
+                        // Push the updated effort and neighbor into the
+                        // min-heap
+                        pq.push({maxDiff, {r, c}});
+                    }
+                }
+            }
+        }
+
+        // Return the minimum effort required to reach the destination
+        return dist[n - 1][m - 1];
+    }
+};
