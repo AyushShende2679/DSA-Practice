@@ -1,0 +1,65 @@
+/* Bellman-Ford Algorithm — Logic:
+
+1. Initialize the distance of every vertex to infinity (`1e8`) and set the source vertex distance to `0`.
+
+2. Run a loop `V - 1` times because the shortest path can contain at most `V - 1` edges.
+
+3. In each iteration, traverse all edges and extract the source vertex `u`, destination vertex `v`, and edge weight `wt`.
+
+4. If `u` is reachable and `dist[u] + wt < dist[v]`, update `dist[v] = dist[u] + wt`. This process is called edge relaxation.
+
+5. After `V - 1` iterations, traverse all edges once more to detect a negative-weight cycle.
+
+6. If any edge can still be relaxed and its source is reachable, return `{-1}` because a reachable negative-weight cycle exists.
+
+7. Otherwise, return the distance array containing the shortest distances from the source to every vertex.
+*/
+
+class Solution {
+	public:
+	vector<int> bellmanFord(int V, vector<vector<int>> & edges, int src) {
+		
+		// Initialize distance of all vertices as infinity
+		vector<int> dist(V, 1e8);
+		
+		// Distance of source vertex from itself is 0
+		dist[src] = 0;
+		
+		// Relax all edges V-1 times
+		// Shortest path can contain at most V-1 edges
+		for (int i = 0; i < V - 1; i++) {
+			
+			// Traverse every edge in each iteration
+			for (int j = 0; j < edges.size(); j++) {
+				
+				int u = edges[j][0]; // Source vertex of edge
+				int v = edges[j][1]; // Destination vertex
+				int wt = edges[j][2]; // Weight of edge
+				
+				// Relax the edge if u is reachable
+				// and the new distance is smaller
+				if (dist[u] != 1e8 && dist[u] + wt < dist[v]) {
+					dist[v] = dist[u] + wt;
+				}
+			}
+		}
+		
+		// Check for a negative weight cycle
+		// If any edge can still be relaxed, a reachable
+		// negative weight cycle exists
+		for (int i = 0; i < edges.size(); i++) {
+			
+			int u = edges[i][0];
+			int v = edges[i][1];
+			int wt = edges[i][2];
+			
+			// Check whether the distance can still decrease
+			if (dist[u] != 1e8 && dist[u] + wt < dist[v]) {
+				return {-1}; // Negative cycle detected
+			}
+		}
+		
+		// Return shortest distances from the source
+		return dist;
+	}
+};
