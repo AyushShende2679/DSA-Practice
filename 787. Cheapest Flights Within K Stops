@@ -1,0 +1,113 @@
+/* Logic: 
+
+1. Create an adjacency list to store each city’s neighboring cities and flight costs.
+
+2. Initialize the distance array with infinity for every city, except the source city, whose cost is `0`.
+
+3. Run a loop `k + 1` times, because at most `k` stops means at most `k + 1` flights.
+
+4. In each iteration:
+
+- Create a temporary array `temp` as a copy of `dist`.
+- Traverse every flight `(u, v, wt)`.
+- If city `u` is reachable and `dist[u] + wt < temp[v]`, update `temp[v]` with the lower cost.
+- After processing all flights, assign `temp` to `dist`.
+
+5. Return the answer:
+
+- If `dist[dst]` is infinity, return `-1`.
+- Otherwise, return `dist[dst]`.
+*/
+
+class Solution {
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst,
+                          int k) {
+
+        // Create an adjacency list to store destination and flight cost
+        vector<vector<pair<int, int>>> adj(n);
+
+        for (int i = 0; i < flights.size(); i++) {
+            int s = flights[i][0];
+            int d = flights[i][1];
+            int wt = flights[i][2];
+
+            // Store {destination, weight} for each flight
+            adj[s].push_back({d, wt});
+        }
+
+        // Queue stores {number of flights, {current node, total cost}}
+        queue<pair<int, pair<int, int>>> q;
+
+        // dist[i] stores the minimum cost found to reach city i
+        vector<int> dist(n, 1e9);
+
+        // Initially, we are at the source with 0 flights and 0 cost
+        q.push({0, {src, 0}});
+        dist[src] = 0;
+
+        while (!q.empty()) {
+            auto it = q.front();
+            q.pop();
+
+            int stops = it.first;
+            int node = it.second.first;
+            int cost = it.second.second;
+
+            // Do not take more than k + 1 flights
+            if (stops > k)
+                continue;
+
+            // Explore all neighboring cities
+            for (auto neigh : adj[node]) {
+                int nextNode = neigh.first;
+                int wt = neigh.second;
+
+                // If taking this flight gives a cheaper cost,
+                // update the distance and add the new state to the queue
+                if (cost + wt < dist[nextNode]) {
+                    dist[nextNode] = cost + wt;
+                    q.push({stops + 1, {nextNode, cost + wt}});
+                }
+            }
+        }
+
+        // If the destination is unreachable, return -1
+        if (dist[dst] == 1e9)
+            return -1;
+
+        // Otherwise, return the cheapest cost
+        return dist[dst];
+    }
+};
+
+/* Bellman ford : 
+
+class Solution {
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& flights,
+                          int src, int dst, int k) {
+        vector<int> dist(n, 1e9);
+        dist[src] = 0;
+
+        // At most k stops means k + 1 flights
+        for (int i = 0; i <= k; i++) {
+            vector<int> temp = dist;
+
+            for (auto& flight : flights) {
+                int u = flight[0];
+                int v = flight[1];
+                int wt = flight[2];
+
+                if (dist[u] != 1e9 &&
+                    dist[u] + wt < temp[v]) {
+                    temp[v] = dist[u] + wt;
+                }
+            }
+
+            dist = temp;
+        }
+
+        return dist[dst] == 1e9 ? -1 : dist[dst];
+    }
+}; */
