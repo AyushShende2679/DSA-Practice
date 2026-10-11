@@ -1,0 +1,86 @@
+/* Logic of Prim’s Algorithm:
+
+1. Create an adjacency list to store each node, its adjacent nodes, and the corresponding edge weights.
+2. Create a min-heap to always select the edge with the minimum weight.
+3. Start from node `0` by pushing `{0, 0}` into the min-heap, where the first value is the weight and the second is the node.
+4. Initialize a `visit` array with all values set to `0` and initialize `sum = 0`.
+5. Run a loop until the min-heap becomes empty:
+   - Extract the minimum-weight edge and its node from the min-heap.
+   - If the node is already visited, skip it.
+   - Otherwise, mark the node as visited and add its weight to `sum`.
+   - Traverse all adjacent nodes and push the edges of unvisited neighbors into the min-heap.
+6. After the loop ends, return `sum`, which represents the total weight of the Minimum Spanning Tree (MST), provided the graph is connected.
+
+Approach: Greedy Algorithm + Min-Heap (Priority Queue).
+*/
+
+class Solution {
+	public:
+	int spanningTree(int V, vector<vector<int>> & edges) {
+		
+		// Create an adjacency list to represent the graph
+		// Each pair stores {neighbor, edge weight}
+		vector<vector<pair<int, int>> > adj(V);
+		
+		// Build the adjacency list from the given edges
+		for (int i = 0; i < edges.size(); i++) {
+			int u = edges[i][0];
+			int v = edges[i][1];
+			int w = edges[i][2];
+			
+			// Since the graph is undirected, add both directions
+			adj[u].push_back({v, w});
+			adj[v].push_back({u, w});
+		}
+		
+		// Min-heap storing {weight, node}
+		// The node with the minimum edge weight is processed first
+		priority_queue<
+		pair<int, int>,
+		vector<pair<int, int>>,
+		greater<pair<int, int>>
+		> pq;
+		
+		// Track whether each node has been included in the MST
+		vector<int> visit(V, 0);
+		
+		// Start Prim's Algorithm from node 0 with weight 0
+		pq.push({0, 0});
+		
+		// Stores the total weight of the Minimum Spanning Tree
+		int sum = 0;
+		
+		// Process nodes until the priority queue becomes empty
+		while (!pq.empty()) {
+			
+			// Get the minimum-weight entry from the heap
+			auto [weight, node] = pq.top();
+			pq.pop();
+			
+			// Skip the node if it has already been visited
+			if (visit[node] == 1)
+				continue;
+			
+			// Include this node in the MST
+			visit[node] = 1;
+			
+			// Add the selected edge's weight to the total
+			sum += weight;
+			
+			// Explore all adjacent nodes
+			for (auto neigh : adj[node]) {
+				int nextNode = neigh.first;
+				int wt = neigh.second;
+				
+				// Add unvisited neighbors to the min-heap
+				// Their edges will be considered in increasing
+				// order of weight
+				if (!visit[nextNode])
+					pq.push({wt, nextNode});
+			}
+		}
+		
+		// Return the total weight of the MST
+		return sum;
+	}
+};
