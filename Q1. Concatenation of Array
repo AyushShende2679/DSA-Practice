@@ -1,0 +1,31 @@
+/* Logic: Concatenation of Array (C++)
+
+1. Create a new vector `ans` and copy all elements of `nums` into it.
+2. Use a `for` loop to traverse each element of `nums`.
+3. Add each element of `nums` to the end of `ans` using `push_back()`.
+4. Return `ans`, which now contains the original array repeated twice.
+
+Example:
+
+- Input: `nums = [1, 2, 1]`
+- Copy the array: `ans = [1, 2, 1]`
+- Append the elements: `ans = [1, 2, 1, 1, 2, 1]`
+- Output: `[1, 2, 1, 1, 2, 1]`
+*/
+
+class Solution {
+public:
+    vector<int> getConcatenation(vector<int>& nums) {
+        // Copy the original array into ans
+        vector<int> ans = nums;
+
+        // Traverse through each element of nums
+        for (int i = 0; i < nums.size(); i++) {
+            // Add each element to the end of ans
+            ans.push_back(nums[i]);
+        }
+
+        // Return the concatenated array
+        return ans;
+    }
+};
