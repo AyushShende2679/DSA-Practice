@@ -1,0 +1,83 @@
+/* Logic – Word Ladder (BFS)
+
+1. Store all words from `wordList` in an `unordered_set` for fast searching.
+2. Create a queue that stores `{word, steps}` and push `{beginWord, 1}`.
+3. Remove `beginWord` from the set to avoid revisiting it.
+4. Run BFS while the queue is not empty:
+   - Take the front word and its step count, then pop it.
+   - If the current word equals `endWord`, return `steps`.
+   - Change each character of the current word one at a time, trying every letter from `'a'` to `'z'`.
+   - If the newly formed word exists in the set:
+     - Remove it from the set to prevent revisiting.
+     - Push it into the queue with `steps + 1`.
+   - Restore the original character before moving to the next position.
+5. If BFS finishes without finding `endWord`, return `0`.
+
+Why BFS? BFS explores transformations level by level, so the first time we reach `endWord`, we have found the shortest transformation sequence.
+*/
+
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord,
+                     vector<string>& wordList) {
+
+        // Store all words in a set for O(1) average lookup
+        unordered_set<string> st(wordList.begin(), wordList.end());
+
+        // Queue stores {word, number of steps}
+        queue<pair<string, int>> q;
+
+        // Start BFS with beginWord at step 1
+        q.push({beginWord, 1});
+
+        // Remove beginWord to avoid visiting it again
+        st.erase(beginWord);
+
+        // Perform Breadth-First Search (BFS)
+        while (!q.empty()) {
+
+            // Get the word and its transformation count
+            string word = q.front().first;
+            int steps = q.front().second;
+            q.pop();
+
+            // If the target word is reached, return the count
+            if (word == endWord)
+                return steps;
+
+            // Try changing each character of the current word
+            for (int i = 0; i < word.size(); i++) {
+
+                // Save the original character for restoration
+                char w = word[i];
+
+                // Replace the character with every letter from a to z
+                for (char ch = 'a'; ch <= 'z'; ch++) {
+
+                    // Skip the unchanged character
+                    if (word[i] == ch)
+                        continue;
+
+                    // Generate a new word by changing one character
+                    word[i] = ch;
+
+                    // Check whether the new word exists in the set
+                    if (st.find(word) != st.end()) {
+
+                        // Remove it to prevent revisiting the same word
+                        st.erase(word);
+
+                        // Add the new word with one additional step
+                        q.push({word, steps + 1});
+                    }
+                }
+
+                // Restore the original character before moving on
+                word[i] = w;
+            }
+        }
+
+        // Return 0 if no valid transformation sequence exists
+        return 0;
+    }
+};
