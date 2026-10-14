@@ -1,0 +1,42 @@
+/* Logic:
+
+1. Initialize two pointers, `i = 0` and `j = 0`, to traverse both sorted arrays.
+2. Compare `nums1[i]` and `nums2[j]`.
+3. If both elements are equal, return that element because it is the smallest common element.
+4. If `nums1[i] < nums2[j]`, increment `i` because the smaller element cannot be the common element at this comparison.
+5. Otherwise, increment `j` to find a matching element.
+6. Repeat until either pointer reaches the end of its array.
+7. If no common element is found, return `-1`.
+
+Time Complexity: $O(n+m)
+
+Space Complexity: $O(1)
+*/
+
+class Solution {
+public:
+    int getCommon(vector<int>& nums1, vector<int>& nums2) {
+        // Initialize two pointers at the beginning of both arrays
+        int i = 0, j = 0;
+
+        // Traverse both arrays while neither pointer goes out of bounds
+        while (i < nums1.size() && j < nums2.size()) {
+
+            // If both elements are equal, we found the common element
+            if (nums1[i] == nums2[j])
+                return nums1[i];
+
+            // If nums1's element is smaller, move its pointer forward
+            // because it cannot match the current or any smaller nums2 element
+            if (nums1[i] < nums2[j])
+                i++;
+
+            // Otherwise, move nums2's pointer forward
+            else
+                j++;
+        }
+
+        // No common element was found
+        return -1;
+    }
+};
