@@ -1,0 +1,118 @@
+/*
+## 1. Memoization (Top-Down DP)
+
+Logic: Recursion + storing already calculated answers.
+
+- Base case: If `n <= 1`, return `n`.
+- Check whether `dp[n]` is already calculated. If yes, return it.
+- Otherwise, calculate `fib(n-1) + fib(n-2)` and store the result in `dp[n]`.
+- Return the stored result.
+
+- Time: $O(n)$
+- Space: $O(n)$, including the DP array and recursion stack.
+
+## 2. Tabulation (Bottom-Up DP)
+
+Logic: Start from the base cases and calculate answers iteratively.
+
+- Initialize `dp[0] = 0` and `dp[1] = 1`.
+- Run a loop from `i = 2` to `n`.
+- Calculate `dp[i] = dp[i-1] + dp[i-2]`.
+- Return `dp[n]`.
+- Handle `n <= 1` before accessing `dp[1]`.
+
+- Time: $O(n)$
+- Space: $O(n)$ for the DP array.
+
+## 3. Space Optimization
+
+Logic: Store only the previous two Fibonacci values instead of the entire DP array.
+
+- Initialize `prev2 = 0` and `prev1 = 1`.
+- Run a loop from `i = 2` to `n`.
+- Calculate `curr = prev1 + prev2`.
+- Shift the values: `prev2 = prev1` and `prev1 = curr`.
+- Return `prev1`.
+- Handle `n <= 1` before the loop.
+
+- Time: $O(n)$
+- Space: $O(1)$.
+
+## Quick comparison
+
+| Approach | Main idea | Time | Space |
+| --- | --- | --- | --- |
+| Memoization | Recursion + cache | $O(n)$ | $O(n)$ |
+| Tabulation | Iteration + DP array | $O(n)$ | $O(n)$ |
+| Space optimization | Keep two previous values | $O(n)$ | $O(1)$ |
+
+Remember these three patterns:
+
+- Memoization: Check → Calculate → Store → Return.
+- Tabulation: Initialize → Loop → Store → Return.
+- Space optimization: Initialize two variables → Calculate current → Shift variables → Return.
+
+*/
+
+class Solution {
+public:
+    // DP : Memoization
+    int solve(int n, vector<int>& dp) {
+        if (n <= 1)
+            return n;
+
+        if (dp[n] != -1)
+            return dp[n];
+
+        return dp[n] = solve(n - 1, dp) + solve(n - 2, dp);
+    }
+
+    int fib(int n) {
+        vector<int> dp(n + 1, -1);
+        return solve(n, dp);
+    }
+};
+/*
+class Solution {
+public:
+    // DP : Tabulation
+    int solve(int n, vector<int>& dp) {
+        if (n <= 1)
+            return n;
+
+        dp[0] = 0;
+        dp[1] = 1;
+
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+
+    int fib(int n) {
+        vector<int> dp(n + 1, -1);
+        return solve(n, dp);
+    }
+};*/
+/*
+class Solution {
+public:
+    // DP : space optimization
+    int solve(int n, int prev1, int prev2) {
+        if (n <= 1)
+            return n;
+            
+        for (int i = 2; i <= n; i++) {
+            int curr = prev1 + prev2;
+            prev2 = prev1;
+            prev1 = curr;
+        }
+        return prev1;
+    }
+
+    int fib(int n) {
+        int prev2 = 0, prev1 = 1;
+        return solve(n, prev1, prev2);
+    }
+};
+*/
