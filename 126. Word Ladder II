@@ -1,0 +1,88 @@
+/* Logic for Word Ladder II
+
+1. Store all words from `wordList` in an `unordered_set` for fast searching.
+2. If `endWord` is not present in the set, return an empty result.
+3. Create a queue that stores complete transformation paths and push `{beginWord}` into it.
+4. Remove `beginWord` from the set to avoid revisiting it.
+5. Process the queue level by level using BFS, because BFS guarantees the shortest transformation length.
+6. For each path:
+   - Take the last word in the path.
+   - Try replacing each character with letters from `'a'` to `'z'`.
+   - If the generated word exists in the set, append it to the current path and push the new path into the queue.
+   - Store the generated word in `usedOnLevel`.
+7. If the last word equals `endWord`, add the complete path to the result.
+8. After processing the entire BFS level, remove all words in `usedOnLevel` from the set. This allows multiple shortest paths to reach the same word at the same level.
+9. Once the level containing `endWord` has been completely processed, stop BFS.
+10. Return all the shortest transformation sequences.
+
+Key concept: Use BFS to find the shortest paths and remove visited words only after processing the entire level to preserve all possible shortest sequences.
+*/
+
+class Solution {
+public:
+    vector<vector<string>> findLadders(string beginWord, string endWord,
+                                       vector<string>& wordList) {
+        vector<vector<string>> res;
+
+        unordered_set<string> st(wordList.begin(), wordList.end());
+
+        // If endWord is not present, no transformation is possible.
+        if (st.find(endWord) == st.end())
+            return res;
+
+        queue<vector<string>> q;
+        q.push({beginWord});
+
+        st.erase(beginWord);
+
+        while (!q.empty()) {
+            int size = q.size();
+            vector<string> usedOnLevel;
+
+            for (int k = 0; k < size; k++) {
+                vector<string> path = q.front();
+                q.pop();
+
+                string word = path.back();
+
+                if (word == endWord) {
+                    res.push_back(path);
+                    continue;
+                }
+
+                for (int i = 0; i < word.size(); i++) {
+                    char original = word[i];
+
+                    for (char ch = 'a'; ch <= 'z'; ch++) {
+                        if (ch == original)
+                            continue;
+
+                        word[i] = ch;
+
+                        if (st.find(word) != st.end()) {
+                            path.push_back(word);
+                            q.push(path);
+                            path.pop_back();
+
+                            usedOnLevel.push_back(word);
+                        }
+                    }
+
+                    word[i] = original;
+                }
+            }
+
+            // Remove words only after processing the entire level.
+            // This allows multiple shortest paths to reach the same word.
+            for (const string& w : usedOnLevel) {
+                st.erase(w);
+            }
+
+            // Stop after processing the level that reaches endWord.
+            if (!res.empty())
+                break;
+        }
+
+        return res;
+    }
+};
