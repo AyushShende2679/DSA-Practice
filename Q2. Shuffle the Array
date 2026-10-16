@@ -1,0 +1,46 @@
+/* Logic:
+
+1. Initialize `i = 0` to point to the first half of the array and `j = n` to point to the second half.
+2. Create an answer vector `ans` of size `2*n` and initialize `idx = 0` to track its index.
+3. Run a `while` loop until `i < n`.
+4. First, store `nums[i]` in `ans[idx]` and increment `idx`.
+5. Next, store `nums[j]` in `ans[idx]` and increment `idx`.
+6. Increment both `i` and `j` to move to the next elements in their respective halves.
+7. Repeat until all elements from both halves are inserted alternately.
+8. Return the `ans` vector containing the shuffled array.
+*/
+
+class Solution {
+public:
+    vector<int> shuffle(vector<int>& nums, int n) {
+
+        // i points to the first half of the array
+        // j points to the second half of the array
+        int i = 0, j = n;
+
+        // idx tracks the position in the answer vector
+        int idx = 0;
+
+        // Create a vector of size 2*n to store the shuffled elements
+        vector<int> ans(2 * n);
+
+        // Iterate through the first half of the array
+        while (i < n) {
+
+            // Place the element from the first half
+            ans[idx] = nums[i];
+            idx++;
+
+            // Place the corresponding element from the second half
+            ans[idx] = nums[j];
+            idx++;
+
+            // Move to the next elements in both halves
+            i++;
+            j++;
+        }
+
+        // Return the shuffled array
+        return ans;
+    }
+};
