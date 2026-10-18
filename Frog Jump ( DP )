@@ -1,0 +1,212 @@
+/* Here is the logic for all 3 approaches to the Frog Jump problem: Recursion + Memoization, Tabulation, and Space Optimization.
+
+## 1. Memoization (Top-Down DP)
+
+Approach: Use recursion and store calculated results in a DP array to avoid repeated calculations.
+
+### Logic
+
+1. Define `solve(idx)` as the minimum energy required to reach stair `idx`.
+2. Base case: If `idx == 0`, return `0`.
+3. If `dp[idx]` is already calculated, return it.
+4. Calculate the one-step jump cost:
+   - `left = solve(idx-1) + abs(height[idx] - height[idx-1])`
+5. Calculate the two-step jump cost if `idx > 1`:
+   - `right = solve(idx-2) + abs(height[idx] - height[idx-2])`
+6. Store and return `min(left, right)` in `dp[idx]`.
+7. Call `solve(n-1)` to get the answer.
+
+Complexity:
+
+- Time: $O(n)$
+- Auxiliary space: $O(n)$ for the DP array and recursion stack.
+
+## 2. Tabulation (Bottom-Up DP)
+
+Approach: Solve the problem iteratively, starting from the first stair and moving toward the last.
+
+### Logic
+
+1. Create a DP array of size `n`.
+2. Initialize `dp[0] = 0`.
+3. Iterate from `i = 1` to `n-1`.
+4. Calculate the one-step jump cost:
+   - `left = dp[i-1] + abs(height[i] - height[i-1])`
+5. Calculate the two-step jump cost if `i > 1`:
+   - `right = dp[i-2] + abs(height[i] - height[i-2])`
+6. Store `min(left, right)` in `dp[i]`.
+7. Return `dp[n-1]`.
+
+Complexity:
+
+- Time: $O(n)$
+- Auxiliary space: $O(n)$.
+
+## 3. Space Optimization
+
+Approach: Since each DP state depends only on the previous two states, replace the DP array with two variables.
+
+### Logic
+
+1. Initialize `prev1 = 0` and `prev2 = 0`.
+2. Iterate from `i = 1` to `n-1`.
+3. Calculate the one-step jump cost:
+   - `left = prev1 + abs(height[i] - height[i-1])`
+4. Calculate the two-step jump cost if `i > 1`:
+   - `right = prev2 + abs(height[i] - height[i-2])`
+5. Calculate `curr = min(left, right)`.
+6. Update the variables:
+   - `prev2 = prev1`
+   - `prev1 = curr`
+7. Return `prev1`.
+
+Complexity:
+
+- Time: $O(n)$
+- Auxiliary space: $O(1)$.
+
+## Quick comparison
+
+| Feature | Memoization | Tabulation | Space Optimization |
+| --- | --- | --- | --- |
+| Technique | Recursion | Iteration | Iteration |
+| Storage | DP array | DP array | Two previous states |
+| Direction | Top-down | Bottom-up | Bottom-up |
+| Time | $O(n)$ | $O(n)$ | $O(n)$ |
+| Auxiliary space | $O(n)$ | $O(n)$ | $O(1)$ |
+
+*/
+class Solution {
+	private:
+	// Recursive function to find the minimum cost to reach index idx
+	int solve(vector<int>& height, int idx, vector<int>& dp) {
+		
+		// Base case: Cost to reach the first stair is 0
+		if (idx == 0)
+			return 0;
+		
+		// If the result is already calculated, return it
+		if (dp[idx] != -1)
+			return dp[idx];
+		
+		// Option 1: Jump from the previous stair (idx - 1)
+		// Cost = previous stair's cost + absolute height difference
+		int left = solve(height, idx - 1, dp)
+		+ abs(height[idx] - height[idx - 1]);
+		
+		// Initialize the cost of a two-step jump to infinity
+		int right = INT_MAX;
+		
+		// Option 2: Jump from two stairs before (idx - 2)
+		// This jump is possible only when idx > 1
+		if (idx > 1)
+			right = solve(height, idx - 2, dp)
+		+ abs(height[idx] - height[idx - 2]);
+		
+		// Store and return the minimum cost of both options
+		return dp[idx] = min(left, right);
+	}
+	
+	public:
+	int minCost(vector<int>& height) {
+		
+		// Number of stairs
+		int n = height.size();
+		
+		// Initialize the DP array with -1 (uncomputed states)
+		vector<int> dp(n + 1, -1);
+		
+		// Find the minimum cost to reach the last stair
+		return solve(height, n - 1, dp);
+	}
+};
+/*class Solution {
+	public:
+	int minCost(vector<int>& height) {
+		
+		// Number of stairs
+		int n = height.size();
+		
+		// Handle empty or single-element input
+		if (n <= 1)
+			return 0;
+		
+		// DP array: dp[i] stores the minimum cost to reach stair i
+		vector<int> dp(n, 0);
+		
+		// Base case: Cost to reach the first stair is 0
+		dp[0] = 0;
+		
+		// Calculate the minimum cost for each stair
+		for (int i = 1; i < n; i++) {
+			
+			// Option 1: Jump from the previous stair
+			// Previous minimum cost + energy required for the jump
+			int left = dp[i - 1]
+			+ abs(height[i] - height[i - 1]);
+			
+			// Initialize the two-step jump cost
+			int right = INT_MAX;
+			
+			// Option 2: Jump from two stairs before
+			if (i > 1) {
+				right = dp[i - 2]
+				+ abs(height[i] - height[i - 2]);
+			}
+			
+			// Choose the minimum cost between both options
+			dp[i] = min(left, right);
+		}
+		
+		// Return the minimum cost to reach the last stair
+		return dp[n - 1];
+	}
+};
+*/
+/*
+class Solution {
+	public:
+	int minCost(vector<int>& height) {
+		
+		// Number of stairs
+		int n = height.size();
+		
+		// Handle empty or single-element input
+		if (n <= 1)
+			return 0;
+		
+		// Space optimization:
+		// prev1 stores the minimum cost to reach stair i - 1
+		// prev2 stores the minimum cost to reach stair i - 2
+		int prev1 = 0, prev2 = 0;
+		
+		// Calculate the minimum cost for each stair
+		for (int i = 1; i < n; i++) {
+			
+			// Option 1: Jump from the previous stair
+			int left = prev1
+			+ abs(height[i] - height[i - 1]);
+			
+			// Initialize the two-step jump cost
+			int right = INT_MAX;
+			
+			// Option 2: Jump from two stairs before
+			if (i > 1) {
+				right = prev2
+				+ abs(height[i] - height[i - 2]);
+			}
+			
+			// Minimum cost to reach the current stair
+			int curr = min(left, right);
+			
+			// Update variables for the next iteration
+			prev2 = prev1;
+			prev1 = curr;
+		}
+		
+		// Return the minimum cost to reach the last stair
+		return prev1;
+	}
+};
+
+*/
