@@ -1,0 +1,46 @@
+/* Logic:
+
+1. Find the size of the array `n`.
+2. Create a frequency array of size `n + 1`, initialized with zeros.
+3. Traverse the given array and increment the frequency of each number.
+4. Traverse the frequency array from `1` to `n`:
+   - If the frequency is `2`, the number is the duplicate.
+   - If the frequency is `0`, the number is the missing.
+5. Return the duplicate and missing numbers in that order.
+*/
+
+class Solution {
+public:
+    vector<int> findErrorNums(vector<int>& nums) {
+        // Get the size of the array
+        int n = nums.size();
+
+        // Create a frequency array initialized with 0
+        // freq[i] stores how many times number i appears
+        vector<int> freq(n + 1, 0);
+
+        // Count the frequency of each number in nums
+        for (int i = 0; i < n; i++) {
+            freq[nums[i]]++;
+        }
+
+        // Initialize duplicate and missing numbers
+        int duplicate = -1;
+        int missing = -1;
+
+        // Check numbers from 1 to n
+        for (int i = 1; i <= n; i++) {
+
+            // If a number appears twice, it is the duplicate
+            if (freq[i] == 2)
+                duplicate = i;
+
+            // If a number never appears, it is the missing number
+            else if (freq[i] == 0)
+                missing = i;
+        }
+
+        // Return duplicate first, followed by missing
+        return {duplicate, missing};
+    }
+};
