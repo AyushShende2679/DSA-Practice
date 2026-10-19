@@ -1,0 +1,212 @@
+/* Logic: 
+
+## 1. Memoization (Top-Down DP)
+
+- Start from the last house.
+- For each house, make two choices:
+  - Include: Rob the current house and move two houses backward.
+  - Exclude: Skip the current house and move one house backward.
+- Take the maximum of these two choices.
+- Store the result in the DP array so the same subproblem is not solved again.
+- Base cases:
+  - If the index is less than 0, return 0.
+  - If the index is 0, return the value of the first house.
+
+## 2. Tabulation (Bottom-Up DP)
+
+- Create a DP array to store the maximum money that can be robbed up to each house.
+- Initialize the first house's result with its value.
+- Traverse from the second house to the last house.
+- For each house:
+  - Include: Current house value + maximum money up to two houses before.
+  - Exclude: Maximum money up to the previous house.
+- Store the maximum of these two choices in the current DP position.
+- Return the value stored for the last house.
+
+## 3. Space Optimization
+
+- The tabulation approach only needs the results from the previous two positions.
+- Instead of maintaining the entire DP array, maintain two variables:
+  - `prev1`: Maximum money up to the previous house.
+  - `prev2`: Maximum money up to two houses before.
+- Initialize `prev1` with the first house's value and `prev2` with 0.
+- Traverse from the second house to the last house.
+- For each house:
+  - Include: Current house value + `prev2`.
+  - Exclude: `prev1`.
+  - Store the maximum in a temporary variable, `curr`.
+- Update `prev2` to `prev1` and `prev1` to `curr`.
+- Return `prev1` as the final answer.
+
+## Complexity comparison
+
+| Approach | Time | Auxiliary space |
+| --- | --- | --- |
+| Memoization | $O(n)$ | $O(n)$ |
+| Tabulation | $O(n)$ | $O(n)$ |
+| Space optimization | $O(n)$ | $O(1)$ |
+
+In short: Memoization uses recursion and caching, tabulation fills a DP array iteratively, and space optimization keeps only the previous two results.
+*/
+class Solution {
+public:
+    // DP : Memoization
+    int solve(vector<int>& nums, int idx, vector<int>& dp) {
+
+        // Base case: If index becomes negative,
+        // there are no houses left to rob.
+        if (idx < 0)
+            return 0;
+
+        // Base case: If only the first house remains,
+        // robbing it gives nums[0].
+        if (idx == 0)
+            return nums[0];
+
+        // If this subproblem has already been solved,
+        // return the stored result to avoid recomputation.
+        if (dp[idx] != -1)
+            return dp[idx];
+
+        // Include the current house:
+        // Add its money and move two indices backward
+        // because adjacent houses cannot both be robbed.
+        int includeAns = nums[idx] + solve(nums, idx - 2, dp);
+
+        // Exclude the current house:
+        // Skip it and consider the previous house.
+        int excludeAns = solve(nums, idx - 1, dp);
+
+        // Store and return the maximum money obtainable
+        // by either including or excluding this house.
+        return dp[idx] = max(includeAns, excludeAns);
+    }
+
+    int rob(vector<int>& nums) {
+
+        // Get the total number of houses.
+        int n = nums.size();
+
+        // If there are no houses, the maximum money is zero.
+        if (n == 0)
+            return 0;
+
+        // Initialize the DP array with -1 to indicate
+        // that no subproblem has been solved yet.
+        vector<int> dp(n, -1);
+
+        // Start from the last house and calculate
+        // the maximum money that can be robbed.
+        return solve(nums, n - 1, dp);
+    }
+};
+/*
+
+class Solution {
+public:
+    // DP: Tabulation (Bottom-Up)
+    int solve(vector<int>& nums, int idx, vector<int>& dp) {
+
+        // Base case: No houses to rob.
+        if (idx < 0)
+            return 0;
+
+        // Base case: Maximum money from the first house.
+        dp[0] = nums[0];
+
+        // Calculate the maximum money for each house
+        // from left to right, starting at index 1.
+        for (int i = 1; i < nums.size(); i++) {
+
+            // Include the current house.
+            // Since adjacent houses cannot be robbed,
+            // add the best result from index i - 2.
+            int includeAns = nums[i];
+
+            if (i > 1)
+                includeAns += dp[i - 2];
+
+            // Exclude the current house.
+            // Take the maximum money calculated up to i - 1.
+            int excludeAns = dp[i - 1];
+
+            // Store the maximum money obtainable
+            // from houses 0 through i.
+            dp[i] = max(includeAns, excludeAns);
+        }
+
+        // Return the answer for the last house.
+        return dp[idx];
+    }
+
+    int rob(vector<int>& nums) {
+
+        // Get the total number of houses.
+        int n = nums.size();
+
+        // If there are no houses, return 0.
+        if (n == 0)
+            return 0;
+
+        // Initialize the DP array.
+        vector<int> dp(n, -1);
+
+        // Calculate the answer using tabulation.
+        return solve(nums, n - 1, dp);
+    }
+};
+
+*/
+/*
+
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+
+        // Get the total number of houses.
+        int n = nums.size();
+
+        // If there are no houses, return 0.
+        if (n == 0)
+            return 0;
+
+        // prev1 stores the maximum money robbed
+        // from houses up to the previous index (i - 1).
+        int prev1 = nums[0];
+
+        // prev2 stores the maximum money robbed
+        // from houses up to index (i - 2).
+        int prev2 = 0;
+
+        // Start from the second house.
+        for (int i = 1; i < n; i++) {
+
+            // Include the current house.
+            // Start with the money in the current house.
+            int includeAns = nums[i];
+
+            // If a house exists two positions before,
+            // add the best result up to that house.
+            if (i > 1)
+                includeAns += prev2;
+
+            // Exclude the current house.
+            // Use the best result up to the previous house.
+            int excludeAns = prev1;
+
+            // Choose the option that gives more money.
+            int curr = max(includeAns, excludeAns);
+
+            // Update the DP variables for the next iteration.
+            // The previous result becomes the result from i - 2.
+            prev2 = prev1;
+
+            // The current result becomes the result from i - 1.
+            prev1 = curr;
+        }
+
+        // Return the maximum money that can be robbed.
+        return prev1;
+    }
+};
+*/
