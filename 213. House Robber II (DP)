@@ -1,0 +1,93 @@
+/* Logic – House Robber II
+
+1. Since the houses are arranged in a circle, the first and last houses are adjacent. We cannot rob both of them.
+
+2. Divide the problem into two cases:
+
+- Case 1: Exclude the first house and consider houses from index `1` to `n-1`.
+- Case 2: Exclude the last house and consider houses from index `0` to `n-2`.
+
+3. For each case, apply the House Robber I logic using dynamic programming:
+
+- Include: Rob the current house and add its money to the maximum loot from two houses back.
+- Exclude: Skip the current house and keep the maximum loot up to the previous house.
+- Choose the maximum of these two options.
+
+4. Optimize space using two variables, `prev1` and `prev2`, instead of a DP array.
+
+5. Return the maximum loot from both cases.
+
+Time Complexity: $O(n)$
+
+Space Complexity: $O(n)$ for the two temporary arrays.
+*/
+
+
+// pre-requisite : 198. House Robber ( DP ) - https://github.com/AyushShende2679/DSA-Practice/blob/main/198.%20House%20Robber%20(%20DP%20)
+class Solution {
+private:
+    // Solves the House Robber problem for a linear array
+    int solve(vector<int>& nums) {
+        int n = nums.size();
+
+        // prev1 stores the maximum loot up to the previous house
+        // prev2 stores the maximum loot up to two houses back
+        int prev1 = nums[0], prev2 = 0;
+
+        // Start from the second house
+        for (int i = 1; i < n; i++) {
+
+            // Option 1: Rob the current house
+            int include = nums[i];
+
+            // If possible, add the loot from two houses back
+            // because adjacent houses cannot both be robbed
+            if (i > 1)
+                include += prev2;
+
+            // Option 2: Skip the current house
+            // Keep the maximum loot from the previous house
+            int exclude = 0 + prev1;
+
+            // Choose the option that gives maximum loot
+            int curr = max(include, exclude);
+
+            // Update variables for the next iteration
+            prev2 = prev1;
+            prev1 = curr;
+        }
+
+        // Return the maximum loot from the linear array
+        return prev1;
+    }
+
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+
+        // If there is only one house, rob it
+        if (n == 1)
+            return nums[0];
+
+        // Since houses are in a circle, the first and last
+        // houses cannot both be robbed
+
+        vector<int> temp1, temp2;
+
+        for (int i = 0; i < n; i++) {
+
+            // Case 1: Exclude the first house
+            // Include houses from index 1 to n-1
+            if (i != 0)
+                temp1.push_back(nums[i]);
+
+            // Case 2: Exclude the last house
+            // Include houses from index 0 to n-2
+            if (i != n - 1)
+                temp2.push_back(nums[i]);
+        }
+
+        // Solve both cases and return the maximum loot
+        return max(solve(temp1), solve(temp2));
+    }
+};
