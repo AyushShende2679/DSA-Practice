@@ -1,0 +1,230 @@
+/* Logic: 
+
+### 1. Recursion + Memoization (Top-Down DP)
+
+1. Start from the last day with `last = 3`, meaning no task is restricted.
+2. For the current day, try all three tasks: Task 0, Task 1, and Task 2.
+3. Skip the task if it is equal to `last`.
+4. For each valid task, add its points to the result of the previous day, passing the current task as the new `last`.
+5. Take the maximum points among all valid choices.
+6. Store the result in `dp[day][last]` to avoid recalculating the same state.
+7. Base case: On day 0, return the maximum points among tasks that are different from `last`.
+
+### 2. Tabulation (Bottom-Up DP)
+
+1. Create a DP table of size `N × 4`.
+2. Initialize the first day:
+   - `dp[0][0]` = maximum of Task 1 and Task 2.
+   - `dp[0][1]` = maximum of Task 0 and Task 2.
+   - `dp[0][2]` = maximum of Task 0 and Task 1.
+   - `dp[0][3]` = maximum of all three tasks.
+3. Start iterating from day 1 to day `N - 1`.
+4. For every day, iterate over all four possible values of `last`.
+5. For each `last`, try all three tasks and skip the task equal to `last`.
+6. Calculate the points by adding the current task's points to `dp[day - 1][task]`.
+7. Store the maximum points in `dp[day][last]`.
+8. Return `dp[N - 1][3]`.
+
+### 3. Space Optimization
+
+1. Instead of maintaining the entire DP table, use two arrays of size 4: `prev` and `temp`.
+2. Initialize `prev` using the four base cases for day 0.
+3. Iterate from day 1 to day `N - 1`.
+4. For each day, create or reset `temp` to store the current day's results.
+5. Iterate over all four values of `last`.
+6. For each `last`, try all three tasks, skipping the task equal to `last`.
+7. Calculate the points by adding the current task's points to `prev[task]`.
+8. Store the maximum points in `temp[last]`.
+9. After processing all states for the day, update `prev = temp`.
+10. Return `prev[3]`.
+
+## The common logic
+
+For all three approaches, the main idea is the same:
+
+- Never perform the same task on consecutive days.
+- Try every valid task and calculate its total points.
+- Choose the task that gives the maximum total points.
+
+The difference is how the results are stored:
+
+- Memoization stores answers while solving recursively.
+- Tabulation fills a DP table iteratively.
+- Space optimization stores only the previous and current day's results.
+*/
+
+class Solution {
+	private:
+	// Recursive function to find the maximum points up to a given day
+	// 'last' represents the task performed on the previous day
+	int solve(vector<vector<int>> & mat, int day, int last,
+	vector<vector<int>> & dp) {
+		
+		// Base case: On day 0, choose the task with maximum points
+		// that is different from the last task
+		if (day == 0) {
+			int maximum = 0;
+			
+			for (int task = 0; task < 3; task++) {
+				if (task != last) {
+					maximum = max(maximum, mat[0][task]);
+				}
+			}
+			
+			return maximum;
+		}
+		
+		// If the answer is already calculated, return it
+		if (dp[day][last] != -1) {
+			return dp[day][last];
+		}
+		
+		int maximum = 0;
+		
+		// Try all three tasks for the current day
+		for (int task = 0; task < 3; task++) {
+			
+			// The same task cannot be performed on consecutive days
+			if (task != last) {
+				
+				// Add the current task's points to the maximum
+				// points obtained from the previous day
+				int points = mat[day][task] +
+				solve(mat, day - 1, task, dp);
+				
+				// Update the maximum points
+				maximum = max(maximum, points);
+			}
+		}
+		
+		// Store the result to avoid recalculating the same state
+		return dp[day][last] = maximum;
+	}
+	
+	public:
+	int maximumPoints(vector<vector<int>> & mat) {
+		
+		// Total number of days
+		int n = mat.size();
+		
+		// DP table initialized with -1 (uncomputed states)
+		// 4 possible values for 'last': 0, 1, 2, and 3
+		vector<vector<int>> dp(n, vector<int>(4, -1));
+		
+		// Start from the last day
+		// 3 means no task is restricted initially
+		return solve(mat, n - 1, 3, dp);
+	}
+/*class Solution {
+	public:
+	int maximumPoints(vector<vector<int>> & mat) {
+		
+		// Total number of days
+		int n = mat.size();
+		
+		// Create a DP table of size n x 4
+		// dp[day][last] represents the maximum points achievable
+		// up to the current day when task 'last' cannot be performed
+		// last = 0, 1, 2 represents the three tasks
+		// last = 3 means no task is restricted
+		vector<vector<int>> dp(n, vector<int>(4, -1));
+		
+		// Base case: Day 0
+		// If task 0 was performed previously, choose task 1 or 2
+		dp[0][0] = max(mat[0][1], mat[0][2]);
+		
+		// If task 1 was performed previously, choose task 0 or 2
+		dp[0][1] = max(mat[0][0], mat[0][2]);
+		
+		// If task 2 was performed previously, choose task 0 or 1
+		dp[0][2] = max(mat[0][0], mat[0][1]);
+		
+		// If no task is restricted, choose the maximum of all tasks
+		dp[0][3] = max({mat[0][0], mat[0][1], mat[0][2]});
+		
+		// Process the remaining days from day 1 to day n-1
+		for (int day = 1; day < n; day++) {
+			
+			// Consider all possible values of the restricted task
+			for (int last = 0; last < 4; last++) {
+				
+				// Initialize the maximum points for this state
+				dp[day][last] = 0;
+				
+				// Try all three tasks on the current day
+				for (int task = 0; task < 3; task++) {
+					
+					// A task cannot be repeated on consecutive days
+					if (task != last) {
+						
+						// Add current task points to the best points
+						// from the previous day, where this task is restricted
+						int points = mat[day][task]
+						+ dp[day - 1][task];
+						
+						// Update the maximum points for this state
+						dp[day][last] = max(dp[day][last], points);
+					}
+				}
+			}
+		}
+		
+		// Return the maximum points achievable over all days
+		// Initially, no task is restricted, so last = 3
+		return dp[n - 1][3];
+	}
+};
+*/
+/*
+class Solution {
+	public:
+	int maximumPoints(vector<vector<int>> & mat) {
+		
+		// Total number of days
+		int n = mat.size();
+		
+		// prev[last] stores the maximum points from the previous day
+		// last = 0, 1, 2 means that task cannot be selected
+		// last = 3 means no task is restricted
+		
+		// Base case: Day 0
+		vector<int> prev(4, 0);
+		
+		prev[0] = max(mat[0][1], mat[0][2]);
+		prev[1] = max(mat[0][0], mat[0][2]);
+		prev[2] = max(mat[0][0], mat[0][1]);
+		prev[3] = max({mat[0][0], mat[0][1], mat[0][2]});
+		
+		// Process the remaining days
+		for (int day = 1; day < n; day++) {
+			
+			// Store the current day's results
+			vector<int> temp(4, 0);
+			
+			// Consider every possible restricted task
+			for (int last = 0; last < 4; last++) {
+				
+				// Try all three tasks
+				for (int task = 0; task < 3; task++) {
+					
+					// Cannot repeat the previous day's task
+					if (task != last) {
+						
+						// Current task points + best previous-day points
+						int points = mat[day][task] + prev[task];
+						
+						// Keep the maximum points for this state
+						temp[last] = max(temp[last], points);
+					}
+				}
+			}
+			
+			// Update previous-day results
+			prev = temp;
+		}
+		
+		// Return the maximum points with no task initially restricted
+		return prev[3];
+	}
+};
+*/
