@@ -1,0 +1,194 @@
+/* Logic: 
+## 1. Memoization (Top-Down DP)
+
+- Start from the last item and the full capacity `W`.
+- For each item, consider two choices:
+  - Include: If the item's weight is less than or equal to the remaining capacity, add its value and recursively solve for the remaining capacity.
+  - Exclude: Skip the current item and recursively solve for the same capacity.
+- Take the maximum of the include and exclude choices.
+- Store the result in `dp[idx][W]` so that the same subproblem is not calculated again.
+- Base case: If only the first item remains, take it if it fits; otherwise, return `0`.
+
+Time: O(n × W) Space: O(n × W) for DP + O(n) recursion stack.
+
+## 2. Tabulation (Bottom-Up DP)
+
+- Create a 2D DP table where `dp[idx][cap]` represents the maximum value achievable using items from index `0` to `idx` with capacity `cap`.
+- Initialize the first row: for every capacity that can hold the first item, store its value; otherwise, keep `0`.
+- Iterate through each remaining item and every capacity from `0` to `W`.
+- For each state, calculate:
+  - Include: Current item's value + the result for the remaining capacity in the previous row, if the item fits.
+  - Exclude: The result for the same capacity in the previous row.
+- Store the maximum of these two choices in `dp[idx][cap]`.
+- Return `dp[n-1][W]`.
+
+Time: O(n × W) Space: O(n × W).
+
+## 3. Space Optimization (Two 1D Arrays)
+
+- Instead of a 2D DP table, use two 1D arrays: `prev` and `curr`, each of size `W + 1`.
+- Initialize `prev` for the first item, just as in tabulation.
+- Iterate through each remaining item and every capacity from `0` to `W`.
+- Calculate the include and exclude choices using only `prev`.
+- Store the maximum value in `curr[cap]`.
+- After processing all capacities for an item, assign `curr` to `prev` so the current results become the previous row for the next item.
+- Return `prev[W]`.
+
+Time: O(n × W) Space: O(W), because only two 1D arrays are used.
+
+### The key difference
+
+- Memoization: Recursion + caching results.
+- Tabulation: Iteratively fills a 2D DP table.
+- Space optimization: Uses two 1D arrays instead of a 2D table.
+
+All three approaches use the same include/exclude logic; they differ only in how they store and compute the subproblem results.
+*/
+class Solution {
+private:
+    // Recursive function to find the maximum value
+    // using items from index 0 to idx with capacity W
+    int solve(int idx, int W, vector<int> &val,
+              vector<int> &wt, vector<vector<int>> &dp) {
+
+        // Base case: only the first item is left
+        if (idx == 0) {
+            // If the first item's weight fits, take it
+            if (wt[idx] <= W) {
+                return val[idx];
+            }
+            // Otherwise, do not take the item
+            else {
+                return 0;
+            }
+        }
+
+        // If this state has already been calculated,
+        // return the stored result
+        if (dp[idx][W] != -1) {
+            return dp[idx][W];
+        }
+
+        // Choice 1: Include the current item
+        // Initialize to INT_MIN because the item might
+        // not fit in the remaining capacity
+        int include = INT_MIN;
+
+        // Include the item only if its weight fits
+        if (wt[idx] <= W) {
+            include = val[idx] +
+                      solve(idx - 1, W - wt[idx], val, wt, dp);
+        }
+
+        // Choice 2: Exclude the current item
+        // Capacity remains unchanged
+        int exclude = 0 +
+                      solve(idx - 1, W, val, wt, dp);
+
+        // Store and return the maximum value from
+        // including or excluding the current item
+        return dp[idx][W] = max(include, exclude);
+    }
+
+public:
+    int knapsack(int W, vector<int> &val, vector<int> &wt) {
+        int n = val.size();
+
+        // Initialize the DP table with -1
+        // dp[idx][W] stores the maximum value achievable
+        // using items 0 to idx with capacity W
+        vector<vector<int>> dp(n, vector<int>(W + 1, -1));
+
+        // Start from the last item and full capacity
+        return solve(n - 1, W, val, wt, dp);
+    }
+};
+/*class Solution {
+	public:
+	int knapsack(int W, vector<int> &val, vector<int> &wt) {
+		int n = val.size();
+		
+		// Handle the case where there are no items
+		if (n == 0)
+			return 0;
+		
+		// dp[idx][cap] stores the maximum value achievable
+		// using items from index 0 to idx with capacity cap
+		vector<vector<int>> dp(n, vector<int>(W + 1, 0));
+		
+		// Base case: consider only the first item
+		for (int cap = wt[0]; cap <= W; cap++) {
+			dp[0][cap] = val[0];
+		}
+		
+		// Process the remaining items
+		for (int idx = 1; idx < n; idx++) {
+			for (int cap = 0; cap <= W; cap++) {
+				
+				// Choice 1: Exclude the current item
+				int exclude = dp[idx - 1][cap];
+				
+				// Choice 2: Include the current item if it fits
+				int include = INT_MIN;
+				
+				if (wt[idx] <= cap) {
+					include = val[idx] +
+					dp[idx - 1][cap - wt[idx]];
+				}
+				
+				// Store the maximum value from both choices
+				dp[idx][cap] = max(include, exclude);
+			}
+		}
+		
+		// Return the answer after processing all items
+		return dp[n - 1][W];
+	}
+};
+
+*/
+/*
+class Solution {
+public:
+    int knapsack(int W, vector<int> &val, vector<int> &wt) {
+        int n = val.size();
+
+        // Handle the case where there are no items
+        if (n == 0)
+            return 0;
+
+        // Space optimization: store only the previous and current rows
+        vector<int> prev(W + 1, 0), curr(W + 1, 0);
+
+        // Base case: consider only the first item
+        for (int cap = wt[0]; cap <= W; cap++) {
+            prev[cap] = val[0];
+        }
+
+        // Process the remaining items
+        for (int idx = 1; idx < n; idx++) {
+            for (int cap = 0; cap <= W; cap++) {
+
+                // Choice 1: Exclude the current item
+                int exclude = prev[cap];
+
+                // Choice 2: Include the current item if it fits
+                int include = INT_MIN;
+
+                if (wt[idx] <= cap) {
+                    include = val[idx] + prev[cap - wt[idx]];
+                }
+
+                // Store the maximum value for this capacity
+                curr[cap] = max(include, exclude);
+            }
+
+            // Move the current row into the previous row
+            prev = curr;
+        }
+
+        // Maximum value achievable with capacity W
+        return prev[W];
+    }
+};
+*/
