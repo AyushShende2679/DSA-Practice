@@ -1,0 +1,192 @@
+/*Logic: 
+
+### 1. Memoization (Top-Down DP)
+
+Logic:
+
+- If `sum == 0`, return `true`.
+- If `idx == 0`, return whether `arr[0] == sum`.
+- Create a `dp[n][sum + 1]` table initialized with `-1`.
+- Before calculating a state, check if `dp[idx][sum]` is already computed. If yes, return the stored result.
+- Pick: If `arr[idx] <= sum`, recursively check `sum - arr[idx]` using the previous index.
+- Not Pick: Recursively check the same sum using the previous index.
+- Store and return `pick || notPick`.
+
+Time: O(n × sum) Space: O(n × sum) for DP + O(n) recursion stack.
+
+### 2. Tabulation (Bottom-Up DP)
+
+Logic:
+
+- Create a `dp[n][sum + 1]` table initialized with `false`.
+- Set `dp[i][0] = true` for every index because a sum of zero is always possible.
+- If `arr[0] <= sum`, set `dp[0][arr[0]] = true`.
+- Iterate through each index from `1` to `n - 1` and each target from `1` to `sum`.
+- Pick: If `arr[idx] <= target`, take the value of `dp[idx - 1][target - arr[idx]]`.
+- Not Pick: Take the value of `dp[idx - 1][target]`.
+- Set `dp[idx][target] = pick || notPick`.
+- Return `dp[n - 1][sum]`.
+
+Time: O(n × sum) Space: O(n × sum).
+
+### 3. Tabulation with Space Optimization
+
+Logic:
+
+- Create two 1D arrays, `prev` and `curr`, of size `sum + 1`, initialized with `false`.
+- Set `prev[0] = true` because a sum of zero is always possible.
+- If `arr[0] <= sum`, set `prev[arr[0]] = true`.
+- Iterate through the elements from index `1` to `n - 1`.
+- For every target from `1` to `sum`:
+  - Pick: If `arr[idx] <= target`, set `pick = prev[target - arr[idx]]`.
+  - Not Pick: Set `notPick = prev[target]`.
+  - Set `curr[target] = pick || notPick`.
+- After processing each element, assign `prev = curr`.
+- Return `prev[sum]`.
+
+Time: O(n × sum) Space: O(sum).
+
+### Quick revision table
+
+| Approach | Technique | Space complexity |
+| --- | --- | --- |
+| Memoization | Recursion + caching | O(n × sum) |
+| Tabulation | 2D DP table | O(n × sum) |
+| Space optimization | Two 1D arrays | O(sum) |
+
+All three approaches assume a non-empty array of non-negative integers and a non-negative target sum.
+*/
+
+class Solution {
+	private:
+	// Recursive function to check if a subset with the given sum exists
+	bool solve(int idx, vector<int>& arr, int sum,
+	vector<vector<int>> & dp) {
+		
+		// Base case: sum becomes 0, so a valid subset is found
+		if (sum == 0)
+			return true;
+		
+		// Base case: only the first element is left
+		// Check if it alone can form the required sum
+		if (idx == 0)
+			return arr[0] == sum;
+		
+		// If this state has already been computed, return its result
+		if (dp[idx][sum] != -1)
+			return dp[idx][sum];
+		
+		// Choice 1: Include the current element
+		bool include = false;
+		
+		// Include only if the current element does not exceed sum
+		if (sum >= arr[idx])
+			include = solve(idx - 1, arr, sum - arr[idx], dp);
+		
+		// Choice 2: Exclude the current element
+		// Move to the previous index without changing sum
+		bool exclude = solve(idx - 1, arr, sum, dp);
+		
+		// Store and return true if either choice succeeds
+		return dp[idx][sum] = include || exclude;
+	}
+	
+	public:
+	bool isSubsetSum(vector<int>& arr, int sum) {
+		int n = arr.size();
+		
+		// Initialize DP table with -1 (uncomputed states)
+		// Rows represent indices; columns represent target sums
+		vector<vector<int>> dp(n, vector<int>(sum + 1, -1));
+		
+		// Start recursion from the last index and the target sum
+		return solve(n - 1, arr, sum, dp);
+	}
+};
+/*class Solution {
+	public:
+	bool isSubsetSum(vector<int>& arr, int sum) {
+		int n = arr.size();
+		
+		// dp[idx][target] = whether target can be formed
+		// using elements from index 0 to idx
+		vector<vector<bool>> dp(n, vector<bool>(sum + 1, false));
+		
+		// A sum of 0 is always possible using an empty subset
+		for (int i = 0; i < n; i++)
+			dp[i][0] = true;
+		
+		// Base case: use only the first element
+		if (arr[0] <= sum)
+			dp[0][arr[0]] = true;
+		
+		// Process each element starting from index 1
+		for (int idx = 1; idx < n; idx++) {
+			for (int target = 1; target <= sum; target++) {
+				
+				// Choice 1: Include the current element
+				bool include = false;
+				
+				if (target >= arr[idx])
+					include = dp[idx - 1][target - arr[idx]];
+				
+				// Choice 2: Exclude the current element
+				bool exclude = dp[idx - 1][target];
+				
+				// Target is possible if either choice succeeds
+				dp[idx][target] = include || exclude;
+			}
+		}
+		
+		// Check if the required sum is possible using all elements
+		return dp[n - 1][sum];
+	}
+};
+*/
+/*
+class Solution {
+public:
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        int n = arr.size();
+
+        // prev[target] = whether target can be formed
+        // using elements processed so far
+        vector<int> prev(sum + 1, 0), curr(sum + 1, 0);
+
+        // A sum of 0 is always possible using an empty subset
+        prev[0] = true;
+
+        // Base case: use only the first element
+        if (arr[0] <= sum)
+            prev[arr[0]] = true;
+
+        // Process each element starting from index 1
+        for (int idx = 1; idx < n; idx++) {
+
+            // Sum 0 is always possible
+            curr[0] = true;
+
+            for (int target = 1; target <= sum; target++) {
+
+                // Choice 1: Include the current element
+                bool include = false;
+
+                if (target >= arr[idx])
+                    include = prev[target - arr[idx]];
+
+                // Choice 2: Exclude the current element
+                bool exclude = prev[target];
+
+                // Target is possible if either choice succeeds
+                curr[target] = include || exclude;
+            }
+
+            // Current row becomes the previous row
+            prev = curr;
+        }
+
+        // Check whether the required sum is possible
+        return prev[sum];
+    }
+};
+*/
