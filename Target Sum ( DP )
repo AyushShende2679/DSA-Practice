@@ -1,0 +1,130 @@
+/* Logic:
+
+1. Calculate the sum of all elements in the array: `totalSum`.
+2. Divide the array into two subsets, `S1` and `S2`, such that:
+
+$$
+S_1-S_2=diff
+$$
+
+$$
+S_1+S_2=totalSum
+$$
+
+3. Add both equations to get:
+
+$$
+S_1=\frac{totalSum+diff}{2}
+$$
+
+4. If `diff > totalSum`, return `0` because no valid partition is possible.
+5. If `(totalSum + diff)` is odd, return `0` because the target sum cannot be an integer.
+6. Set `target = (totalSum + diff) / 2`.
+7. Use Dynamic Programming to count the number of subsets whose sum equals `target`:
+   - Initialize `prev[0] = 1`, since an empty subset gives sum zero.
+   - If the first element is zero, set `prev[0] = 2`, because it can be included or excluded.
+   - For every remaining element, calculate the number of ways to form each sum by:
+     - Exclude: `prev[sum]`
+     - Include: `prev[sum - arr[idx]]`, if `sum >= arr[idx]`
+   - Add both choices: `curr[sum] = exclude + include`.
+   - Update `prev = curr`.
+8. Return `prev[target]`, which gives the number of valid partitions.
+
+Key idea: Convert the partition problem into a subset-sum counting problem and solve it using space-optimized DP.
+*/
+
+// pre-requrisite : Partitions with Given Difference 
+class Solution {
+	private:
+	int solve(vector<int>& arr, int target) {
+		int n = arr.size();
+		
+		// prev[sum] = number of ways to form 'sum'
+		// using the elements processed so far.
+		vector<int> prev(target + 1, 0);
+		
+		// An empty subset can always form sum 0.
+		prev[0] = 1;
+		
+		// Initialize the first element.
+		// If arr[0] == 0, we have two choices:
+		// include it or exclude it, both giving sum 0.
+		if (arr[0] == 0)
+			prev[0] = 2;
+		else if (arr[0] <= target)
+			prev[arr[0]] = 1;
+		
+		// Process the remaining array elements.
+		for (int idx = 1; idx < n; idx++) {
+			
+			// curr[sum] stores the number of ways to
+			// form 'sum' using elements up to index idx.
+			vector<int> curr(target + 1, 0);
+			
+			// Number of ways to form sum 0.
+			// A zero doubles the number of ways because
+			// it can be included or excluded.
+			curr[0] = prev[0];
+			
+			if (arr[idx] == 0)
+				curr[0] *= 2;
+			
+			// Calculate the number of ways for each sum.
+			for (int sum = 1; sum <= target; sum++) {
+				
+				// Choice 1: Exclude the current element.
+				int exclude = prev[sum];
+				
+				// Choice 2: Include the current element,
+				// if it does not exceed the required sum.
+				int include = 0;
+				
+				if (sum >= arr[idx])
+					include = prev[sum - arr[idx]];
+				
+				// Total ways = ways by including
+				// + ways by excluding the element.
+				curr[sum] = include + exclude;
+			}
+			
+			// Current DP row becomes the previous row
+			// for processing the next element.
+			prev = curr;
+		}
+		
+		// Return the number of subsets with sum = target.
+		return prev[target];
+	}
+	
+	int countPartitions(vector<int>& arr, int diff) {
+		
+		// Calculate the sum of all array elements.
+		int totalSum = accumulate(arr.begin(), arr.end(), 0);
+		
+		// If the required difference is too large,
+		// no valid partition is possible.
+		if (diff > totalSum)
+			return 0;
+		
+		// Derivation:
+		// S1 + S2 = totalSum
+		// S1 - S2 = diff
+		// Therefore, S1 = (totalSum + diff) / 2.
+		//
+		// If totalSum + diff is odd, S1 cannot be
+		// an integer, so no valid partition exists.
+		if ((totalSum + diff) % 2 != 0)
+			return 0;
+		
+		// Convert the partition problem into a
+		// subset-sum counting problem.
+		int target = (totalSum + diff) / 2;
+		
+		// Count subsets whose sum equals target.
+		return solve(arr, target);
+	}
+	public:
+	int totalWays(vector<int>& arr, int target) {
+		return countPartitions(arr,target);
+	}
+};
