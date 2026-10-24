@@ -1,0 +1,147 @@
+/*  Logic:
+
+1. Memoization (Top-Down DP)
+
+Logic:
+
+1. Calculate the total sum of the array.
+2. If the total sum is odd, return `false`, because equal partition is impossible.
+3. Set `target = totalSum / 2`.
+4. Define a recursive function `f(idx, target)` that checks whether a subset from index `0` to `idx` can form the required target sum.
+5. Base cases:
+   - If `target == 0`, return `true`.
+   - If `idx == 0`, return whether `arr[0] == target`.
+6. Check whether the current state is already stored in the DP array. If so, return the stored result.
+7. Include: If `arr[idx] <= target`, recursively check whether the remaining sum `target - arr[idx]` can be formed using previous elements.
+8. Exclude: Recursively check whether the same target can be formed without the current element.
+9. Store and return the result of `include OR exclude` in the DP array.
+
+Key idea: Recursion explores both choices, and memoization stores previously calculated states to avoid repeated work.
+
+## 2. Tabulation (Bottom-Up DP)
+
+Logic:
+
+1. Calculate the total sum. If it is odd, return `false`.
+2. Set `target = totalSum / 2`.
+3. Create a 2D DP array of size `n × (target + 1)`.
+4. Base cases:
+   - A sum of `0` is always possible, so mark `dp[idx][0] = true` for every index.
+   - Using only the first element, mark `dp[0][arr[0]] = true` if it does not exceed the target.
+5. Iterate through the array starting from index `1`.
+6. For every target from `1` to `target`, calculate two choices:
+   - Include: If the current element is not greater than the target, check `dp[idx - 1][target - arr[idx]]`.
+   - Exclude: Check `dp[idx - 1][target]`.
+7. Set the current DP state to `include OR exclude`.
+8. Return `dp[n - 1][target]`.
+
+Key idea: Instead of recursion, calculate smaller subproblems first and use their results to solve larger subproblems.
+
+## 3. Space Optimization
+
+Logic:
+
+1. Calculate the total sum. If it is odd, return `false`.
+2. Set `target = totalSum / 2`.
+3. Instead of a 2D DP array, use two 1D arrays: `prev` and `curr`, each of size `target + 1`.
+4. Initialize `prev[0] = true`, since sum zero is always possible.
+5. If the first element does not exceed the target, mark `prev[arr[0]] = true`.
+6. Iterate through the remaining elements.
+7. For each element, iterate through every target from `1` to `target`:
+   - Include: Check whether `prev[target - arr[idx]]` is true, provided the current element does not exceed the target.
+   - Exclude: Check whether `prev[target]` is true.
+8. Store `include OR exclude` in `curr[target]`.
+9. After processing each element, update `prev = curr`.
+10. Return `prev[target]`.
+
+Key idea: Each DP row depends only on the previous row, so we do not need to store the entire 2D table.
+
+## Complexity comparison
+
+Let $n$ be the number of elements and $S = \text{totalSum}/2$.
+
+| Approach | Time Complexity | Space Complexity |
+| --- | --- | --- |
+| Memoization | $O(nS)$ | $O(nS) + O(n)$ recursion stack |
+| Tabulation | $O(nS)$ | $O(nS)$ |
+| Space Optimization | $O(nS)$ | $O(S)$ |
+
+Remember the progression:
+
+- Memoization: Recursion + DP storage.
+- Tabulation: Iterative DP using a 2D table.
+- Space optimization: Iterative DP using only the previous and current rows.
+*/
+
+// pre-requirisite : Subset Sum Problem
+class Solution {
+private:
+    // Function to check whether a subset with the given sum exists
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        int n = arr.size();
+
+        // prev[target] = true if the target sum can be formed
+        // using the elements processed in the previous iteration
+        vector<int> prev(sum + 1, 0), curr(sum + 1, 0);
+
+        // Base case: sum 0 is always possible by choosing an empty subset
+        prev[0] = true;
+
+        // Base case: using only the first element,
+        // we can form a sum equal to arr[0]
+        if (arr[0] <= sum)
+            prev[arr[0]] = true;
+
+        // Process the remaining elements one by one
+        for (int idx = 1; idx < n; idx++) {
+
+            // Sum 0 is always possible by choosing no elements
+            curr[0] = true;
+
+            // Check every possible target sum from 1 to sum
+            for (int target = 1; target <= sum; target++) {
+
+                // Choice 1: Include the current element
+                // This is possible only if target >= arr[idx]
+                bool include = false;
+
+                if (target >= arr[idx])
+                    // Check if the remaining sum was possible
+                    // using the previously processed elements
+                    include = prev[target - arr[idx]];
+
+                // Choice 2: Exclude the current element
+                // Check whether the target was already possible
+                bool exclude = prev[target];
+
+                // The target is possible if either choice works
+                curr[target] = include || exclude;
+            }
+
+            // Update the previous DP row with the current row
+            // so it can be used for the next element
+            prev = curr;
+        }
+
+        // Return whether the required sum can be formed
+        return prev[sum];
+    }
+
+public:
+    // Function to determine whether the array can be partitioned
+    // into two subsets having equal sums
+    bool canPartition(vector<int>& nums) {
+
+        // Calculate the sum of all array elements
+        int n = nums.size();
+        int totalSum = accumulate(nums.begin(), nums.end(), 0);
+
+        // If the total sum is odd, equal partition is impossible
+        if (totalSum % 2 == 1)
+            return false;
+
+        // Each subset must have a sum equal to half of totalSum
+        // Check whether any subset can form this target sum
+        return isSubsetSum(nums, totalSum / 2);
+    }
+};
