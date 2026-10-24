@@ -1,0 +1,270 @@
+/* Logic:
+Now the problem becomes counting the subsets whose sum equals `target`.
+
+Before starting, if `diff > totalSum` or `totalSum + diff` is odd, return `0` (assuming non-negative array elements and a non-negative difference).
+
+## 1. Recursion
+
+1. Start from the last index with the required `target`.
+2. At each index, make two choices:
+   - Exclude: Do not select the current element; the target remains unchanged.
+   - Include: Select the current element; reduce the target by its value.
+3. Add the number of ways from both choices.
+4. Base case — `idx == 0`:
+   - If `target == 0` and `arr[0] == 0`, return `2`.
+   - If `target == 0` or `target == arr[0]`, return `1`.
+   - Otherwise, return `0`.
+
+Main idea: Explore every possible subset and count the valid ones.
+
+## 2. Memoization (Top-Down DP)
+
+1. Follow the same include/exclude recursion.
+2. Create a 2D DP table indexed by `idx` and `target`, initialized to `-1`.
+3. Before calculating a state, check whether its answer is already stored.
+4. If it is stored, return that answer.
+5. Otherwise, calculate the include and exclude choices.
+6. Store their sum in `dp[idx][target]` and return it.
+
+Main idea: Use recursion, but remember previously calculated answers to avoid repeated work.
+
+## 3. Tabulation (Bottom-Up DP)
+
+1. Create a 2D DP table where `dp[idx][sum]` represents the number of subsets forming `sum` using elements from index `0` through `idx`.
+2. Initialize the first row:
+   - If the first element is zero, set `dp[0][0] = 2`.
+   - Otherwise, set `dp[0][0] = 1`.
+   - If the first element is nonzero and does not exceed `target`, set `dp[0][arr[0]] = 1`.
+3. Traverse indices from `1` to `n - 1`.
+4. For each index, traverse sums from `0` to `target`.
+5. Calculate:
+   - Exclude: `dp[idx - 1][sum]`
+   - Include: If `arr[idx] <= sum`, use `dp[idx - 1][sum - arr[idx]]`; otherwise, use `0`.
+6. Add the two counts and store the result in `dp[idx][sum]`.
+7. Return `dp[n - 1][target]`.
+
+Main idea: Build the solution iteratively using answers to smaller subproblems.
+
+## 4. Space Optimization
+
+1. Instead of a 2D DP table, create two 1D arrays: `prev` and `curr`, each of size `target + 1`.
+2. Initialize `prev` using the first element, handling zero as described in tabulation.
+3. Traverse the remaining elements from index `1` to `n - 1`.
+4. For each element, calculate every sum from `0` to `target`:
+   - Exclude: `prev[sum]`
+   - Include: If `arr[idx] <= sum`, use `prev[sum - arr[idx]]`; otherwise, use `0`.
+5. Add both counts and store the result in `curr[sum]`.
+6. After processing the element, assign `curr` to `prev`.
+7. Return `prev[target]`.
+
+Main idea: Keep only the previous row and the current row because older rows are no longer needed.
+
+## Quick comparison
+
+| Approach | Technique | Time complexity | DP space |
+| --- | --- | --- | --- |
+| Recursion | Explore all choices | $O(2^n)$ | $O(1)$\* |
+| Memoization | Recursion + cache | $O(nT)$ | $O(nT)$ |
+| Tabulation | Iterative 2D DP | $O(nT)$ | $O(nT)$ |
+| Space optimization | Iterative 1D DP | $O(nT)$ | $O(T)$ |
+
+\*Recursion also requires an $O(n)$ call stack. Here, $T = (totalSum + diff)/2$.
+
+Remember the common transition:
+
+$$
+\boxed{ways=include+exclude}
+$$
+
+The key difference between the four approaches is how they calculate and store the results, not the underlying include/exclude logic.
+*/
+class Solution {
+private:
+    int solve(int idx, int target, vector<int>& arr,
+              vector<vector<int>>& dp) {
+
+        // Base case: only the first element remains.
+        if (idx == 0) {
+            if (target == 0 && arr[0] == 0)
+                return 2;  // Include or exclude zero.
+
+            if (target == 0 || target == arr[0])
+                return 1;
+
+            return 0;
+        }
+
+        // Return the previously calculated answer.
+        if (dp[idx][target] != -1)
+            return dp[idx][target];
+
+        // Choice 1: Exclude the current element.
+        int exclude = solve(idx - 1, target, arr, dp);
+
+        // Choice 2: Include the current element.
+        int include = 0;
+        if (arr[idx] <= target)
+            include = solve(idx - 1, target - arr[idx], arr, dp);
+
+        // Total number of ways.
+        return dp[idx][target] = include + exclude;
+    }
+
+public:
+    int countPartitions(vector<int>& arr, int diff) {
+        int n = arr.size();
+        int totalSum = accumulate(arr.begin(), arr.end(), 0);
+
+        if (diff > totalSum || (totalSum + diff) % 2 != 0)
+            return 0;
+
+        int target = (totalSum + diff) / 2;
+
+        vector<vector<int>> dp(n, vector<int>(target + 1, -1));
+
+        return solve(n - 1, target, arr, dp);
+    }
+};
+/*class Solution {
+private:
+    int solve(vector<int>& arr, int target) {
+        int n = arr.size();
+
+        // dp[idx][sum] = number of ways to form sum
+        // using elements from index 0 to idx.
+        vector<vector<int>> dp(n, vector<int>(target + 1, 0));
+
+        // Initialize the first element.
+        if (arr[0] == 0)
+            dp[0][0] = 2;
+        else
+            dp[0][0] = 1;
+
+        if (arr[0] != 0 && arr[0] <= target)
+            dp[0][arr[0]] = 1;
+
+        // Fill the DP table.
+        for (int idx = 1; idx < n; idx++) {
+            for (int sum = 0; sum <= target; sum++) {
+
+                // Exclude the current element.
+                int exclude = dp[idx - 1][sum];
+
+                // Include the current element if possible.
+                int include = 0;
+                if (arr[idx] <= sum)
+                    include = dp[idx - 1][sum - arr[idx]];
+
+                dp[idx][sum] = include + exclude;
+            }
+        }
+
+        return dp[n - 1][target];
+    }
+
+public:
+    int countPartitions(vector<int>& arr, int diff) {
+        int n = arr.size();
+        int totalSum = accumulate(arr.begin(), arr.end(), 0);
+
+        if (diff > totalSum || (totalSum + diff) % 2 != 0)
+            return 0;
+
+        int target = (totalSum + diff) / 2;
+
+        return solve(arr, target);
+    }
+};
+*/
+class Solution {
+	private:
+	int solve(vector<int>& arr, int target) {
+		int n = arr.size();
+		
+		// prev[sum] = number of ways to form 'sum'
+		// using the elements processed so far.
+		vector<int> prev(target + 1, 0);
+		
+		// An empty subset can always form sum 0.
+		prev[0] = 1;
+		
+		// Initialize the first element.
+		// If arr[0] == 0, we have two choices:
+		// include it or exclude it, both giving sum 0.
+		if (arr[0] == 0)
+			prev[0] = 2;
+		else if (arr[0] <= target)
+			prev[arr[0]] = 1;
+		
+		// Process the remaining array elements.
+		for (int idx = 1; idx < n; idx++) {
+			
+			// curr[sum] stores the number of ways to
+			// form 'sum' using elements up to index idx.
+			vector<int> curr(target + 1, 0);
+			
+			// Number of ways to form sum 0.
+			// A zero doubles the number of ways because
+			// it can be included or excluded.
+			curr[0] = prev[0];
+			
+			if (arr[idx] == 0)
+				curr[0] *= 2;
+			
+			// Calculate the number of ways for each sum.
+			for (int sum = 1; sum <= target; sum++) {
+				
+				// Choice 1: Exclude the current element.
+				int exclude = prev[sum];
+				
+				// Choice 2: Include the current element,
+				// if it does not exceed the required sum.
+				int include = 0;
+				
+				if (sum >= arr[idx])
+					include = prev[sum - arr[idx]];
+				
+				// Total ways = ways by including
+				// + ways by excluding the element.
+				curr[sum] = include + exclude;
+			}
+			
+			// Current DP row becomes the previous row
+			// for processing the next element.
+			prev = curr;
+		}
+		
+		// Return the number of subsets with sum = target.
+		return prev[target];
+	}
+	
+	public:
+	int countPartitions(vector<int>& arr, int diff) {
+		
+		// Calculate the sum of all array elements.
+		int totalSum = accumulate(arr.begin(), arr.end(), 0);
+		
+		// If the required difference is too large,
+		// no valid partition is possible.
+		if (diff > totalSum)
+			return 0;
+		
+		// Derivation:
+		// S1 + S2 = totalSum
+		// S1 - S2 = diff
+		// Therefore, S1 = (totalSum + diff) / 2.
+		//
+		// If totalSum + diff is odd, S1 cannot be
+		// an integer, so no valid partition exists.
+		if ((totalSum + diff) % 2 != 0)
+			return 0;
+		
+		// Convert the partition problem into a
+		// subset-sum counting problem.
+		int target = (totalSum + diff) / 2;
+		
+		// Count subsets whose sum equals target.
+		return solve(arr, target);
+	}
+};
+*/
