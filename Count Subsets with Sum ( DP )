@@ -1,0 +1,102 @@
+/* Logic:
+
+The goal is to count the number of subsets whose sum equals the given target.
+
+1. Create two DP arrays: `prev` and `curr`, of size `target + 1`, initialized to `0`.
+2. Initialize the base case: `prev[0] = 1`, because there is one way to make sum `0` using the empty subset.
+3. Handle the first element: If `arr[0] <= target`, increment `prev[arr[0]]` to count the subset containing the first element.
+4. Process each remaining element: For every element `arr[idx]`, calculate the number of ways to form each sum.
+   - Exclude: `prev[t]` — don't select the current element.
+   - Include: `prev[t - arr[idx]]` — select the current element, if `t >= arr[idx]`.
+5. Add both choices:
+
+$$
+curr[t] = exclude + include
+$$
+
+6. Handle sum `0`: If the current element is `0`, double `prev[0]`, because including or excluding zero gives two distinct subsets with the same sum.
+7. Update the DP array: Assign `prev = curr` after processing each element.
+8. Return the answer: `prev[target]` gives the total number of subsets whose sum equals the target.
+
+Complexity:
+
+- Time: $O(n \times target)$
+- Space: $O(target)$ using two DP arrays.
+*/
+
+// pre-requrisite : Subset Sum Problem 
+class Solution {
+private:
+    int isSubsetSum(vector<int>& arr, int sum) {
+        int n = arr.size();
+
+        // prev[t] = number of subsets that form sum t
+        // using the elements processed in the previous iteration
+        // curr[t] = number of subsets that form sum t
+        // after processing the current element
+        vector<int> prev(sum + 1, 0), curr(sum + 1, 0);
+
+        // There is exactly one way to make sum 0:
+        // choose the empty subset
+        prev[0] = 1;
+
+        // Initialize the counts using the first element.
+        // If arr[0] is 0, this correctly makes prev[0] = 2,
+        // counting both the empty subset and the subset {0}.
+        if (arr[0] <= sum)
+            prev[arr[0]] += 1;
+
+        // Process the remaining elements one by one
+        for (int idx = 1; idx < n; idx++) {
+
+            // Start curr[0] with the previous count.
+            // If the current element is 0, the recurrence below
+            // must double this count to account for both choices.
+            curr[0] = prev[0];
+
+            // Calculate the number of subsets for every positive sum
+            for (int target = 1; target <= sum; target++) {
+
+                // Choice 1: Do not include the current element.
+                // The number of ways remains unchanged.
+                int exclude = prev[target];
+
+                // Choice 2: Include the current element.
+                // This is possible only if arr[idx] <= target.
+                // We need to form target - arr[idx] using previous elements.
+                int include = 0;
+
+                if (target >= arr[idx])
+                    include = prev[target - arr[idx]];
+
+                // Total ways = ways without the element
+                //            + ways with the element
+                curr[target] = include + exclude;
+            }
+
+            // If the current element is zero, including or excluding
+            // it doubles the number of ways to make sum 0.
+            if (arr[idx] == 0)
+                curr[0] = 2 * prev[0];
+
+            // The current DP row becomes the previous row
+            // for processing the next element.
+            prev = curr;
+        }
+
+        // Return the number of subsets whose sum equals the target
+        return prev[sum];
+    }
+
+public:
+    int perfectSum(vector<int>& arr, int target) {
+
+        // Handle an empty array safely.
+        // Only the empty subset can form sum 0.
+        if (arr.empty())
+            return target == 0 ? 1 : 0;
+
+        // Count subsets that add up to the required target
+        return isSubsetSum(arr, target);
+    }
+};
