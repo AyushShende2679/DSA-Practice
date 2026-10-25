@@ -1,0 +1,63 @@
+/* Logic:
+
+1. Find the size of the array `n`.
+2. Traverse the array and calculate the index `idx = abs(nums[i]) - 1` for each number.
+3. If `nums[idx]` is positive, make it negative to mark that the number `idx + 1` is present.
+4. Traverse the array again. If `nums[i]` is positive, `i + 1` is a missing number.
+5. Store all missing numbers in the answer vector and return it.
+
+Time Complexity: $O(n)$
+
+Auxiliary Space: $O(1)$, excluding the output vector.
+*/
+
+
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+
+        // Mark the index corresponding to each number as negative
+        for (int i = 0; i < n; i++) {
+            int idx = abs(nums[i]) - 1;
+
+            // Mark only if the value is positive
+            if (nums[idx] > 0) {
+                nums[idx] = -nums[idx];
+            }
+        }
+
+        // Store numbers whose corresponding indices remain positive
+        vector<int> ans;
+
+        for (int i = 0; i < n; i++) {
+            // A positive value means i + 1 is missing
+            if (nums[i] > 0) {
+                ans.push_back(i + 1);
+            }
+        }
+
+        // Return all missing numbers
+        return ans;
+    }
+};
+
+/*
+class Solution {
+public:
+    vector<int> findDisappearedNumbers(vector<int>& nums) {
+        int n = nums.size();
+        unordered_map<int, int> mp;
+        vector<int> ans;
+
+        for (int i = 0; i < n; i++)
+            mp[nums[i]]++;
+
+        for (int i = 1; i <= n; i++) {
+            if (mp.find(i) == mp.end())
+                ans.push_back(i);
+        }
+        return ans;
+    }
+}; 
+*/
