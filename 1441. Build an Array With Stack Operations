@@ -1,0 +1,41 @@
+/* Logic:
+
+1. Initialize an empty vector `ans` to store the operations, `i = 0` to track the target elements, and `stream = 1` to start reading numbers from 1.
+2. Run a `while` loop until all target elements are processed or the stream ends.
+3. For every stream number, add `"Push"` to `ans`.
+4. If the current stream number equals `target[i]`, keep it in the stack and increment `i`.
+5. Otherwise, add `"Pop"` to `ans` to remove the unwanted number.
+6. Increment `stream` to read the next number.
+7. Return `ans` containing all the operations needed to build the target array.
+*/
+
+class Solution {
+public:
+    vector<string> buildArray(vector<int>& target, int n) {
+        vector<string> ans; // Stores the Push and Pop operations
+
+        int i = 0;      // Points to the current element in target
+        int stream = 1; // Numbers in the stream start from 1
+
+        // Continue until all target elements are built or stream ends
+        while (i < target.size() && stream <= n) {
+
+            // Every number read from the stream must be pushed first
+            ans.push_back("Push");
+
+            // If the current stream number matches the target element
+            if (stream == target[i]) {
+                i++; // Keep the number and move to the next target element
+            } else {
+                // If the number is not needed, remove it from the stack
+                ans.push_back("Pop");
+            }
+
+            // Move to the next number in the stream
+            stream++;
+        }
+
+        // Return all operations required to build the target array
+        return ans;
+    }
+};
