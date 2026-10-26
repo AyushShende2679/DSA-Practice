@@ -1,0 +1,169 @@
+/* Logic: 
+1. Recursion (Memoization)
+
+- Start from the last indices of both strings: `n1-1` and `n2-1`.
+- If either index becomes negative, return `0` because no common subsequence is possible.
+- If the result is already calculated, return the stored value from `dp`.
+- If the current characters match, add `1` and move both indices backward by one.
+- If the characters do not match, try two possibilities: move the first index backward or move the second index backward. Take the maximum of both results.
+- Store the result in `dp[idx1][idx2]` to avoid repeated calculations.
+- Return the answer for the last indices of both strings.
+
+Time Complexity: O(n1 × n2)
+
+Space Complexity: O(n1 × n2) for DP, plus O(n1 + n2) for the recursion stack.
+
+ 2. Tabulation (Bottom-Up DP)
+
+- Create a 2D DP array of size `(n1+1) × (n2+1)`, initialized with zeros.
+- The first row and first column represent an empty string, so their LCS length is `0`.
+- Traverse both strings using indices from `1` to their respective lengths.
+- If the current characters match, set `dp[i][j] = 1 + dp[i-1][j-1]`.
+- If the characters do not match, set `dp[i][j] = max(dp[i-1][j], dp[i][j-1])`.
+- Continue filling the table until all subproblems are solved.
+- Return `dp[n1][n2]`, which contains the LCS length of both complete strings.
+
+Time Complexity: O(n1 × n2)
+
+Space Complexity: O(n1 × n2)
+
+ 3. Space Optimization (Two Rows)
+
+- Instead of storing the entire 2D DP table, maintain two 1D arrays: `prev` and `curr`, each of size `n2+1`.
+- Initialize both arrays with zeros to handle empty prefixes.
+- Traverse the first string using the outer loop and the second string using the inner loop.
+- If the current characters match, set `curr[j] = 1 + prev[j-1]`.
+- If they do not match, set `curr[j] = max(prev[j], curr[j-1])`.
+- After completing each row, copy `curr` into `prev` so the next iteration can use the previous row's results.
+- Return `prev[n2]` after processing both strings.
+
+Time Complexity: O(n1 × n2)
+
+Space Complexity: O(n2) for the two arrays.
+
+Note: To achieve O(min(n1, n2)) space, make the shorter string the second string before creating the arrays.
+*/
+
+class Solution {
+private:
+    int solve(int idx1, int idx2, string& t1, string& t2,
+              vector<vector<int>>& dp) {
+
+        // Base case: if either string is exhausted,
+        // no common subsequence is possible
+        if (idx1 < 0 || idx2 < 0)
+            return 0;
+
+        // If the result is already calculated, return it
+        if (dp[idx1][idx2] != -1)
+            return dp[idx1][idx2];
+
+        // If current characters match, include this character
+        // and move diagonally to the previous characters
+        if (t1[idx1] == t2[idx2]) {
+            return dp[idx1][idx2] = 1 + solve(idx1 - 1, idx2 - 1, t1, t2, dp);
+        }
+
+        // If characters don't match, try both possibilities:
+        // 1. Skip the current character from t1
+        // 2. Skip the current character from t2
+        // Take the maximum of both results
+        return dp[idx1][idx2] = max(solve(idx1 - 1, idx2, t1, t2, dp),
+                                    solve(idx1, idx2 - 1, t1, t2, dp));
+    }
+
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int n1 = text1.size();
+        int n2 = text2.size();
+
+        // Initialize DP table with -1 to indicate
+        // that no subproblem has been solved yet
+        vector<vector<int>> dp(n1, vector<int>(n2, -1));
+
+        // Start recursion from the last indices
+        // of both strings
+        return solve(n1 - 1, n2 - 1, text1, text2, dp);
+    }
+};
+/*
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int n1 = text1.size();
+        int n2 = text2.size();
+
+        // dp[i][j] stores the length of the LCS
+        // of the first i characters of text1
+        // and the first j characters of text2
+        vector<vector<int>> dp(n1 + 1, vector<int>(n2 + 1, 0));
+
+        // Base cases:
+        // If either string is empty, LCS length is 0
+        for (int i = 0; i <= n1; i++)
+            dp[i][0] = 0;
+
+        for (int j = 0; j <= n2; j++)
+            dp[0][j] = 0;
+
+        // Fill the DP table from smaller subproblems
+        // to larger subproblems
+        for (int idx1 = 1; idx1 <= n1; idx1++) {
+            for (int idx2 = 1; idx2 <= n2; idx2++) {
+
+                // If current characters match,
+                // include this character in the LCS
+                if (text1[idx1 - 1] == text2[idx2 - 1]) {
+                    dp[idx1][idx2] = 1 + dp[idx1 - 1][idx2 - 1];
+                } else {
+                    // If characters don't match,
+                    // skip one character from either string
+                    // and take the maximum LCS length
+                    dp[idx1][idx2] =
+                        max(dp[idx1 - 1][idx2], dp[idx1][idx2 - 1]);
+                }
+            }
+        }
+
+        // The answer is the LCS length of both complete strings
+        return dp[n1][n2];
+    }
+};
+*/
+/*class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int n1 = text1.size();
+        int n2 = text2.size();
+
+        // prev[j] stores the LCS length for the
+        // previous row, and curr[j] for the current row
+        vector<int> prev(n2 + 1, 0), curr(n2 + 1, 0);
+
+        // Fill the DP table row by row
+        for (int idx1 = 1; idx1 <= n1; idx1++) {
+
+            // Empty text2 prefix has LCS length 0
+            curr[0] = 0;
+
+            for (int idx2 = 1; idx2 <= n2; idx2++) {
+
+                // If characters match, add 1 to diagonal
+                if (text1[idx1 - 1] == text2[idx2 - 1]) {
+                    curr[idx2] = 1 + prev[idx2 - 1];
+                } else {
+                    // Otherwise, take the maximum of
+                    // the value above and the value to the left
+                    curr[idx2] = max(prev[idx2], curr[idx2 - 1]);
+                }
+            }
+
+            // Current row becomes the previous row
+            prev = curr;
+        }
+
+        // LCS length of both complete strings
+        return prev[n2];
+    }
+};
+*/
