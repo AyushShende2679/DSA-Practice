@@ -1,0 +1,172 @@
+/* Logic: 
+### 1. Recursion (Top-Down without DP)
+
+- Start from the destination cell `(m-1, n-1)`.
+- If you reach `(0,0)`, return `1` because there is one valid path.
+- If the row or column becomes negative, return `0` because you went outside the grid.
+- Recursively calculate the number of paths by moving up and left.
+- Return the sum of the paths from above and from the left.
+
+### 2. Memoization (Top-Down DP)
+
+- Follow the same recursive approach.
+- Create a 2D DP array initialized with `-1` to mark uncomputed cells.
+- Before calculating a cell, check whether its result is already stored in DP. If it is, return the stored result.
+- Otherwise, calculate the paths from above and from the left.
+- Store their sum in `dp[i][j]` and return it.
+- This avoids repeated calculations.
+
+### 3. Tabulation (Bottom-Up DP)
+
+- Create a 2D DP array initialized with `0`.
+- Set `dp[0][0] = 1` because there is one way to reach the starting cell.
+- Traverse the grid row by row and column by column.
+- Skip the starting cell because it is already initialized.
+- For each remaining cell, take the number of paths from above and from the left, using `0` when either direction is outside the grid.
+- Store the sum of these two values in the current cell.
+- Return `dp[m-1][n-1]`.
+
+### 4. Space Optimization (Bottom-Up DP)
+
+- Instead of a 2D DP array, use two 1D arrays: `prev` and `curr`.
+- Traverse the grid row by row.
+- For each cell, get the number of paths from above using `prev[j]` and from the left using `curr[j-1]`.
+- Store their sum in `curr[j]`.
+- After completing a row, assign `curr` to `prev`.
+- Return `prev[n-1]`.
+
+### Complexity comparison
+
+| Approach | Time | Extra space |
+| --- | --- | --- |
+| Recursion | Exponential | $O(m+n)$ stack |
+| Memoization | $O(mn)$ | $O(mn)$ |
+| Tabulation | $O(mn)$ | $O(mn)$ |
+| Space optimization | $O(mn)$ | $O(n)$ |
+*/
+
+class Solution {
+private:
+    int solve(int i, int j, vector<vector<int>>& dp) {
+
+        // Base case: Reached the starting cell (0, 0).
+        // There is exactly one way to reach the starting cell.
+        if (i == 0 && j == 0)
+            return 1;
+
+        // If we go outside the grid, there are no valid paths.
+        if (i < 0 || j < 0)
+            return 0;
+
+        // If the result is already calculated, return it
+        // to avoid repeated recursive calculations.
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        // Count the paths by moving up from (i-1, j).
+        int up = solve(i - 1, j, dp);
+
+        // Count the paths by moving left from (i, j-1).
+        int left = solve(i, j - 1, dp);
+
+        // Total paths = paths from above + paths from the left.
+        // Store the result in dp to use it in future calls.
+        return dp[i][j] = up + left;
+    }
+
+public:
+    int uniquePaths(int m, int n) {
+
+        // Initialize the DP table with -1,
+        // indicating that no cell has been calculated yet.
+        vector<vector<int>> dp(m, vector<int>(n, -1));
+
+        // Start recursion from the destination cell (m-1, n-1).
+        return solve(m - 1, n - 1, dp);
+    }
+};
+/*
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+
+        // Initialize the DP table with 0.
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+
+        // Base case: only one way to reach the starting cell.
+        dp[0][0] = 1;
+
+        // Traverse every cell in the grid.
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // Skip the starting cell because it is already initialized.
+                if (i == 0 && j == 0)
+                    continue;
+
+                // Number of paths from the cell above.
+                int up = 0;
+                if (i > 0)
+                    up = dp[i - 1][j];
+
+                // Number of paths from the cell on the left.
+                int left = 0;
+                if (j > 0)
+                    left = dp[i][j - 1];
+
+                // Total paths = paths from above + paths from the left.
+                dp[i][j] = up + left;
+            }
+        }
+
+        // Return the number of paths to the destination.
+        return dp[m - 1][n - 1];
+    }
+};
+*/
+/*
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+
+        // prev stores the results of the previous row.
+        // curr stores the results of the current row.
+        vector<int> prev(n, 0), curr(n, 0);
+
+        // Traverse every row.
+        for (int i = 0; i < m; i++) {
+
+            // First column has exactly one path from the start.
+            curr[0] = 1;
+
+            // Traverse every column.
+            for (int j = 0; j < n; j++) {
+
+                // Starting cell has exactly one path.
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+
+                // Paths from the cell above.
+                int up = 0;
+                if (i > 0)
+                    up = prev[j];
+
+                // Paths from the cell on the left.
+                int left = 0;
+                if (j > 0)
+                    left = curr[j - 1];
+
+                // Total paths = paths from above + paths from left.
+                curr[j] = up + left;
+            }
+
+            // Current row becomes the previous row for the next iteration.
+            prev = curr;
+        }
+
+        // Return paths to the bottom-right cell.
+        return prev[n - 1];
+    }
+};
+*/
