@@ -1,0 +1,218 @@
+/* Logic: 
+
+## 1. Unique Paths — Recursion / Memoization
+
+- Start from the destination cell `(m-1, n-1)` and find the number of ways to reach `(0,0)`.
+- If the row or column index becomes negative, return `0` because the cell is outside the grid.
+- If the current cell is `(0,0)`, return `1` because there is exactly one way to reach the starting cell.
+- Recursively calculate the number of paths from above and from the left.
+- Add both results to get the total number of paths.
+- In memoization, store each calculated result in a DP array to avoid repeated calculations.
+
+Recurrence: `dp[i][j] = dp[i-1][j] + dp[i][j-1]`
+
+Time: O(m × n) with memoization. Space: O(m × n) for DP, plus recursion stack.
+
+## 2. Unique Paths — Tabulation
+
+- Create a 2D DP array of size `m × n`, initialized with zero.
+- Set `dp[0][0] = 1` because there is one way to reach the starting cell.
+- Traverse the grid from top to bottom and left to right.
+- For each cell, take the number of paths from above and from the left.
+- If the cell is in the first row, there are no paths from above.
+- If the cell is in the first column, there are no paths from the left.
+- Store the sum of the two values in the current cell.
+- Return `dp[m-1][n-1]`.
+
+Recurrence: `dp[i][j] = up + left`
+
+Time: O(m × n). Space: O(m × n).
+
+## 3. Unique Paths with Obstacles — Space-Optimized Tabulation
+
+- Get the number of rows `m` and columns `n`.
+- If the starting cell contains an obstacle, return `0`.
+- Create two 1D arrays of size `n`: `prev` for the previous row and `curr` for the current row.
+- Traverse the grid row by row.
+- Reset `curr` to zero at the beginning of every row.
+- If the current cell contains an obstacle, set its path count to `0` and skip further calculations for that cell.
+- If the current cell is the starting cell, set its path count to `1`.
+- Otherwise, get the number of paths from above using `prev[j]`.
+- Get the number of paths from the left using `curr[j-1]`.
+- Add the two values and store the result in `curr[j]`.
+- After completing a row, assign `prev = curr`.
+- Return `prev[n-1]`, which contains the number of unique paths to the destination.
+
+Recurrence for a free cell: `curr[j] = up + left`
+
+Time: O(m × n). Space: O(n).
+
+Main difference: The first approach uses recursion, the second uses a full 2D DP table, and the third reduces space by keeping only the previous and current rows while also handling obstacles.
+*/
+
+class Solution {
+private:
+    int solve(int i, int j, vector<vector<int>>& obstacleGrid,
+              vector<vector<int>>& dp) {
+
+        // If we go outside the grid, there are no valid paths
+        if (i < 0 || j < 0)
+            return 0;
+
+        // If the current cell contains an obstacle, we cannot pass through it
+        if (obstacleGrid[i][j] == 1)
+            return 0;
+
+        // If we reach the starting cell and it is not blocked,
+        // there is exactly one way to reach it
+        if (i == 0 && j == 0)
+            return 1;
+
+        // If the result for this cell is already calculated,
+        // return the stored value to avoid repeated calculations
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        // Calculate the number of paths coming from above
+        int up = solve(i - 1, j, obstacleGrid, dp);
+
+        // Calculate the number of paths coming from the left
+        int left = solve(i, j - 1, obstacleGrid, dp);
+
+        // Store and return the total number of paths to this cell
+        return dp[i][j] = up + left;
+    }
+
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+
+        // Get the number of rows and columns in the grid
+        int m = obstacleGrid.size();
+        int n = obstacleGrid[0].size();
+
+        // Initialize the DP table with -1, meaning not calculated yet
+        vector<vector<int>> dp(m, vector<int>(n, -1));
+
+        // Start from the destination (bottom-right cell)
+        // and calculate the number of valid paths to reach it
+        return solve(m - 1, n - 1, obstacleGrid, dp);
+    }
+};
+/*
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+
+        // Get the number of rows and columns
+        int m = obstacleGrid.size();
+        int n = obstacleGrid[0].size();
+
+        // If the starting cell is blocked, no path exists
+        if (obstacleGrid[0][0] == 1)
+            return 0;
+
+        // Initialize the DP table with 0
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+
+        // There is one way to reach the starting cell
+        dp[0][0] = 1;
+
+        // Traverse every cell in the grid
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // Skip the starting cell because it is already initialized
+                if (i == 0 && j == 0)
+                    continue;
+
+                // If the current cell is an obstacle, paths = 0
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                    continue;
+                }
+
+                // Number of paths coming from above
+                int up = 0;
+                if (i > 0)
+                    up = dp[i - 1][j];
+
+                // Number of paths coming from the left
+                int left = 0;
+                if (j > 0)
+                    left = dp[i][j - 1];
+
+                // Total paths = paths from above + paths from left
+                dp[i][j] = up + left;
+            }
+        }
+
+        // Return the number of paths to the destination
+        return dp[m - 1][n - 1];
+    }
+};
+*/
+/*
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
+
+        // Get the number of rows and columns in the grid
+        int m = obstacleGrid.size();
+        int n = obstacleGrid[0].size();
+
+        // If the starting cell is blocked, no path exists
+        if (obstacleGrid[0][0] == 1)
+            return 0;
+
+        // prev stores the number of paths for the previous row
+        // curr stores the number of paths for the current row
+        vector<int> prev(n, 0), curr(n, 0);
+
+        // Traverse every row of the grid
+        for (int i = 0; i < m; i++) {
+
+            // Reset the current row before processing it
+            fill(curr.begin(), curr.end(), 0);
+
+            // Traverse every column of the current row
+            for (int j = 0; j < n; j++) {
+
+                // If the current cell is an obstacle,
+                // no path can pass through it
+                if (obstacleGrid[i][j] == 1) {
+                    curr[j] = 0;
+                    continue;
+                }
+
+                // Starting cell: there is exactly one way to reach it
+                if (i == 0 && j == 0) {
+                    curr[j] = 1;
+                    continue;
+                }
+
+                // Number of paths coming from the cell above
+                // Use prev because it stores the previous row
+                int up = 0;
+                if (i > 0)
+                    up = prev[j];
+
+                // Number of paths coming from the cell on the left
+                // Use curr because it stores the current row
+                int left = 0;
+                if (j > 0)
+                    left = curr[j - 1];
+
+                // Total paths = paths from above + paths from the left
+                curr[j] = up + left;
+            }
+
+            // After finishing this row, make it the previous row
+            // for the next iteration
+            prev = curr;
+        }
+
+        // Return the number of unique paths to the bottom-right cell
+        return prev[n - 1];
+    }
+};
+*/
