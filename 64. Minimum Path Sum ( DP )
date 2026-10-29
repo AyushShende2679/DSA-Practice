@@ -1,0 +1,196 @@
+/* Logic: 
+## 1. Minimum Path Sum — Recursion
+
+- Start from the bottom-right cell and recursively find the minimum path sum to reach the top-left cell.
+- If the current cell is `(0, 0)`, return its value because it is the starting cell.
+- If the row or column index becomes negative, return a large value to indicate an invalid path.
+- Calculate the path sum by moving up and moving left.
+- Add the current cell's value to each valid path sum.
+- Return the minimum of the two path sums.
+- The final answer is the minimum path sum from the bottom-right cell to the top-left cell.
+
+## 2. Minimum Path Sum — Recursion + Memoization
+
+- Use the same recursive approach, but maintain a DP table to store calculated results.
+- If the current cell is the starting cell, return its value.
+- If the current position is out of bounds, return a large value.
+- Before calculating the answer, check whether the result is already stored in the DP table.
+- If the result exists, return it without making further recursive calls.
+- Otherwise, calculate the path sum by moving up and left.
+- Add the current cell's value to both path sums and take the minimum.
+- Store the result in the DP table before returning it.
+- Finally, return the result for the bottom-right cell.
+
+## 3. Minimum Path Sum — Tabulation (Bottom-Up DP)
+
+- Create a 2D DP table to store the minimum path sum required to reach each cell from the starting cell.
+- Initialize the starting cell with its own value.
+- Traverse the grid row by row and column by column.
+- Skip the starting cell because its value is already initialized.
+- For each cell, calculate the path sum from above if the cell above exists.
+- Calculate the path sum from the left if the cell to the left exists.
+- Add the current cell's value to each valid path sum.
+- Store the minimum of the upward and leftward path sums in the DP table.
+- After processing all cells, return the value stored at the bottom-right cell.
+
+## 4. Minimum Path Sum — Space-Optimized DP
+
+- Instead of maintaining a 2D DP table, use two 1D arrays named `prev` and `curr`.
+- The `prev` array stores the minimum path sums for the previous row.
+- The `curr` array stores the minimum path sums for the current row.
+- Traverse the grid row by row and column by column.
+- For the starting cell, store its value directly in `curr[0]`.
+- For every other cell, calculate the upward path sum using `prev[j]`, if an upper cell exists.
+- Calculate the leftward path sum using `curr[j - 1]`, if a left cell exists.
+- Add the current cell's value to each valid path sum.
+- Store the minimum of the two path sums in `curr[j]`.
+- After processing a complete row, copy `curr` into `prev` so it can be used for the next row.
+- After processing the entire grid, return `prev[n - 1]`, which contains the minimum path sum to the destination.
+
+## Complexity comparison
+
+| Approach | Time complexity | Space complexity |
+| --- | --- | --- |
+| Recursion | Exponential | $O(m+n)$ stack |
+| Memoization | $O(m \times n)$ | $O(m \times n)$ + stack |
+| Tabulation | $O(m \times n)$ | $O(m \times n)$ |
+| Space-optimized DP | $O(m \times n)$ | $O(n)$ |
+
+Main takeaway: All four approaches use the same core logic: reach each cell by choosing the minimum path sum from above or from the left, then add the current cell's value. The difference is how they store and reuse previously calculated results.
+*/
+class Solution {
+private:
+    int solve(int i, int j, vector<vector<int>>& grid,
+              vector<vector<int>>& dp) {
+
+        // Base case: reached the starting cell
+        if (i == 0 && j == 0)
+            return grid[i][j];
+
+        // Out of bounds: return a large value
+        // so this path is not chosen as the minimum
+        if (i < 0 || j < 0)
+            return INT_MAX / 2;
+
+        // If the result is already calculated, return it
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        // Calculate minimum path sum by moving up
+        int up = grid[i][j] + solve(i - 1, j, grid, dp);
+
+        // Calculate minimum path sum by moving left
+        int left = grid[i][j] + solve(i, j - 1, grid, dp);
+
+        // Store and return the minimum of both paths
+        return dp[i][j] = min(up, left);
+    }
+
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+
+        // Get the number of rows and columns
+        int m = grid.size();
+        int n = grid[0].size();
+
+        // Initialize DP table with -1 (uncomputed states)
+        vector<vector<int>> dp(m, vector<int>(n, -1));
+
+        // Start from the bottom-right cell
+        // and find the minimum path sum to (0, 0)
+        return solve(m - 1, n - 1, grid, dp);
+    }
+};
+/*class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+
+        // Get the number of rows and columns
+        int m = grid.size();
+        int n = grid[0].size();
+
+        // Create a DP table to store minimum path sums
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+
+        // Base case: minimum path sum at the starting cell
+        dp[0][0] = grid[0][0];
+
+        // Traverse the grid row by row
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+
+                // Skip the starting cell
+                if (i == 0 && j == 0)
+                    continue;
+
+                // Initialize the upward path with a large value
+                int up = INT_MAX / 2;
+
+                // If moving up is possible, calculate its path sum
+                if (i > 0)
+                    up = grid[i][j] + dp[i - 1][j];
+
+                // Initialize the leftward path with a large value
+                int left = INT_MAX / 2;
+
+                // If moving left is possible, calculate its path sum
+                if (j > 0)
+                    left = grid[i][j] + dp[i][j - 1];
+
+                // Store the minimum path sum to the current cell
+                dp[i][j] = min(up, left);
+            }
+        }
+
+        // Return the minimum path sum to the bottom-right cell
+        return dp[m - 1][n - 1];
+    }
+};
+*/
+/*class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+
+        // Get the number of rows and columns
+        int m = grid.size();
+        int n = grid[0].size();
+
+        // Create a DP table to store minimum path sums
+        vector<int> prev(n, 0), curr(n, 0);
+
+        // Traverse the grid row by row
+        for (int i = 0; i < m; i++) {
+
+            for (int j = 0; j < n; j++) {
+
+                // Skip the starting cell
+                if (i == 0 && j == 0) {
+                    curr[j] = grid[0][0];
+                    continue;
+                }
+
+                // Initialize the upward path with a large value
+                int up = INT_MAX / 2;
+
+                // If moving up is possible, calculate its path sum
+                if (i > 0)
+                    up = grid[i][j] + prev[j];
+
+                // Initialize the leftward path with a large value
+                int left = INT_MAX / 2;
+
+                // If moving left is possible, calculate its path sum
+                if (j > 0)
+                    left = grid[i][j] + curr[j - 1];
+
+                // Store the minimum path sum to the current cell
+                curr[j] = min(up, left);
+            }
+            prev = curr;
+        }
+
+        // Return the minimum path sum to the bottom-right cell
+        return prev[n - 1];
+    }
+};
+*/
