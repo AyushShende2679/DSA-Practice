@@ -1,0 +1,233 @@
+/* Logic: 
+# Triangle – Minimum Path Sum (Logic of All 4 Approaches)
+
+1. Recursion (Brute Force)
+
+Logic:
+
+- Start from the top element (0,0).
+- At every position, we have two choices: move down (i+1, j) or diagonally (i+1, j+1).
+- Calculate the minimum path sum for both choices.
+- Add the current element to the minimum of both paths.
+- Base case: When we reach the last row, return the current element.
+- Finally, return the minimum path sum.
+
+Time Complexity: O(2^n)
+
+Space Complexity: O(n) recursion stack.
+
+2. Memoization (Top-Down DP)
+
+Logic:
+
+- Start from the top element (0,0).
+- Before calculating a state, check whether its answer is already stored in the DP array.
+- If already calculated, return the stored answer.
+- Otherwise, calculate both down and diagonal paths.
+- Add the current element to the minimum of both paths.
+- Store the result in dp\[i\]\[j\].
+- Finally, return dp\[0\]\[0\].
+
+Time Complexity: O(n²)
+
+Space Complexity: O(n²) DP array + O(n) recursion stack.
+
+3. Tabulation (Bottom-Up DP)
+
+Logic:
+
+- Create a 2D DP array.
+- Copy the last row of the triangle into the DP array because the minimum path sum from the last row is the element itself.
+- Start traversing from the second-last row towards the first row.
+- For every cell, calculate the down and diagonal costs using the values from the row below.
+- Store the minimum of both choices in dp\[i\]\[j\].
+- Continue until reaching the first row.
+- Finally, return dp\[0\]\[0\].
+
+Time Complexity: O(n²)
+
+Space Complexity: O(n²)
+
+4. Space Optimized Tabulation
+
+Logic:
+
+- Instead of maintaining a 2D DP array, use two 1D arrays: prev and curr.
+- Copy the last row of the triangle into the prev array.
+- Start traversing from the second-last row towards the first row.
+- For every cell, calculate down and diagonal using prev\[j\] and prev\[j+1\].
+- Store the minimum result in curr\[j\].
+- After completing one row, update prev = curr.
+- Repeat until reaching the first row.
+- Finally, return prev\[0\].
+
+Time Complexity: O(n²)
+
+Space Complexity: O(n)
+
+Important concepts to remember:
+
+- Recursion: Explore all possible paths.
+- Memoization: Recursion + storing previously calculated answers.
+- Tabulation: Bottom-up iterative DP.
+- Space Optimization: Store only the previous and current rows instead of the entire DP table.
+
+Key recurrence relation:
+
+f(i,j) = triangle\[i\]\[j\] + min(f(i+1,j), f(i+1,j+1))
+*/
+/* this will give TLE 
+class Solution {
+private:
+    int solve(int i, int j, vector<vector<int>>& triangle,
+              vector<vector<int>>& dp) {
+
+        // Base case: If we reach the last row,
+        // return the current element because no further movement is possible.
+        if (i == triangle.size() - 1)
+            return triangle[i][j];
+
+        // If the minimum path sum for this cell is already calculated,
+        // return the stored result to avoid repeated calculations.
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        // Option 1: Move to the element directly below.
+        int down = triangle[i][j] + solve(i + 1, j, triangle, dp);
+
+        // Option 2: Move diagonally to the bottom-right element.
+        int diagonal = triangle[i][j] + solve(i + 1, j + 1, triangle, dp);
+
+        // Store and return the minimum path sum from the current cell.
+        return dp[i][j] = min(down, diagonal);
+    }
+
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+
+        // Number of rows in the triangle.
+        int n = triangle.size();
+
+        // Initialize DP table with -1 (indicates uncomputed states).
+        vector<vector<int>> dp(n, vector<int>(n, -1));
+
+        // Start recursion from the topmost element (0, 0).
+        return solve(0, 0, triangle, dp);
+    }
+};
+*/
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+
+        // Number of rows in the triangle.
+        int n = triangle.size();
+
+        // Initialize DP table with 0.
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+
+        // Base case: Copy the last row of the triangle into DP.
+        // From the last row, the minimum path sum is the element itself.
+        for (int i = 0; i < n; i++)
+            dp[n - 1][i] = triangle[n - 1][i];
+
+        // Start from the second-last row and move upwards.
+        for (int i = n - 2; i >= 0; i--) {
+
+            // Traverse each valid column in the current row.
+            for (int j = i; j >= 0; j--) {
+
+                // Option 1: Move to the element directly below.
+                int down = triangle[i][j] + dp[i + 1][j];
+
+                // Option 2: Move diagonally to the bottom-right element.
+                int diagonal = triangle[i][j] + dp[i + 1][j + 1];
+
+                // Store the minimum path sum from the current cell.
+                dp[i][j] = min(down, diagonal);
+            }
+        }
+
+        // The minimum path sum starting from the top element.
+        return dp[0][0];
+    }
+};
+
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+
+        // Number of rows in the triangle.
+        int n = triangle.size();
+
+        // Initialize DP table with 0.
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+
+        // Base case: Copy the last row of the triangle into DP.
+        // From the last row, the minimum path sum is the element itself.
+        for (int i = 0; i < n; i++)
+            dp[n - 1][i] = triangle[n - 1][i];
+
+        // Start from the second-last row and move upwards.
+        for (int i = n - 2; i >= 0; i--) {
+
+            // Traverse each valid column in the current row.
+            for (int j = i; j >= 0; j--) {
+
+                // Option 1: Move to the element directly below.
+                int down = triangle[i][j] + dp[i + 1][j];
+
+                // Option 2: Move diagonally to the bottom-right element.
+                int diagonal = triangle[i][j] + dp[i + 1][j + 1];
+
+                // Store the minimum path sum from the current cell.
+                dp[i][j] = min(down, diagonal);
+            }
+        }
+
+        // The minimum path sum starting from the top element.
+        return dp[0][0];
+    }
+};
+/*class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+
+        // Number of rows in the triangle.
+        int n = triangle.size();
+
+        // Space optimized DP using two 1D arrays.
+        vector<int> prev(n, 0), curr(n, 0);
+
+        // Base case: Copy the last row into prev.
+        // Minimum path sum from the last row is the element itself.
+        for (int i = 0; i < n; i++)
+            prev[i] = triangle[n - 1][i];
+
+        // Traverse from the second-last row towards the first row.
+        for (int i = n - 2; i >= 0; i--) {
+
+            // Process all valid columns in the current row.
+            for (int j = i; j >= 0; j--) {
+
+                // Option 1: Move down to (i+1, j).
+                int down = triangle[i][j] + prev[j];
+
+                // Option 2: Move diagonally to (i+1, j+1).
+                int diagonal = triangle[i][j] + prev[j + 1];
+
+                // Store the minimum path sum in the current array.
+                curr[j] = min(down, diagonal);
+            }
+
+            // Update prev with the results of the current row.
+            // This becomes the next row's reference for calculation.
+            prev = curr;
+        }
+
+        // The top element contains the minimum path sum.
+        return prev[0];
+    }
+};
+*/
