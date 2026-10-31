@@ -1,0 +1,41 @@
+/* Logic:
+
+1. Initialize `mini` with the first day's stock price to keep track of the minimum buying price.
+2. Initialize `profit = 0` to store the maximum profit.
+3. Traverse the array from index `1` to `n-1`.
+4. For each day, calculate the profit by subtracting the minimum buying price from the current day's price.
+5. Update the maximum profit using `max()`.
+6. Update the minimum buying price using `min()`.
+7. After traversing the entire array, return the maximum profit.
+
+Key Idea: Buy at the lowest price encountered so far and sell at the current price to maximize profit.
+*/
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+
+        // Store the minimum price seen so far (best buying price)
+        int mini = prices[0];
+
+        // Store the maximum profit possible
+        int profit = 0;
+
+        // Traverse the array starting from the second day
+        for (int i = 1; i < n; i++) {
+
+            // Calculate profit if we sell the stock today
+            int cost = prices[i] - mini;
+
+            // Update maximum profit
+            profit = max(profit, cost);
+
+            // Update minimum buying price seen so far
+            mini = min(mini, prices[i]);
+        }
+
+        // Return the maximum profit
+        return profit;
+    }
+};
