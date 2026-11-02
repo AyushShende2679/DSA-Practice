@@ -1,0 +1,134 @@
+/* Logic: 
+## 1. Space Optimization – Logic
+
+1. Identify the three changing states: `i`, `buy`, and `cap`.
+2. `i` represents the current day, `buy` represents the buying or selling state, and `cap` represents the remaining transaction capacity.
+3. In tabulation, the current day's answer depends only on the next day's DP values (`i+1`).
+4. Therefore, instead of maintaining a 3D DP array, use two 2D arrays:
+   - `after` stores the next day's DP values.
+   - `curr` stores the current day's DP values.
+5. Initialize both arrays with 0 because when no days are left, the maximum profit is 0.
+6. Traverse the days backwards, from `n-1` to `0`.
+7. Run a loop for both buying and selling states (`buy = 0` and `buy = 1`).
+8. Run another loop for transaction capacity from `1` to `k`, because capacity 0 is already a base case.
+9. If `buy == 1` (Buying state):
+   - Buy: Subtract the current stock price and move to the selling state (`buy = 0`). Transaction capacity remains unchanged.
+   - Skip: Move to the next day without buying. Remain in the buying state.
+   - Take the maximum profit from both choices.
+10. If `buy == 0` (Selling state):
+    - Sell: Add the current stock price, decrease transaction capacity by 1, and move to the buying state (`buy = 1`).
+    - Skip: Move to the next day without selling. Remain in the selling state.
+    - Take the maximum profit from both choices.
+11. Store the calculated profit in `curr[buy][cap]`.
+12. After calculating all states for the current day, update `after = curr`.
+13. Repeat until all days are processed.
+14. Finally, return `after[1][k]`, which represents the maximum profit starting from day 0, in the buying state, with `k` transactions available.
+
+## 2. Important observations
+
+- Buying decreases profit because we spend money.
+- Selling increases profit because we receive money.
+- Transaction capacity decreases only when selling.
+- `after` represents the next day.
+- `curr` represents the current day.
+- We use two arrays because we only need the next day's values.
+- Unlike Stock III, where transaction capacity is fixed at 2, Stock IV allows up to `k` transactions.
+
+## 3. Complexity analysis
+
+- Time Complexity: $O(n \times 2 \times k) = O(nk)$
+- Space Complexity: $O(2 \times (k+1)) = O(k)$
+
+Key DP pattern: Recursion → Memoization → Tabulation → Space Optimization.
+
+The same buy/sell recurrence is reused; only the transaction capacity changes.
+*/
+
+// Pre-requrisite : 123. Best Time to Buy and Sell Stock III
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+
+        int n = prices.size();
+
+        // Space Optimization:
+        // Instead of maintaining a 3D DP array,
+        // we use only two 2D arrays: after and curr.
+
+        // after = stores the DP values of the next day (i+1).
+        // curr  = stores the DP values of the current day (i).
+
+        // Dimensions:
+        // 2   = buying or selling state
+        // k+1 = remaining transaction capacity (0 to k)
+
+        // Initially, both arrays are filled with 0.
+        // This represents the base case when no days are left.
+        vector<vector<int>> after(2, vector<int>(k + 1, 0));
+        vector<vector<int>> curr(2, vector<int>(k + 1, 0));
+
+        // Traverse days backwards because the current day's
+        // answer depends on the next day's answer.
+        for (int i = n - 1; i >= 0; i--) {
+
+            // Two possible states:
+            // buy = 1 -> We can buy a stock.
+            // buy = 0 -> We can sell the stock we are holding.
+            for (int buy = 0; buy < 2; buy++) {
+
+                // Transaction capacity ranges from 1 to k.
+                // Start from 1 because cap = 0 is a base case.
+                for (int cap = 1; cap <= k; cap++) {
+
+                    int profit = 0;
+
+                    if (buy) {
+
+                        // We are in the buying state.
+
+                        // Choice 1: Buy today's stock.
+                        // Subtract today's price.
+                        // Move to selling state (buy = 0).
+                        // Transaction capacity remains unchanged.
+
+                        // Choice 2: Skip buying today.
+                        // Remain in buying state (buy = 1).
+
+                        profit = max(-prices[i] + after[0][cap], after[1][cap]);
+
+                    } else {
+
+                        // We are in the selling state.
+
+                        // Choice 1: Sell today's stock.
+                        // Add today's price.
+                        // Move to buying state (buy = 1).
+                        // Decrease transaction capacity by 1.
+
+                        // Choice 2: Skip selling today.
+                        // Remain in selling state (buy = 0).
+                        // Transaction capacity remains unchanged.
+
+                        profit =
+                            max(prices[i] + after[1][cap - 1], after[0][cap]);
+                    }
+
+                    // Store the maximum profit for the current day,
+                    // current buying/selling state and transaction capacity.
+                    curr[buy][cap] = profit;
+                }
+            }
+
+            // Move current day's results into the after array.
+            // These values will be used to calculate the previous day.
+            after = curr;
+        }
+
+        // Starting state:
+        // Day = 0
+        // buy = 1 (initially we are allowed to buy)
+        // cap = k (at most k transactions are allowed)
+
+        return after[1][k];
+    }
+};
