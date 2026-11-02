@@ -1,0 +1,348 @@
+/* 
+
+The problem is to find the maximum profit by completing at most 2 transactions. One transaction consists of buying and selling one stock.
+
+## 1. Recursion – Logic
+
+1. Create a recursive function with three states: `i`, `buy`, and `cap`.
+2. `i` represents the current day.
+3. `buy = 1` means we can buy a stock, and `buy = 0` means we can sell a stock.
+4. `cap` represents the number of transactions remaining.
+5. If `cap == 0`, return 0 because no more transactions are allowed.
+6. If `i == n`, return 0 because no days are left.
+7. If `buy == 1`:
+   - Buy the stock: subtract the current price and move to the selling state.
+   - Skip buying: move to the next day without changing the state.
+   - Return the maximum of both choices.
+8. If `buy == 0`:
+   - Sell the stock: add the current price, decrease transaction capacity by one, and move to the buying state.
+   - Skip selling: move to the next day without changing the state.
+   - Return the maximum of both choices.
+9. Start recursion from day 0, with `buy = 1` and `cap = 2`.
+
+Time Complexity: O(2ⁿ)
+
+Space Complexity: O(n), recursion stack.
+
+## 2. Memoization (Top-Down DP) – Logic
+
+1. Identify the changing states: `i`, `buy`, and `cap`.
+2. Create a 3D DP array of size `n × 2 × 3`, initialized with -1.
+3. Apply the same base cases as recursion:
+   - If `cap == 0`, return 0.
+   - If `i == n`, return 0.
+4. Before calculating the answer, check whether `dp[i][buy][cap]` is already calculated.
+5. If the value is not -1, return the stored answer.
+6. Otherwise, perform the same buy and sell choices as recursion.
+7. Store the calculated maximum profit in `dp[i][buy][cap]`.
+8. Return the stored answer.
+9. Start from day 0, buying state, and transaction capacity 2.
+
+Time Complexity: O(n × 2 × 3) = O(n)
+
+Space Complexity: O(n) DP array + O(n) recursion stack.
+
+## 3. Tabulation (Bottom-Up DP) – Logic
+
+1. Identify the three states: `i`, `buy`, and `cap`.
+2. Create a 3D DP array of size `(n+1) × 2 × 3`, initialized with 0.
+3. The extra row `n` represents the base case when no days are left.
+4. The capacity 0 column represents the base case when no transactions are remaining.
+5. Traverse days backwards, from `n-1` to `0`.
+6. Run a loop for both buying and selling states.
+7. Run another loop for transaction capacity from 1 to 2.
+8. If `buy == 1`:
+   - Calculate the profit from buying today.
+   - Calculate the profit from skipping today.
+   - Store the maximum of both choices.
+9. If `buy == 0`:
+   - Calculate the profit from selling today.
+   - Calculate the profit from skipping today.
+   - Store the maximum of both choices.
+10. Use the next day's DP values (`i+1`) to calculate the current day's answer.
+11. Finally, return `dp[0][1][2]`.
+
+Time Complexity: O(n)
+
+Space Complexity: O(n)
+
+## 4. Space Optimization – Logic
+
+1. In tabulation, notice that the current day's answer depends only on the next day's DP values.
+2. We do not need to store the answers for all days.
+3. Therefore, replace the 3D DP array with two 2D arrays:
+   - `after` stores the next day's DP values.
+   - `curr` stores the current day's DP values.
+4. Initialize both arrays with 0 because they represent the base case.
+5. Traverse days backwards, from `n-1` to `0`.
+6. Run a loop for both buying and selling states.
+7. Run another loop for transaction capacity from 1 to 2.
+8. If `buy == 1`:
+   - Calculate the profit from buying today using `after`.
+   - Calculate the profit from skipping today using `after`.
+   - Store the maximum in `curr`.
+9. If `buy == 0`:
+   - Calculate the profit from selling today using `after`.
+   - Decrease transaction capacity by one after selling.
+   - Calculate the profit from skipping today.
+   - Store the maximum in `curr`.
+10. After calculating all states for the current day, update `after = curr`.
+11. Repeat this process until all days are completed.
+12. Finally, return `after[1][2]`.
+
+Time Complexity: O(n)
+
+Space Complexity: O(1)
+
+## 5. Comparison of all four approaches
+
+| Approach | Time | Space |
+| --- | --- | --- |
+| Recursion | O(2ⁿ) | O(n) |
+| Memoization | O(n) | O(n) |
+| Tabulation | O(n) | O(n) |
+| Space Optimization | O(n) | O(1) |
+
+## 6. Most important points to remember
+
+- Buying decreases profit because we spend money.
+- Selling increases profit because we receive money.
+- Transaction capacity decreases only when we sell.
+- `buy = 1` means we are allowed to buy.
+- `buy = 0` means we are allowed to sell.
+- In memoization, store all changing states.
+- In tabulation, traverse backwards because the current state depends on the next day.
+- In space optimization, use `curr` and `after` when only the next row is required.
+
+The overall DP progression:
+
+Recursion → Memoization → Tabulation → Space Optimization.
+
+This is a reusable pattern for solving many Dynamic Programming problems, especially the Stock Buy and Sell series.
+*/
+
+class Solution {
+    // Recursive function to calculate maximum profit
+    // i   = current day
+    // buy = 1 means we can buy, 0 means we can sell
+    // cap = maximum number of transactions remaining
+
+    int solve(int i, int buy, int cap, vector<int>& prices,
+              vector<vector<vector<int>>>& dp) {
+
+        // Base case: No transactions left
+        if (cap == 0)
+            return 0;
+
+        // Base case: No more days left
+        if (i == prices.size())
+            return 0;
+
+        // If this state is already calculated, return stored answer
+        if (dp[i][buy][cap] != -1)
+            return dp[i][buy][cap];
+
+        int profit = 0;
+
+        if (buy) {
+            // We have two choices:
+
+            // 1. Buy the stock today
+            //    Subtract today's price and move to selling state
+
+            // 2. Skip buying today
+            //    Remain in buying state
+
+            profit = max(-prices[i] + solve(i + 1, 0, cap, prices, dp),
+                         0 + solve(i + 1, 1, cap, prices, dp));
+
+        } else {
+
+            // We have two choices:
+
+            // 1. Sell the stock today
+            //    Add today's price and decrease transaction capacity
+            //    Move to buying state
+
+            // 2. Skip selling today
+            //    Remain in selling state
+
+            profit = max(prices[i] + solve(i + 1, 1, cap - 1, prices, dp),
+                         0 + solve(i + 1, 0, cap, prices, dp));
+        }
+
+        // Store the calculated profit in DP array
+        return dp[i][buy][cap] = profit;
+    }
+
+public:
+    int maxProfit(vector<int>& prices) {
+
+        int n = prices.size();
+
+        // DP dimensions:
+        // n = number of days
+        // 2 = buying or selling state
+        // 3 = remaining transaction capacity (0, 1, 2)
+        // Initialize all states with -1 (not calculated)
+
+        vector<vector<vector<int>>> dp(
+            n, vector<vector<int>>(2, vector<int>(3, -1)));
+
+        // Start from day 0
+        // Initially we can buy (buy = 1)
+        // We have at most 2 transactions
+
+        return solve(0, 1, 2, prices, dp);
+    }
+};
+
+/*class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+
+        int n = prices.size();
+
+        // n+1 because we need an extra row for the base case i == n
+        // 2 states: buy or sell
+        // 3 states: remaining transaction capacity (0, 1, 2)
+
+        vector<vector<vector<int>>> dp(
+            n + 1, vector<vector<int>>(2, vector<int>(3, 0))
+        );
+
+        // Traverse days backwards
+        for (int i = n - 1; i >= 0; i--) {
+
+            for (int buy = 0; buy < 2; buy++) {
+
+                for (int cap = 1; cap <= 2; cap++) {
+
+                    int profit = 0;
+
+                    if (buy) {
+
+                        // Choice 1: Buy today's stock
+                        // Choice 2: Skip buying
+
+                        profit = max(
+                            -prices[i] + dp[i + 1][0][cap],
+                            dp[i + 1][1][cap]
+                        );
+
+                    } else {
+
+                        // Choice 1: Sell today's stock
+                        // Choice 2: Skip selling
+
+                        profit = max(
+                            prices[i] + dp[i + 1][1][cap - 1],
+                            dp[i + 1][0][cap]
+                        );
+                    }
+
+                    // Store the maximum profit
+                    dp[i][buy][cap] = profit;
+                }
+            }
+        }
+
+        // Start from day 0, buying state, 2 transactions
+        return dp[0][1][2];
+    }
+};
+*/
+/*
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+
+        int n = prices.size();
+
+        // Space Optimization:
+        // Instead of maintaining a 3D DP array,
+        // we use only two 2D arrays: after and curr.
+
+        // after = stores the DP values of the next day (i+1).
+        // curr  = stores the DP values of the current day (i).
+
+        // Dimensions:
+        // 2 = buying or selling state
+        // 3 = remaining transaction capacity (0, 1, 2)
+
+        // Initially, both arrays are filled with 0.
+        // This represents the base case when no days are left.
+        vector<vector<int>> after(2, vector<int>(3, 0));
+        vector<vector<int>> curr(2, vector<int>(3, 0));
+
+        // Traverse days backwards because the current day's
+        // answer depends on the next day's answer.
+        for (int i = n - 1; i >= 0; i--) {
+
+            // Two possible states:
+            // buy = 1 -> We can buy a stock.
+            // buy = 0 -> We can sell the stock we are holding.
+            for (int buy = 0; buy < 2; buy++) {
+
+                // Maximum transaction capacity is 2.
+                // Start from 1 because cap = 0 is a base case.
+                for (int cap = 1; cap <= 2; cap++) {
+
+                    int profit = 0;
+
+                    if (buy) {
+
+                        // We are in the buying state.
+
+                        // Choice 1: Buy today's stock.
+                        // Subtract today's price.
+                        // Move to selling state (buy = 0).
+                        // Transaction capacity remains unchanged.
+                        //
+                        // Choice 2: Skip buying today.
+                        // Remain in buying state (buy = 1).
+
+                        profit = max(
+                            -prices[i] + after[0][cap],
+                            0 + after[1][cap]
+                        );
+
+                    } else {
+
+                        // We are in the selling state.
+
+                        // Choice 1: Sell today's stock.
+                        // Add today's price.
+                        // Move to buying state (buy = 1).
+                        // Decrease transaction capacity by 1.
+                        //
+                        // Choice 2: Skip selling today.
+                        // Remain in selling state (buy = 0).
+                        // Transaction capacity remains unchanged.
+
+                        profit = max(
+                            prices[i] + after[1][cap - 1],
+                            0 + after[0][cap]
+                        );
+                    }
+
+                    // Store the maximum profit for the current day,
+                    // current buying/selling state and transaction capacity.
+                    curr[buy][cap] = profit;
+                }
+            }
+
+            // Move current day's results into the after array.
+            // These values will be used to calculate the previous day.
+            after = curr;
+        }
+
+        // Starting state:
+        // Day = 0
+        // buy = 1 (initially we are allowed to buy)
+        // cap = 2 (at most two transactions are allowed)
+
+        return after[1][2];
+    }
+};
+*/
