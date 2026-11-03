@@ -1,0 +1,198 @@
+/*
+## 1. Recursive Approach (Partition DP)
+
+Logic:
+
+1. First, add `0` and `n` to the cuts array because they represent the boundaries of the stick.
+2. Sort the cuts array so that all cutting positions are in increasing order.
+3. Define a recursive function `solve(i, j)` where `i` and `j` represent the range of cuts that are yet to be performed.
+4. If `i > j`, it means there are no cuts left to perform, so return `0`.
+5. Try every possible cut from `i` to `j`, assuming each cut is performed first.
+6. The cost of performing the current cut is the length of the current stick segment, which is `cuts[j+1] - cuts[i-1]`.
+7. Recursively calculate the minimum cost of performing the remaining cuts on the left and right segments.
+8. Add the current cutting cost, left segment cost, and right segment cost.
+9. Take the minimum cost among all possible choices of the first cut.
+10. Finally, return `solve(1, c)` because the actual cutting positions are from index `1` to `c`.
+
+## 2. Memoization Approach (Top-Down DP)
+
+Logic:
+
+1. Follow the same recursive approach by trying every possible cut as the first cut.
+2. Create a 2D DP array initialized with `-1` to store the results of already computed states.
+3. Before calculating a state `(i, j)`, check whether `dp[i][j]` is already calculated.
+4. If it is not `-1`, return the previously stored answer instead of making recursive calls again.
+5. Otherwise, try every possible first cut from `i` to `j`.
+6. Calculate the current cutting cost as the length of the stick segment plus the minimum costs of the left and right subproblems.
+7. Find the minimum among all possible choices.
+8. Store the minimum answer in `dp[i][j]` and return it.
+9. Finally, return `solve(1, c)`.
+
+Main idea: Memoization avoids recalculating the same recursive states multiple times by storing their answers.
+
+## 3. Tabulation Approach (Bottom-Up DP)
+
+Logic:
+
+1. First, add `0` and `n` to the cuts array and sort it.
+2. Create a 2D DP array initialized with `0`.
+3. Define `dp[i][j]` as the minimum cost required to perform all cuts from index `i` to `j`.
+4. Since the base case is `i > j`, initialize the DP array with `0`. This automatically handles states where there are no cuts to perform.
+5. Start the outer loop from `i = c` and move backwards to `1`.
+6. Run the inner loop from `j = 1` to `c`.
+7. If `i > j`, skip that state because there are no cuts to perform.
+8. For every valid state `(i, j)`, try every possible cut from `i` to `j`, assuming each cut is performed first.
+9. Calculate the current cutting cost as `cuts[j+1] - cuts[i-1]`.
+10. Add the cost of the left subproblem `dp[i][idx-1]` and the right subproblem `dp[idx+1][j]`.
+11. Take the minimum cost among all possible first cuts.
+12. Store the minimum answer in `dp[i][j]`.
+13. Finally, return `dp[1][c]`, which represents the minimum cost of performing all the cuts.
+
+Main idea: Tabulation eliminates recursion by solving smaller subproblems first and storing their answers in the DP table.
+
+## Complexity Comparison
+
+Let `c` be the number of cutting positions.
+
+| Approach | Time Complexity | Space Complexity |
+| --- | --- | --- |
+| Recursion | Exponential | O(c) |
+| Memoization | O(c³) | O(c²) + O(c) stack |
+| Tabulation | O(c³) | O(c²) |
+
+## Important pattern to remember
+
+All three approaches use the same Partition DP logic:
+
+- Identify the range of operations: `(i, j)`.
+- Try every possible operation (`idx`) as the first operation.
+- Calculate the current cost.
+- Solve the left and right subproblems.
+- Take the minimum of all possibilities.
+
+The only difference is how we store and calculate the answers:
+
+- Recursion: Calculate answers using function calls.
+- Memoization: Calculate recursively and store answers to avoid repetition.
+- Tabulation: Calculate iteratively using a DP table.
+*/
+
+class Solution {
+    // Recursive function to find minimum cost to perform cuts
+    // from index i to j
+    int solve(int i, int j, vector<int>& cuts,
+              vector<vector<int>>& dp) {
+
+        // Base case: No cuts left to perform
+        if (i > j)
+            return 0;
+
+        // If the answer for this state is already calculated,
+        // return the stored result
+        if (dp[i][j] != -1)
+            return dp[i][j];
+
+        // Store the minimum possible cost
+        int mini = INT_MAX;
+
+        // Try every cut as the first cut in the current segment
+        for (int idx = i; idx <= j; idx++) {
+
+            // Cost of making the current cut
+            // Current segment length = cuts[j+1] - cuts[i-1]
+            int cost = (cuts[j + 1] - cuts[i - 1])
+
+                       // Cost of performing cuts on the left segment
+                       + solve(i, idx - 1, cuts, dp)
+
+                       // Cost of performing cuts on the right segment
+                       + solve(idx + 1, j, cuts, dp);
+
+            // Update the minimum cost
+            mini = min(mini, cost);
+        }
+
+        // Store the answer in DP and return it
+        return dp[i][j] = mini;
+    }
+
+public:
+    int minCost(int n, vector<int>& cuts) {
+
+        // Total number of cuts
+        int c = cuts.size();
+
+        // Add the two boundaries of the stick
+        cuts.push_back(n);
+        cuts.insert(cuts.begin(), 0);
+
+        // Sort cutting positions in increasing order
+        sort(cuts.begin(), cuts.end());
+
+        // DP array initialized with -1 (uncomputed states)
+        vector<vector<int>> dp(c + 1, vector<int>(c + 1, -1));
+
+        // Consider all actual cuts, from index 1 to c
+        return solve(1, c, cuts, dp);
+    }
+};
+/*class Solution {
+public:
+    int minCost(int n, vector<int>& cuts) {
+
+        // Total number of cuts
+        int c = cuts.size();
+
+        // Add the two boundaries of the stick
+        cuts.push_back(n);
+        cuts.insert(cuts.begin(), 0);
+
+        // Sort cutting positions in increasing order
+        sort(cuts.begin(), cuts.end());
+
+        // DP array initialized with 0
+        // dp[i][j] represents minimum cost to perform cuts
+        // from index i to j
+        vector<vector<int>> dp(c + 2, vector<int>(c + 2, 0));
+
+        // Start from the last cut and move backwards
+        for (int i = c; i >= 1; i--) {
+
+            // Iterate over all possible ending indices
+            for (int j = 1; j <= c; j++) {
+
+                // No cuts to perform when i > j
+                // Already handled by initializing DP with 0
+                if (i > j)
+                    continue;
+
+                // Store minimum possible cost
+                int mini = INT_MAX;
+
+                // Try every possible cut as the first cut
+                for (int idx = i; idx <= j; idx++) {
+
+                    // Cost of cutting the current stick segment
+                    // Segment length = cuts[j+1] - cuts[i-1]
+                    int cost = (cuts[j + 1] - cuts[i - 1])
+
+                               // Minimum cost of left subproblem
+                               + dp[i][idx - 1]
+
+                               // Minimum cost of right subproblem
+                               + dp[idx + 1][j];
+
+                    // Update minimum cost
+                    mini = min(mini, cost);
+                }
+
+                // Store the minimum cost for this state
+                dp[i][j] = mini;
+            }
+        }
+
+        // Answer: minimum cost to perform all cuts
+        return dp[1][c];
+    }
+};
+*/
