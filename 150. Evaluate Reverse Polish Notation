@@ -1,0 +1,75 @@
+/* Logic: (RPN)
+
+1. Create a stack to store numbers and intermediate results.
+2. Traverse the given tokens one by one.
+3. Check whether the current token is an operator (`+`, `-`, `*`, `/`).
+4. If it is a number:
+   - Convert the string into an integer using `stoi()`.
+   - Push it into the stack.
+5. If it is an operator:
+   - Pop the top element and store it in `b`.
+   - Pop the next element and store it in `a`.
+   - Perform the operation `a operator b`.
+   - Push the result back into the stack.
+6. Repeat until all tokens are processed.
+7. Finally, return the top element of the stack as the answer.
+
+Key concept: In Reverse Polish Notation, operators are applied to the two most recently available operands.
+*/
+
+class Solution {
+public:
+    // Converts a string number into an integer
+    // and performs the required arithmetic operation
+    int calculate(int a, int b, string& token) {
+
+        if (token == "+")
+            return a + b;
+
+        else if (token == "-")
+            return a - b;
+
+        else if (token == "*")
+            return a * b;
+
+        else
+            return a / b;
+    }
+
+    int evalRPN(vector<string>& tokens) {
+
+        // Stack to store operands and intermediate results
+        stack<int> st;
+
+        // Traverse each token in the given expression
+        for (auto& token : tokens) {
+
+            // Check whether the current token is an operator
+            if (token == "+" || token == "-" || token == "*" || token == "/") {
+
+                // First popped element is the second operand
+                int b = st.top();
+                st.pop();
+
+                // Second popped element is the first operand
+                int a = st.top();
+                st.pop();
+
+                // Perform the operation
+                int res = calculate(a, b, token);
+
+                // Push the result back into the stack
+                st.push(res);
+            }
+
+            else {
+                // Convert string into integer using stoi()
+                // and push the number into the stack
+                st.push(stoi(token));
+            }
+        }
+
+        // The final result will be at the top of the stack
+        return st.top();
+    }
+};
