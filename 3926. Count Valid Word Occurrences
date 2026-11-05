@@ -1,0 +1,100 @@
+/* Logic:
+
+1. First, concatenate all strings present in the `chunks` array to form a single string `s`.
+
+2. Create an empty string `word` to build words character by character and an unordered map `mp` to store the frequency of each word.
+
+3. Traverse the concatenated string character by character.
+
+4. If the current character is a lowercase English letter (`a-z`), append it to `word`.
+
+5. If the current character is a hyphen (`-`), check whether:
+
+- It is not the first character.
+- It is not the last character.
+- Its previous character is a lowercase letter.
+- Its next character is a lowercase letter.
+
+If all conditions are satisfied, append the hyphen to `word`.
+
+6. If the current character is neither a lowercase letter nor a valid joiner hyphen, treat it as a separator.
+
+- If `word` is not empty, increment its frequency in the map.
+- Clear `word` to start building the next word.
+
+7. After completing the traversal, check whether `word` is non-empty. If it is, increment its frequency in the map. This handles the last word of the string.
+8. Finally, traverse the `queries` array and find the frequency of each query in the map. Store the frequencies in the answer array. If a query does not exist, its frequency will be zero.
+9. Return the answer array.
+
+*/
+
+class Solution {
+public:
+    vector<int> countWordOccurrences(vector<string>& chunks,
+                                     vector<string>& queries) {
+
+        // Step 1: Concatenate all strings in chunks
+        string s = "";
+        for (auto i : chunks) {
+            s += i;
+        }
+
+        string word = "";
+
+        // Stores each valid word and its frequency
+        unordered_map<string, int> mp;
+
+        // Step 2: Traverse the concatenated string character by character
+        for (int i = 0; i < s.size(); i++) {
+
+            char c = s[i];
+
+            // If current character is a lowercase letter,
+            // add it to the current word
+            if (c >= 'a' && c <= 'z') {
+                word += c;
+            }
+
+            // If current character is a hyphen,
+            // check whether both neighboring characters
+            // exist and are lowercase English letters.
+            // Only then is it a valid joiner hyphen.
+            else if (c == '-' && i > 0 && i + 1 < s.size() && s[i - 1] >= 'a' &&
+                     s[i - 1] <= 'z' && s[i + 1] >= 'a' && s[i + 1] <= 'z') {
+
+                word += c;
+            }
+
+            // Any other character acts as a separator
+            else {
+
+                // If we have formed a word, increase its frequency
+                if (!word.empty()) {
+                    mp[word]++;
+
+                    // Clear word to start building the next word
+                    word = "";
+                }
+            }
+        }
+
+        // Step 3: Handle the last word
+        // There may be no separator after the last word
+        if (!word.empty()) {
+            mp[word]++;
+        }
+
+        // Step 4: Find the frequency of each query
+        vector<int> ans;
+
+        for (auto q : queries) {
+
+            // If query exists, return its frequency.
+            // Otherwise, mp[q] automatically gives 0.
+            ans.push_back(mp[q]);
+        }
+
+        return ans;
+    }
+};
+
