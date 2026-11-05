@@ -1,0 +1,53 @@
+/* Logic :
+
+1. First, sort both arrays `g` (children's greed factors) and `s` (cookie sizes) in ascending order.
+
+2. Initialize two pointers:
+
+- `l = 0` → Points to the current child.
+- `r = 0` → Points to the current cookie.
+
+3. Traverse both arrays using a while loop until either all children or all cookies are processed.
+
+4. Compare the current cookie size `s[r]` with the current child's greed factor `g[l]`:
+
+- If `s[r] >= g[l]`, the cookie satisfies the child, so increment `l` to move to the next child.
+- Otherwise, the cookie is too small, so skip it and move to the next cookie.
+
+5. Increment `r` in every iteration because each cookie can be used only once.
+
+6. Finally, return `l`, which represents the total number of children who received cookies.
+
+Greedy Approach: Always try to satisfy the child with the smallest greed factor using the smallest available sufficient cookie. This maximizes the chances of satisfying more children.
+*/
+class Solution {
+public:
+    int findContentChildren(vector<int>& g, vector<int>& s) {
+
+        // Sort greed factors and cookie sizes in ascending order
+        sort(g.begin(), g.end());
+        sort(s.begin(), s.end());
+
+        // l = pointer for children
+        // r = pointer for cookies
+        int l = 0, r = 0;
+
+        // Traverse until all children or cookies are exhausted
+        while (l < g.size() && r < s.size()) {
+
+            // Check if the current cookie can satisfy the current child
+            if (s[r] >= g[l]) {
+
+                // Child is satisfied, move to the next child
+                l++;
+            }
+
+            // Move to the next cookie
+            // Whether the cookie satisfies the child or not
+            r++;
+        }
+
+        // Return the total number of content children
+        return l;
+    }
+};
