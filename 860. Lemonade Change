@@ -1,0 +1,72 @@
+/* Logic:
+
+1. Initialize two variables `five` and `ten` to keep track of the available ₹5 and ₹10 bills.
+
+2. Traverse the `bills` array and process each customer's payment.
+
+3. If the customer pays ₹5, simply increment `five` because no change is required.
+
+4. If the customer pays ₹10:
+
+- Check whether at least one ₹5 bill is available.
+- If available, give one ₹5 bill as change and increment `ten`.
+- Otherwise, return `false`.
+
+5. If the customer pays ₹20:
+
+- First, check whether one ₹5 and one ₹10 bill are available. If yes, give both as change.
+- Otherwise, check whether at least three ₹5 bills are available. If yes, give three ₹5 bills as change.
+- If neither condition is satisfied, return `false`.
+
+6. If all customers receive the correct change, return `true`.
+
+Key Greedy Concept: Always maintain available change and choose a valid combination of bills. For ₹20 payments, prioritize using a ₹10 + ₹5 combination to preserve smaller denominations.
+
+Complexity Analysis:
+
+- Time Complexity: $O(n)$
+- Space Complexity: $O(1)$
+
+*/
+
+class Solution {
+public:
+    bool lemonadeChange(vector<int>& bills) {
+        // Track the number of $5 and $10 bills available
+        int five = 0, ten = 0;
+
+        // Process each customer's payment
+        for (int bill : bills) {
+
+            // Customer pays $5: No change is required
+            if (bill == 5)
+                five++;
+
+            // Customer pays $10: Return one $5 as change
+            else if (bill == 10) {
+                if (five > 0) {
+                    five--; // Give one $5 bill
+                    ten++;  // Store the received $10 bill
+                } else
+                    return false; // Cannot provide change
+            }
+
+            // Customer pays $20: Return $15 as change
+            else {
+                // Prefer giving one $10 and one $5
+                if (five > 0 && ten > 0) {
+                    five--;
+                    ten--;
+                }
+                // Otherwise, give three $5 bills
+                else if (five >= 3) {
+                    five -= 3;
+                } else
+                    return false; // Insufficient change
+            }
+        }
+
+        // Successfully provided change to every customer
+        return true;
+    }
+};
