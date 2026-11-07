@@ -1,0 +1,38 @@
+/* Logic:
+
+1. Initialize `maxIdx = 0` to store the maximum index we can reach.
+2. Traverse the array from index `0` to `n-1`.
+3. At every index `i`, check whether `i > maxIdx`.
+   - If true, it means the current index is unreachable, so return `false`.
+4. If the current index is reachable, calculate the farthest position we can jump to using `i + nums[i]`.
+5. Update `maxIdx` with the maximum of its current value and `i + nums[i]`.
+6. If the loop completes without returning `false`, it means we can reach the last index, so return `true`.
+
+Key intuition: We use Greedy to keep track of the farthest reachable index instead of checking every possible jump.
+*/
+
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n = nums.size();
+
+        // Stores the farthest index we can reach so far
+        int maxIdx = 0;
+
+        // Traverse the array
+        for (int i = 0; i < n; i++) {
+
+            // If current index is beyond our reachable range,
+            // it means we cannot reach this index
+            if (i > maxIdx)
+                return false;
+
+            // Update the farthest reachable index
+            // from the current position
+            maxIdx = max(maxIdx, i + nums[i]);
+        }
+
+        // If we complete the loop, the last index is reachable
+        return true;
+    }
+};
