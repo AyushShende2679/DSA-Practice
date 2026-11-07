@@ -1,0 +1,65 @@
+/* Logic / Approach:
+
+1. First, create a `present` array to store which numbers exist in the original array.
+2. Mark every element of `nums` as `true` in the `present` array.
+3. Initialize `ans = 0` to store the final sum.
+4. Traverse each element `x` in the array.
+5. Initialize `best = x`, assuming the number itself is the smallest valid divisor.
+6. Check possible divisors from `1` to `sqrt(x)` because divisors come in pairs.
+7. If `x % d == 0`, then:
+   - Check whether `d` exists in the original array. If yes, update `best = min(best, d)`.
+   - Calculate the paired divisor `other = x / d`.
+   - Check whether `other` exists in the original array. If yes, update `best = min(best, other)`.
+8. After checking all divisors, add `best` to `ans`.
+9. Repeat for every element in the array.
+10. Return `ans`.
+
+In simple words: For every element, find the smallest divisor that is also present in the original array, then add all these minimum divisors to get the final answer.
+*/
+
+class Solution {
+public:
+    long long minArraySum(vector<int>& nums) {
+
+        int n = nums.size();
+
+        // Step 1: Mark all numbers present in the array
+        vector<bool> present(100001, false);
+
+        for (int x : nums) {
+            present[x] = true;
+        }
+
+        long long ans = 0;
+
+        // Step 2: Find the smallest divisor for every element
+        for (int x : nums) {
+
+            int best = x;
+
+            // Check divisors only up to sqrt(x)
+            for (int d = 1; d * d <= x; d++) {
+
+                if (x % d == 0) {
+
+                    // First divisor
+                    if (present[d]) {
+                        best = min(best, d);
+                    }
+
+                    // Paired divisor
+                    int other = x / d;
+
+                    if (present[other]) {
+                        best = min(best, other);
+                    }
+                }
+            }
+
+            // Add the minimum possible value
+            ans += best;
+        }
+
+        return ans;
+    }
+};
