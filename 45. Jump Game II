@@ -1,0 +1,78 @@
+/* Logic:
+
+1. Initialize `l = 0` and `r = 0` to represent the range of indices reachable with the current number of jumps.
+
+2. Initialize `jumps = 0` to count the minimum jumps required.
+
+3. Run a while loop until `r` reaches or crosses the last index (`n - 1`).
+
+4. Initialize `farthest = 0` to track the maximum index we can reach with one additional jump.
+
+5. Traverse all indices from `l` to `r`:
+
+- Calculate the maximum reachable index from each position using `i + nums[i]`.
+- Update `farthest` with the maximum value.
+
+6. After exploring the current range:
+
+- Update `l = r + 1` to start the next range.
+- Update `r = farthest` to extend the reachable boundary.
+- Increment `jumps` because we have used one more jump.
+
+7. Repeat until the last index is reachable.
+
+8. Return `jumps`.
+
+### Core greedy intuition
+
+Instead of jumping immediately to the next index, explore all positions reachable within the current jump and choose the maximum possible reach for the next jump.
+
+This ensures we reach the last index using the minimum number of jumps.
+
+Complexity:
+
+- Time: O(n)
+- Space: O(1)
+*/
+
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        int n = nums.size();
+
+        // l and r represent the current range of indices
+        // that we can reach using the current number of jumps.
+        int l = 0, r = 0;
+
+        // Counts the minimum number of jumps required.
+        int jumps = 0;
+
+        // Continue until we can reach the last index.
+        while (r < n - 1) {
+
+            // Stores the maximum index reachable
+            // with one additional jump.
+            int farthest = 0;
+
+            // Explore all indices in the current reachable range.
+            for (int i = l; i <= r; i++) {
+
+                // Calculate the farthest index we can reach
+                // by jumping from index i.
+                farthest = max(farthest, i + nums[i]);
+            }
+
+            // The next range starts just after the current range.
+            l = r + 1;
+
+            // Update the right boundary to the farthest reachable index.
+            r = farthest;
+
+            // One jump is completed.
+            jumps++;
+        }
+
+        // Return the minimum number of jumps.
+        return jumps;
+    }
+};
