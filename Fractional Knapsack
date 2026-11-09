@@ -1,0 +1,73 @@
+/* Logic :
+
+1. First, store the value and weight of each item together in a pair so their relationship is maintained.
+
+2. Sort all items in descending order based on their value/weight ratio using a comparator.
+
+3. Initialize `totalVal = 0` to store the maximum value and use the given capacity of the knapsack.
+
+4. Traverse the sorted items:
+
+- If the item's weight is less than or equal to the remaining capacity, take the complete item, add its value to `totalVal`, and reduce the remaining capacity.
+- Otherwise, take only the fraction of the item that fits in the remaining capacity. Add its proportional value to `totalVal` and stop.
+
+5. Finally, return `totalVal`.
+
+Greedy approach: Always choose the item with the highest value per unit of weight first.
+
+Time Complexity: $O(n\log n)$
+
+Space Complexity: $O(n)$
+*/
+
+class Solution {
+	public:
+	
+	// Comparator: Sort items in descending order of value/weight ratio
+	static bool cmp(pair<int, int> a, pair<int, int> b) {
+		return (double)a.first / a.second > (double)b.first / b.second;
+	}
+	
+	double fractionalKnapsack(vector<int>& val, vector<int>& wt, int capacity) {
+		
+		int n = val.size();
+		
+		// Store value and weight together to maintain their relationship
+		vector<pair<int, int>> v;
+		
+		for (int i = 0; i < n; i++) {
+			v.push_back({val[i], wt[i]});
+		}
+		
+		// Sort items based on value/weight ratio (highest first)
+		sort(v.begin(), v.end(), cmp);
+		
+		double totalVal = 0;
+		
+		// Traverse items in descending order of their ratio
+		for (int i = 0; i < n; i++) {
+			
+			// If the complete item fits in the remaining capacity
+			if (v[i].second <= capacity) {
+				
+				// Add the complete item's value
+				totalVal += v[i].first;
+				
+				// Reduce the remaining capacity
+				capacity -= v[i].second;
+			}
+			else {
+				
+				// If the item doesn't fit completely,
+				// take only the fraction that fits
+				totalVal += ((double)v[i].first / v[i].second) * capacity;
+				
+				// Knapsack is full, so stop
+				break;
+			}
+		}
+		
+		// Return the maximum total value
+		return totalVal;
+	}
+};
