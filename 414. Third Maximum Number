@@ -1,0 +1,100 @@
+/* Logic:
+
+1. Initialize three variables:
+
+- `max1` = largest number.
+- `max2` = second-largest number.
+- `max3` = third-largest number.
+
+2. Traverse the array using a loop.
+
+3. If the current number is already present in `max1`, `max2`, or `max3`, skip it to avoid duplicates.
+
+4. If the current number is greater than `max1`:
+
+- Move `max2` to `max3`.
+- Move `max1` to `max2`.
+- Update `max1` with the current number.
+
+5. Otherwise, if the current number is greater than `max2`:
+
+- Move `max2` to `max3`.
+- Update `max2` with the current number.
+
+6. Otherwise, if the current number is greater than `max3`:
+
+- Update `max3` with the current number.
+
+7. After traversing the array:
+
+- If the third maximum doesn't exist, return `max1`.
+- Otherwise, return `max3`.
+
+### Complexity
+
+- Time Complexity: O(n)
+- Space Complexity: O(1)
+
+Key concept: Maintain the top three distinct maximum elements in a single traversal without sorting.
+*/
+
+
+class Solution {
+public:
+    int thirdMax(vector<int>& nums) {
+
+        // Store the largest, second largest and third largest
+        // distinct numbers.
+        long long max1 = LLONG_MIN;
+        long long max2 = LLONG_MIN;
+        long long max3 = LLONG_MIN;
+
+        // Traverse the array
+        for (int num : nums) {
+
+            // Ignore duplicate elements
+            if (num == max1 || num == max2 || num == max3) {
+                continue;
+            }
+
+            // If current number is greater than the largest
+            if (num > max1) {
+
+                // Shift previous largest to second largest
+                max3 = max2;
+
+                // Shift previous second largest to third largest
+                max2 = max1;
+
+                // Update largest
+                max1 = num;
+            }
+
+            // If current number is greater than second largest
+            else if (num > max2) {
+
+                // Previous second largest becomes third largest
+                max3 = max2;
+
+                // Update second largest
+                max2 = num;
+            }
+
+            // If current number is greater than third largest
+            else if (num > max3) {
+
+                // Update third largest
+                max3 = num;
+            }
+        }
+
+        // If fewer than 3 distinct numbers exist,
+        // return the largest number
+        if (max3 == LLONG_MIN) {
+            return max1;
+        }
+
+        // Otherwise return the third largest distinct number
+        return max3;
+    }
+};
