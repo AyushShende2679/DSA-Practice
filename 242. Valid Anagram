@@ -1,0 +1,80 @@
+/* Logic:
+
+1. First, check whether both strings have equal lengths. If not, return `false`.
+2. Create a frequency array of size 26 and initialize all elements to `0`.
+3. Traverse both strings simultaneously:
+   - Increment the frequency of each character in `s`.
+   - Decrement the frequency of each character in `t`.
+   - Use `character - 'a'` to get the array index.
+4. Traverse the frequency array:
+   - If any element is non-zero, return `false`.
+   - Otherwise, continue.
+5. If all 26 frequencies are zero, return `true` because both strings contain exactly the same characters with the same frequencies.
+
+
+### Complexity
+
+- Time: O(n)
+- Space: O(1)
+
+Core idea: Every character must occur the same number of times in both strings.
+*/
+
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+
+        // If lengths are different, they cannot be anagrams
+        if (s.size() != t.size())
+            return false;
+
+        // Frequency array for 26 lowercase English letters
+        int freq[26] = {0};
+
+        // Count characters in s and subtract characters in t
+        for (int i = 0; i < s.size(); i++) {
+
+            // Increment frequency of character in s
+            freq[s[i] - 'a']++;
+
+            // Decrement frequency of character in t
+            freq[t[i] - 'a']--;
+        }
+
+        // Check whether all character frequencies are balanced
+        for (int i = 0; i < 26; i++) {
+
+            // If any frequency is non-zero, strings are not anagrams
+            if (freq[i] != 0)
+                return false;
+        }
+
+        // All frequencies are zero, so strings are anagrams
+        return true;
+    }
+};
+
+
+/*
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+        if (s.size() != t.size())
+            return false;
+
+        int n = s.size();
+        unordered_map<char, int> mp;
+
+        for (auto i : s)
+            mp[i]++;
+
+        for (int i = 0; i < n; i++) {
+            if (mp.find(t[i]) == mp.end()) {
+                return false;
+            }
+            mp[t[i]]--;
+        }
+        return true;
+    }
+};
+*/
