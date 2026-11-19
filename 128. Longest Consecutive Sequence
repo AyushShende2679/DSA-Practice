@@ -1,0 +1,56 @@
+/* Logic:
+
+1. Create an `unordered_set` and insert all elements of the array into it. This removes duplicate elements and allows fast searching.
+2. Initialize `longest = 0` to store the maximum length of the consecutive sequence.
+3. Traverse the unordered\_set instead of the original array so that duplicate elements are not processed repeatedly.
+4. For every element `x`, check whether its previous element (`x - 1`) exists in the set.
+   - If it exists, skip the element because it is not the starting point of a sequence.
+   - If it does not exist, `x` is the starting point of a new consecutive sequence.
+5. Initialize `count = 1` and `currVal = x`.
+6. Check whether the next consecutive element (`currVal + 1`) exists in the set.
+   - If it exists, increment `currVal` and `count`.
+   - Continue until the next consecutive element is not found.
+7. Update the maximum length using `longest = max(longest, count)`.
+8. After checking all unique elements, return `longest`.
+
+
+### Complexity Analysis
+
+- Time Complexity: O(n) average – each unique element is processed efficiently, and each sequence is traversed only once.
+- Space Complexity: O(n) – for storing elements in the unordered set.
+
+Key interview takeaway: Iterate over unique elements and start counting only when the previous element does not exist.
+This avoids duplicate processing and unnecessary repeated traversal.
+*/
+
+
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+
+        unordered_set<int> st(nums.begin(), nums.end());
+
+        int longest = 0;
+
+        // Iterate over unique elements only
+        for (int x : st) {
+
+            // Check if x is the starting element
+            if (st.find(x - 1) == st.end()) {
+
+                int count = 1;
+                int currVal = x;
+
+                // Count consecutive elements
+                while (st.find(currVal + 1) != st.end()) {
+                    currVal++;
+                    count++;
+                }
+
+                longest = max(longest, count);
+            }
+        }
+
+        return longest;
+    }
+};
