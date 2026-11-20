@@ -1,0 +1,72 @@
+/* Logic:
+
+We are given an array containing numbers from `0` to `n`, but one number is missing.
+
+- First, calculate the size of the array and initialize a variable `ans = 0`.
+- XOR all numbers from `0` to `n` because this represents the complete range of numbers that should be present.
+- Then XOR every element of the given array with the same variable `ans`.
+- XOR has an important property: when two identical numbers are XORed, they cancel each other and give `0` (`a ^ a = 0`).
+- Since all numbers except the missing number are present in both the complete range and the array, they cancel each other.
+- The missing number has no matching pair, so it remains in `ans`.
+- Finally, return `ans`, which is the missing number.
+
+Example:
+
+text
+
+```text
+Array = [3, 0, 1]
+Range = [0, 1, 2, 3]
+
+After XOR cancellation:
+0 ^ 0 ^ 1 ^ 1 ^ 3 ^ 3 ^ 2
+
+All pairs cancel, leaving 2.
+
+Answer = 2
+```
+*/
+
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+
+        // Get the size of the array
+        int n = nums.size();
+
+        // Initialize answer with 0
+        int ans = 0;
+
+        // XOR all numbers from 0 to n
+        // This represents the complete range of numbers
+        for(int i = 0; i <= n; i++) {
+            ans ^= i;
+        }
+
+        // XOR all elements present in the array
+        // Common numbers will cancel each other
+        for(int num : nums) {
+            ans ^= num;
+        }
+
+        // Only the missing number remains
+        return ans;
+    }
+};
+
+/*
+class Solution {
+public:
+    int missingNumber(vector<int>& nums) {
+        int n = nums.size();
+        unordered_map<int,int> mp;
+
+        for(int i: nums) mp[i]++;
+
+        for(int i = 0; i<= n ;i++){
+            if(mp.find(i) == mp.end() ) return i;
+        }
+        return -1;
+    }
+};
+*/
