@@ -1,0 +1,70 @@
+/* Logic: 
+
+1. Initialize two pointers:
+
+- `low = 0`
+- `high = n - 1`
+
+2. Run a `while (low <= high)` loop until the search space becomes empty.
+
+3. Calculate the middle index:
+
+- `mid = low + (high - low) / 2`
+
+4. Compare `nums[mid]` with the target:
+
+- If `nums[mid] < target`, search the right half by updating `low = mid + 1`.
+- If `nums[mid] > target`, search the left half by updating `high = mid - 1`.
+- If both are equal, return `mid`.
+
+5. If the target is not found, return `low` because it represents the correct insertion position.
+
+### Key concept to remember
+
+Why return `low`?
+
+When binary search ends, `low` points to the position where the target should be inserted to maintain sorted order.
+
+Complexity:
+
+- Time: O(log n)
+- Space: O(1)
+*/
+
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        int n = nums.size();
+
+        // Initialize binary search boundaries
+        int low = 0, high = n - 1;
+
+        // Continue searching while the search space is valid
+        while (low <= high) {
+
+            // Calculate middle index (avoids integer overflow)
+            int mid = low + (high - low) / 2;
+
+            // If middle element is smaller than target,
+            // search in the right half
+            if (nums[mid] < target) {
+                low = mid + 1;
+            }
+
+            // If middle element is greater than target,
+            // search in the left half
+            else if (nums[mid] > target) {
+                high = mid - 1;
+            }
+
+            // If target is found, return its index
+            else {
+                return mid;
+            }
+        }
+
+        // If target is not found, low represents
+        // the correct insertion position
+        return low;
+    }
+};
