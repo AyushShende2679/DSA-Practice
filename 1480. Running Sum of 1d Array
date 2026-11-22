@@ -1,0 +1,66 @@
+/* Logic:
+
+1. First, calculate the size of the given array.
+2. Create a new array `sumArray` to store the running sum.
+3. Initialize the first element of `sumArray` with the first element of `nums`.
+4. Traverse the array from index `1` to `n-1`.
+5. For each index, add the current element of `nums` to the previous running sum.
+6. Store the calculated value in `sumArray[i]`.
+7. Finally, return `sumArray`.
+
+Complexity:
+
+- Time Complexity: O(n)
+- Space Complexity: O(n)
+*/
+
+class Solution {
+public:
+    vector<int> runningSum(vector<int>& nums) {
+
+        // Get the size of the input array
+        int n = nums.size();
+
+        // Create a new array to store the running sum
+        vector<int> sumArray(n);
+
+        // The first element remains the same
+        sumArray[0] = nums[0];
+
+        // Calculate the running sum from index 1 to n-1
+        for (int i = 1; i < n; i++) {
+
+            // Add the current element to the previous running sum
+            sumArray[i] = sumArray[i - 1] + nums[i];
+        }
+
+        // Return the final running sum array
+        return sumArray;
+    }
+};
+
+/*  Logic:
+
+1. Start traversing the array from index `1`, since the first element is already its own running sum.
+2. For each index `i`, add the previous element's running sum (`nums[i-1]`) to the current element (`nums[i]`).
+3. Update `nums[i]` with the calculated sum.
+4. Continue until the last element of the array.
+5. Finally, return the modified `nums` array.
+
+### Complexity Analysis
+
+- Time Complexity: O(n) – Single traversal of the array.
+- Auxiliary Space Complexity: O(1) – No extra array is created; the original array is modified.
+*/
+
+/*
+class Solution {
+public:
+    vector<int> runningSum(vector<int>& nums) {
+        for (int i = 1; i < nums.size(); i++) {
+            nums[i] += nums[i - 1];
+        }
+        return nums;
+    }
+};
+*/
