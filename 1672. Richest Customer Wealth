@@ -1,0 +1,52 @@
+/* Logic:
+
+1. First, find the number of rows (`m`) and columns (`n`) in the 2D array.
+2. Initialize `maxWealth = 0` to store the maximum wealth.
+3. Use an outer `for` loop to visit each customer's account.
+4. Initialize `sum = 0` for every customer.
+5. Use an inner `for` loop to calculate the total money in all banks for the current customer.
+6. After calculating the total wealth, compare it with `maxWealth`.
+7. If the current customer's wealth is greater, update `maxWealth`.
+8. Repeat until all customers' accounts are checked.
+9. Finally, return `maxWealth`.
+
+### Complexity
+
+- Time: O(m × n)
+- Space: O(1)
+
+Key concept: Nested loops + Row Sum + Maximum Value.
+*/
+
+class Solution {
+public:
+    int maximumWealth(vector<vector<int>>& accounts) {
+
+        // Get the number of customers (rows)
+        int m = accounts.size();
+
+        // Get the number of banks (columns)
+        int n = accounts[0].size();
+
+        // Store the maximum wealth found so far
+        int maxWealth = 0;
+
+        // Traverse each customer's account
+        for (int row = 0; row < m; row++) {
+
+            // Calculate the current customer's total wealth
+            int sum = 0;
+
+            // Add money from all banks for this customer
+            for (int col = 0; col < n; col++) {
+                sum += accounts[row][col];
+            }
+
+            // Update maximum wealth if current wealth is greater
+            maxWealth = max(maxWealth, sum);
+        }
+
+        // Return the richest customer's total wealth
+        return maxWealth;
+    }
+};
