@@ -1,0 +1,31 @@
+/* Logic: 
+1. Initially, count is 0 because we haven't found any 1s yet.
+
+2. Keep checking whether n is greater than 0. If it is, continue the loop.
+
+3. Increase count by 1 because we are going to remove one set bit (1).
+
+4. Use n AND (n - 1) to remove the rightmost set bit (1) from n.
+
+5. Repeat the same process until all the set bits are removed and n becomes 0.
+
+6. Once n becomes 0, the loop stops, and we return count, which gives us the total number of 1s in the binary representation.
+
+Remember: In every iteration, we remove exactly one 1 and increase the count by 1.
+*/
+
+class Solution {
+public:
+    int hammingWeight(int n) {
+        int count = 0; // Stores the number of set bits (1s)
+
+        while (n > 0) { // Continue until all set bits are removed
+            count++;    // Increment count for each set bit
+
+            // Removes the rightmost set bit (1) from n
+            n = n & (n - 1);
+        }
+
+        return count; // Return the total number of set bits
+    }
+};
