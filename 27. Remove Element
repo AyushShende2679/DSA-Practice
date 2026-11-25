@@ -1,0 +1,48 @@
+/* Logic:
+
+1. Initialize `count = 0` to keep track of the position where the next valid element should be placed.
+
+2. Traverse the array using a `for` loop.
+
+3. Check whether the current element is not equal to `val`.
+
+4. If the element is not equal to `val`, copy it to `nums[count]`.
+
+5. Increment `count` after storing the valid element.
+
+6. Continue until all elements are traversed.
+
+7. Finally, return `count`, which represents the number of elements remaining after removing `val`.
+
+Approach: Two Pointer Technique.
+
+Time Complexity: O(n)
+
+Space Complexity: O(1)
+*/
+
+class Solution {
+public:
+    int removeElement(vector<int>& nums, int val) {
+
+        int count = 0; // Tracks the position where the next valid element will
+                       // be stored
+
+        // Traverse through the entire array
+        for (int i = 0; i < nums.size(); i++) {
+
+            // Check if the current element is not equal to val
+            if (nums[i] != val) {
+
+                // Move the valid element to the count position
+                nums[count] = nums[i];
+
+                // Increment count after storing the element
+                count++;
+            }
+        }
+
+        // Return the number of elements remaining
+        return count;
+    }
+};
