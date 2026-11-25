@@ -1,0 +1,28 @@
+/* Logic:
+
+- Initialize a variable `ans = 0`.
+- Traverse the entire array using a loop.
+- Perform XOR (`^`) of each element with `ans`.
+- Since XOR of two same numbers is `0`, all duplicate elements cancel each other out.
+- XOR with `0` leaves the number unchanged.
+- Finally, the remaining value in `ans` is the element that appears only once.
+
+Time Complexity: O(n)
+
+Space Complexity: O(1)
+*/
+
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int ans = 0;  // Initialize answer with 0
+
+        // Traverse through each element in the array
+        for(int val : nums) {
+            ans = ans ^ val;  // XOR cancels out duplicate numbers
+        }
+
+        return ans;  // Return the number that appears only once
+    }
+};
