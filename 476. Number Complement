@@ -1,0 +1,57 @@
+/* Logic:
+
+1. Convert the given number into its binary representation.
+2. We need to flip all bits, but only the bits present in the binary representation.
+3. Create a `mask` containing all 1s with the same number of bits as `num`.
+4. To create the mask:
+   - Left shift `mask` by 1.
+   - Use OR with 1 to add a 1 at the end.
+   - Right shift `temp` by 1 to process the next bit.
+5. Repeat until `temp` becomes 0.
+6. Finally, perform `num ^ mask`.
+7. XOR with 1 flips each bit, giving us the complement.
+
+Example:
+
+text
+
+```text
+num  = 5  →  101
+mask = 7  →  111
+
+  101
+^ 111
+-----
+  010
+
+Answer = 2
+```
+
+Time Complexity: O(log n)
+Space Complexity: O(1)
+
+*/
+
+class Solution {
+public:
+    int findComplement(int num) {
+
+        int mask = 0;       // To create a mask of all 1s
+        int temp = num;     // Copy num so original remains unchanged
+
+        // Create a mask having the same number of bits as num
+        while (temp) {
+
+            // Shift mask left by 1 and add 1 at the end
+            mask = (mask << 1) | 1;
+
+            // Remove the last bit of temp
+            // This helps us count the number of bits
+            temp = temp >> 1;
+        }
+
+        // XOR with 1 flips every bit
+        // So we get the complement of num
+        return num ^ mask;
+    }
+};
