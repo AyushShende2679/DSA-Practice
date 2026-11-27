@@ -1,0 +1,72 @@
+/* Logic:
+
+1. First, check whether the size of the original array is equal to `m * n`. If not, return an empty 2D array because conversion is not possible.
+
+2. Create a 2D vector with `m` rows and `n` columns.
+
+3. Traverse the original 1D array using a loop from index `0` to `original.size() - 1`.
+
+4. For each element, calculate its position in the 2D array:
+
+- Row: `i / n` (integer division).
+- Column: `i % n` (remainder).
+
+5. Place the current element at `arr[row][col]`.
+
+6. After inserting all elements, return the 2D array.
+
+Key concept: Integer division determines the row, while the modulo operator determines the column.
+ This allows us to convert a 1D array into a 2D array without using nested loops.
+*/
+
+class Solution {
+public:
+    vector<vector<int>> construct2DArray(vector<int>& original, int m, int n) {
+
+        // Check if the total number of elements matches m * n
+        // If not, constructing the 2D array is impossible
+        if (original.size() != m * n)
+            return {};
+
+        // Initialize a 2D vector with m rows and n columns
+        vector<vector<int>> arr(m, vector<int>(n));
+
+        // Traverse every element of the original 1D array
+        for (int i = 0; i < original.size(); i++) {
+
+            // Calculate the row index using integer division
+            int row = i / n;
+
+            // Calculate the column index using modulo
+            int col = i % n;
+
+            // Place the current element at its corresponding position
+            arr[row][col] = original[i];
+        }
+
+        // Return the constructed 2D array
+        return arr;
+    }
+};
+
+
+/*
+class Solution {
+public:
+    vector<vector<int>> construct2DArray(vector<int>& original, int m, int n) {
+        if (original.size() != m * n)
+            return {};
+
+        vector<vector<int>> arr(m, vector<int>(n));
+        int idx = 0;
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                arr[i][j] = original[idx];
+                idx++;
+            }
+        }
+        return arr;
+    }
+};
+*/
