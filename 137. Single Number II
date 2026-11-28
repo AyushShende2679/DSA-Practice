@@ -1,0 +1,86 @@
+/* Logic:
+
+We use two variables:
+
+- `ones` → Stores bits that have appeared once.
+- `twos` → Stores bits that have appeared twice.
+
+Logic:
+
+1. When a number comes, XOR it with `ones` to update bits appearing once.
+2. Use `& ~twos` to remove bits that have already appeared twice.
+3. XOR the number with `twos` to update bits appearing twice.
+4. Use `& ~ones` to remove bits that have already appeared once.
+5. When a bit appears for the third time, it gets removed from both `ones` and `twos`.
+6. Finally, `ones` contains the unique number.
+
+cpp
+
+```cpp
+ones = (ones ^ nums[i]) & ~twos;
+twos = (twos ^ nums[i]) & ~ones;
+
+return ones;
+```
+
+Remember: `ones` → 1 occurrence, `twos` → 2 occurrences, third occurrence → reset to 0.
+
+Core idea: Every bit is counted modulo 3, so bits appearing three times cancel out, leaving only the unique number.
+
+*/
+
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+
+        // ones stores bits that have appeared once
+        // twos stores bits that have appeared twice
+        int ones = 0, twos = 0;
+
+        for (int i = 0; i < nums.size(); i++) {
+
+            // Add current number to ones using XOR
+            // Remove bits that are already present in twos
+            ones = (ones ^ nums[i]) & ~twos;
+
+            // Add current number to twos using XOR
+            // Remove bits that are now present in ones
+            twos = (twos ^ nums[i]) & ~ones;
+        }
+
+        // Bits appearing three times are removed
+        // Only the unique number remains in ones
+        return ones;
+    }
+};
+
+/*class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int n = nums.size();
+        sort(nums.begin(), nums.end());
+
+        for (int i = 0; i < n - 2; i = i + 3) {
+            if (nums[i] != nums[i + 1])
+                return nums[i];
+        }
+        return nums[n - 1];
+    }
+};
+*/
+/* 
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        unordered_map<int, int> mp;
+
+        for (auto i : nums)
+            mp[i]++;
+
+        for (auto it: mp) {
+            if(it.second == 1) return it.first;
+        }
+        return 0;
+    }
+};
+*/
